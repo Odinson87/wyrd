@@ -9,6 +9,9 @@ module.exports = {
 		bundle: ['./src/main.js']
 	},
 	resolve: {
+		alias: {
+			svelte: path.resolve('node_modules', 'svelte/src/runtime') // Svelte 3: path.resolve('node_modules', 'svelte')
+		},
 		extensions: ['.mjs', '.js', '.svelte'],
 		conditionNames: ['svelte']
 	},
@@ -56,5 +59,6 @@ module.exports = {
 		},
 		compress: true,
 		port: 9000,
+		hot: true
 	}
 };
