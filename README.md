@@ -8,8 +8,9 @@ This is a [Svelte](https://svelte.technology) app that accompanies a blog post o
 
 ```bash
 npm install
+npm run build
 npm run dev
 ```
 
-Navigate to [localhost:8080](http://localhost:8080). You should see your app running. Edit a component file in `src`, save it, and the page should reload with your changes.
+Navigate to [localhost:9000](http://localhost:9000). You should see your app running. Edit a component file in `src`, save it, and the page should reload with your changes.
 
