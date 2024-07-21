@@ -2,6 +2,7 @@
   import { createEventDispatcher } from 'svelte'
   import { fade } from 'svelte/transition'
   import { debounce } from 'lodash'
+  import { TypesEnum } from './lib/enums'
 
   const dispatch = createEventDispatcher()
 
@@ -53,12 +54,23 @@
 </style>
 
 <li transition:fade>
-  {#if todo.complete}
+  <header>
+    {#if todo.complete}
     <input class='is-complete' value={todo.text} disabled />
     <button on:click={toggleStatus}>❌</button>
-  {:else}
+    {:else}
     <input type='text' on:keyup={debouncedUpdateText} bind:value={todo.text}>
     <button on:click={toggleStatus}>✔️</button>
-  {/if}
-  <button on:click={remove}>💥</button>
+    {/if}
+    <button on:click={remove}>💥</button>
+  </header>
+  <section>
+    <label for="activity-type">Type :</label>
+    <select bind:value={todo.type} name="activity-type">
+        {#each Object.entries(TypesEnum) as [key, type]}
+            {console.log(type)}
+            <option value={type.type}>{type.name}</option>
+        {/each}
+    </select>
+  </section>
 </li>
