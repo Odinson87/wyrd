@@ -2,8 +2,9 @@
   import { createEventDispatcher } from 'svelte'
   import { fade } from 'svelte/transition'
   import { debounce } from 'lodash'
-  import { TypesEnum } from './lib/enums'
+  import { TypesEnum, DurationEnum } from './lib/enums'
   import SaveIcon from './lib/icons/save.svelte'
+  import EditIcon from './lib/icons/edit.svelte'
 
   const dispatch = createEventDispatcher()
 
@@ -14,8 +15,13 @@
   function save() {
     dispatch('update', {todo: doc})
   }
-  // We don’t want to clobber the local DB, so we debounce saving on every keystroke
-  const debouncedSave = debounce(save, 500)
+  // only save once, debouncing multiple clicks, reducing revisions
+  const debouncedSave = debounce(save, 1000)
+
+  function toggleMode(mode) {
+    console.log(mode);
+    viewmode = viewmode === mode ? 'list' : mode;
+  }
 
   function toggleStatus() {
     dispatch('update', {
@@ -26,7 +32,8 @@
     })
   }
 
-  export let doc
+  export let doc;
+  export let viewmode = 'list';
 </script>
 
 <style>
@@ -39,10 +46,10 @@
   input[type="text"] {
     width: 440px;
   }
-  input[disabled] {
+/*  input[disabled] {
     background: none;
     border: 1px solid #0000;
-  }
+  }*/
   button {
     border-radius: 50%;
     width: 2.25em;
@@ -54,27 +61,44 @@
   }
 </style>
 
-<li transition:fade>
-  <header>
-    {#if doc.complete}
-        <input class='is-complete' value={doc.text} disabled />
-        <button on:click={toggleStatus}>❌</button>
-    {:else}
-        <input type='text' bind:value={doc.text}>
-        <button on:click={toggleStatus}>✔️</button>
-    {/if}
-    <button on:click={debouncedSave}>
-        <SaveIcon/>
-    </button>
-    <button on:click={remove}>💥</button>
-</header>
-  <section>
-    <label for="activity-type">Type :</label>
-    <select bind:value={doc.type} name="activity-type">
-        {#each Object.entries(TypesEnum) as [_, type]}
-            {console.log(type)}
-            <option value={type.type}>{type.name}</option>
-        {/each}
-    </select>
-  </section>
+<li transition:fade data-viewmode={viewmode}>
+    <header>
+        {#if doc.complete}
+            <h3 class='is-complete'>{doc.name}</h3>
+            <button on:click={toggleStatus}>❌</button>
+        {:else}
+            <h3>{doc.name}</h3>
+            <button on:click={toggleStatus}>✔️</button>
+        {/if}
+        <button on:click={debouncedSave}>
+            <SaveIcon/>
+        </button>
+        <button on:click={()=> toggleMode('edit')}>
+            <EditIcon/>
+        </button>
+        <button on:click={remove}>💥</button>
+    </header>
+    <section class="edit">
+        <div class="input-group">
+            <label for=activity-name>Name :</label>
+            <input name="activity-name" type='text' bind:value={doc.name}>
+        </div>
+        <div class="input-group">
+            <label for="activity-type">Type :</label>
+            <select bind:value={doc.type} name="activity-type">
+                {#each Object.entries(TypesEnum) as [_, type]}
+                    <option value={type.type}>{type.name}</option>
+                {/each}
+            </select>
+        </div>
+        <div class="input-group">
+            <label for="activity-duration">Duration :</label>
+            <select bind:value={doc.durationType} name="activity-duration">
+                {#each Object.entries(DurationEnum) as [_, duration]}
+                    <option value={duration.name}>{duration.name}</option>
+                {/each}
+            </select>
+            <input type="number" bind:value={doc.durationIncrement} name="activity-duration">
+        </div>
+    </section>
 </li>

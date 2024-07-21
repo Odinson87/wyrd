@@ -62,3 +62,12 @@ button:active {
 button:focus {
 	border-color: #666;
 }
+
+[data-viewmode="list"] section.edit{
+	display:none;
+}
+
+[data-viewmode="edit"] section.edit{
+	display:block;
+}
+

@@ -11,9 +11,9 @@ export const GroupsEnum = Object.freeze({
 });
 
 export const DurationEnum = Object.freeze({
-    Second: { name: "Second", secomds: 1 },
-    Minute: { name: "Minute", seconds: 60 },
-    Hour: { name: "Hour", seconds: 3600 }
+    Second: { name: "Seconds", seconds: 1 },
+    Minute: { name: "Minutes", seconds: 60 },
+    Hour: { name: "Hours", seconds: 3600 }
 });
 
 
