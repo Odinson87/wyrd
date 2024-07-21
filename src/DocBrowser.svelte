@@ -45,7 +45,7 @@
     }
   
     // Event handlers for adding, updating and removing todos
-    async function add(event) {
+    async function addDoc(event) {
       const activity = {
         text: newItemText,
         complete: false,
@@ -130,7 +130,7 @@
     {/each}
   </ul>
   
-  <form on:submit|preventDefault={add}>
+  <form on:submit|preventDefault={addDoc}>
     <input type='text' bind:value={newItemText}>
     <button type='submit'>➕ Add new task</button>
   </form>
