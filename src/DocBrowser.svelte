@@ -126,7 +126,7 @@
   
   <ul>
     {#each sortedAndFilteredItems as todo (todo._id)}
-      <Activity todo={todo} on:remove={removeDoc} on:update={updateDoc}/>
+      <Activity doc={todo} on:remove={removeDoc} on:update={updateDoc}/>
     {/each}
   </ul>
   

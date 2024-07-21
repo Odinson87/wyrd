@@ -8,11 +8,11 @@
   const dispatch = createEventDispatcher()
 
   function remove() {
-    dispatch('remove', {todo})
+    dispatch('remove', {todo: doc})
   }
 
   function save() {
-    dispatch('update', {todo})
+    dispatch('update', {todo: doc})
   }
   // We don’t want to clobber the local DB, so we debounce saving on every keystroke
   const debouncedSave = debounce(save, 500)
@@ -20,13 +20,13 @@
   function toggleStatus() {
     dispatch('update', {
       todo: {
-        ...todo,
-        complete: !todo.complete
+        ...doc,
+        complete: !doc.complete
       }
     })
   }
 
-  export let todo
+  export let doc
 </script>
 
 <style>
@@ -56,11 +56,11 @@
 
 <li transition:fade>
   <header>
-    {#if todo.complete}
-        <input class='is-complete' value={todo.text} disabled />
+    {#if doc.complete}
+        <input class='is-complete' value={doc.text} disabled />
         <button on:click={toggleStatus}>❌</button>
     {:else}
-        <input type='text' bind:value={todo.text}>
+        <input type='text' bind:value={doc.text}>
         <button on:click={toggleStatus}>✔️</button>
     {/if}
     <button on:click={debouncedSave}>
@@ -70,7 +70,7 @@
 </header>
   <section>
     <label for="activity-type">Type :</label>
-    <select bind:value={todo.type} name="activity-type">
+    <select bind:value={doc.type} name="activity-type">
         {#each Object.entries(TypesEnum) as [_, type]}
             {console.log(type)}
             <option value={type.type}>{type.name}</option>
