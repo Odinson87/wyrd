@@ -1,5 +1,5 @@
 <script>
-  import Search from './Search.svelte';
+  import DocBrowser from './DocBrowser.svelte';
 </script>
 
-<Search/>
+<DocBrowser/>

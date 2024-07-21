@@ -25,8 +25,8 @@
     let filterByWhat = ''
     let isLoading = true
     // All the todos directly from the PouchDB. Sorting and filtering comes later
-    export let todos = []
-    $: sortedAndFilteredItems = sortBy(todos, [sortByWhat]).filter((todo) => {
+    export let items = []
+    $: sortedAndFilteredItems = sortBy(items, [sortByWhat]).filter((todo) => {
       const [filterKey, filterValue] = filterByWhat.split(':')
       // Only filter if there’s a proper filter set
       return filterKey && filterValue ? todo[filterKey].toString() === filterValue : true
@@ -40,7 +40,7 @@
       const allDocs = await db.allDocs({
         include_docs: true
       })
-      todos = allDocs.rows.map(row => row.doc)
+      items = allDocs.rows.map(row => row.doc)
       isLoading = false
     }
   
@@ -72,7 +72,7 @@
       if (removal.ok) {
         // For removal, we can just update the local state instead of reloading everything from PouchDB,
         // since we no longer care about the doc’s revision.
-        todos = todos.filter((todo) => {
+        items = items.filter((todo) => {
           return todo._id !== todoToRemove._id
           })
       }
@@ -103,7 +103,7 @@
     </h1>
   {:else}
       <h1>
-        {sortedAndFilteredItems.length} Activities ({todos.length})
+        {sortedAndFilteredItems.length} Activities ({items.length})
       </h1>
   {/if}
   
