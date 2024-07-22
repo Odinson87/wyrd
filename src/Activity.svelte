@@ -9,6 +9,10 @@
 
   const dispatch = createEventDispatcher()
 
+  function add(){
+    dispatch('add',{todo: doc})
+  }
+
   function remove() {
     dispatch('remove', {todo: doc})
   }
@@ -16,8 +20,9 @@
   function save() {
     dispatch('update', {todo: doc})
   }
-  // only save once, debouncing multiple clicks, reducing revisions
+  // only fire once, debouncing multiple clicks, reducing revisions
   const debouncedSave = debounce(save, 1000)
+  const debouncedAdd = debounce(add, 1000)
 
   function toggleMode(mode) {
     console.log(mode);
@@ -38,50 +43,28 @@
 </script>
 
 <style>
-    li { 
-        padding: 5px;
-        margin: 5px 0;
-        border: 1px solid #ccc;
-        border-radius: 4px;
-    }
     header {
         display: flex;
         justify-content: space-between;
         width: 100%;
     }
+    header :nth-child(2) {
+        flex-grow: 1;
+        text-align: center;
+    }
     .is-complete {
         text-decoration: line-through;
         color: green;
     }
-
-    button {
-        margin-bottom: 0;
-        line-height: 1.5em;
-        padding:0;
-    }
-    button.icon {
-        border-radius: 50%;
-        width: 2.75em;
-        height: 2.75em;
-        line-height: 1.5em;
-        text-align: center;
-    }
-    button.done {
-        border-radius: 50%;
-        width: 2.75em;
-        height: 2.75em;
-    }
-    button.title {
-        height: 2.75em;
-        background-color: transparent;
-        border-width: 0px;
-    }
 </style>
 
-<li transition:fade data-viewmode={viewmode}>
+<article 
+    transition:fade
+    data-viewmode={viewmode}
+>
     <header>
         <div>
-            <button class="done" on:click={toggleStatus}>
+            <button class="icon list-btn" on:click={toggleStatus}>
                <TargetIcon/> 
             </button>
         </div>
@@ -89,12 +72,15 @@
             <button class={ doc.complete ? 'is-complete title' : 'title'} on:click={()=> toggleMode('edit')}>
                 {doc.name}
             </button >
-        </div>
-        <div>
-            <button class="icon" on:click={debouncedSave}>
+            <button class="icon add-btn" on:click={debouncedAdd}>
                 <SaveIcon/>
             </button>
-            <button class="icon" on:click={remove}>
+        </div>
+        <div>
+            <button class="icon edit-btn" on:click={debouncedSave}>
+                <SaveIcon/>
+            </button>
+            <button class="icon edit-btn" on:click={remove}>
                 <BinIcon/>
             </button>
         </div>
@@ -116,10 +102,10 @@
             <label for="activity-duration">Duration :</label>
             <select bind:value={doc.durationType} name="activity-duration">
                 {#each Object.entries(DurationEnum) as [_, duration]}
-                    <option value={duration.name}>{duration.name}</option>
+                    <option value={duration.key}>{duration.name}</option>
                 {/each}
             </select>
-            <input type="number" bind:value={doc.durationIncrement} name="activity-duration">
+            <input type="number" bind:value={doc.durationIncrement} name="activity-duration-inc">
         </div>
     </section>
-</li>
+</article>

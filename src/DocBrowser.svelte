@@ -3,7 +3,9 @@
     import { sortBy } from 'lodash'
     import PouchDB from 'pouchdb-browser'
   
+    import ActivityDoc from './lib/ActivityDoc'
     import Activity from './Activity.svelte'
+    import AddIcon from './lib/icons/plus.svelte'
   
     // Set up local PouchDB and continuous replication to remote CouchDB
     let db = new PouchDB('db')
@@ -20,10 +22,12 @@
   */
   
     // Set up our vars and defaults
-    let newItemText = ''
+    let newDoc = new ActivityDoc
     let sortByWhat = 'createdAt'
     let filterByWhat = ''
     let isLoading = true
+    let addNewItem = false
+
     // All the todos directly from the PouchDB. Sorting and filtering comes later
     export let items = []
     $: sortedAndFilteredItems = sortBy(items, [sortByWhat]).filter((todo) => {
@@ -46,16 +50,16 @@
   
     // Event handlers for adding, updating and removing todos
     async function addDoc(event) {
-      const activity = {
-        text: newItemText,
-        complete: false,
-        createdAt: new Date().toISOString()
-      }
-      const addition = await db.post(activity)
-      if (addition.ok) {
-        await updateItems()
-      }
-      newItemText = ''
+        const { todo: activity} = event.detail;
+        activity.complete = false; 
+        activity.createdAt = new Date().toISOString()
+
+        const addition = await db.post(activity)
+        if (addition.ok) {
+            await updateItems()
+        }
+        newDoc = new ActivityDoc;
+        addNewItem = false;
     }
   
     async function updateDoc(event) {
@@ -82,63 +86,66 @@
     onMount(async () => {
       await updateItems()
     })
-  </script>
+
+    // New Item
+    function toggleNewItem(){
+        addNewItem = !addNewItem;
+    }
+</script>
   
-  <style>
+<style>
     ul {
       display: flex;
       flex-flow: column nowrap;
-      max-width: 320px;
       margin: 10px 0;
       padding: 0;
       list-style: none;
     }
-    button {
-      margin-left: 0.75em;
-    }
-    input[type='text'] {
-      width: 440px;
-    }
-  </style>
-  
-  {#if isLoading}
+</style>
+
+<main>  
+{#if isLoading}
     <h1>
-      Loading your todos…
+        Loading your todos…
     </h1>
-  {:else}
-      <h1>
+{:else}
+    <h1>
         {sortedAndFilteredItems.length} Activities ({items.length})
-      </h1>
-  {/if}
-  
-  <section>  
-    <div>
-      <label for="sort-item">Sort by :</label>
-      <select name="sort-item" bind:value={sortByWhat}>
-        <option value='createdAt'>Time</option>
-        <option value='text'>Name</option>
-        <option value='complete'>Completion</option>
-      </select>
-    </div>
-    <div>
-      <label for="filter-item">Filter :</label>
-      <select name="filter-item" bind:value={filterByWhat}>
-        <option value=''>Show all todos</option>
-        <option value='complete:true'>Show completed todos</option>
-        <option value='complete:false'>Show open todos</option>
-      </select>
-    </div>
-  </section>
-  <section>
-    <ul>
-      {#each sortedAndFilteredItems as todo (todo._id)}
-      <Activity doc={todo} on:remove={removeDoc} on:update={updateDoc}/>
-      {/each}
-    </ul>
-  </section>
-  
-  <form on:submit|preventDefault={addDoc}>
-    <input type='text' bind:value={newItemText}>
-    <button type='submit'>➕ Add new task</button>
-  </form>
-  
+    </h1>
+{/if}
+{#if items.length > 0}    
+    <section>  
+        <div>
+            <label for="sort-item">Sort by :</label>
+            <select name="sort-item" bind:value={sortByWhat}>
+            <option value='createdAt'>Time</option>
+            <option value='text'>Name</option>
+            <option value='complete'>Completion</option>
+            </select>
+        </div>
+        <div>
+            <label for="filter-item">Filter :</label>
+            <select name="filter-item" bind:value={filterByWhat}>
+            <option value=''>Show all todos</option>
+            <option value='complete:true'>Show completed todos</option>
+            <option value='complete:false'>Show open todos</option>
+            </select>
+        </div>
+    </section>
+    <section>
+        <ul>
+            {#each sortedAndFilteredItems as todo (todo._id)}
+            <li>
+                <Activity doc={todo} on:remove={removeDoc} on:update={updateDoc}/>
+            </li>
+            {/each}
+        </ul>
+    </section>
+{/if}
+    <section>
+        <button class="icon addItem" on:click={toggleNewItem}>
+            <AddIcon/>
+        </button>
+        <Activity doc={newDoc} viewmode={addNewItem ? 'add' : 'hidden'} on:add={addDoc}/>
+    </section>
+</main>
