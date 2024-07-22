@@ -34,6 +34,7 @@
     });
     dispatch('update', {todo: doc})
   }
+  
   // only fire once, debouncing multiple clicks, reducing revisions
   const debouncedSave = debounce(save, 1000)
   const debouncedAdd = debounce(add, 1000)
@@ -51,6 +52,8 @@
       }
     })
   }
+
+  $: duration = doc.durationIncrement + doc.durationType;
 
   export let doc;
   export let viewmode = 'list';
@@ -70,6 +73,23 @@
         text-decoration: line-through;
         color: green;
     }
+    .since {
+        position:relative;
+        width: 45px;
+        height: 45px;
+        border-radius: 50%;
+        border: solid 1px #ccc;
+        text-align: center;
+    }
+    .since p {
+        position: absolute;
+        font-size: 0.6em;
+        text-align: center;
+        line-height: 1em;
+        width:100%;
+    }
+    .since p:first-child { top: -5px;}
+    .since p:last-child { bottom: -5px;}
 </style>
 
 <article 
@@ -91,6 +111,10 @@
             </button>
         </div>
         <div>
+            <div class="since">
+                <p>N ago</p>
+                <p>{duration}</p>
+            </div>
             <button class="icon edit-btn" on:click={debouncedSave}>
                 <SaveIcon/>
             </button>

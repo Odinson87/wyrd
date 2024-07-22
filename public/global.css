@@ -114,20 +114,24 @@ button.title {
 [data-viewmode="list"] header button.add-btn,
 [data-viewmode="list"] header button.edit-btn,
 [data-viewmode="edit"] header button.add-btn,
+[data-viewmode="edit"] header .since,
 [data-viewmode="select"] section.edit,
 [data-viewmode="add"] header button.title,
 [data-viewmode="add"] header button.list-btn,
-[data-viewmode="add"] header button.edit-btn
+[data-viewmode="add"] header button.edit-btn,
+[data-viewmode="add"] header .since
 {
 	display:none;
 }
 
+[data-viewmode="list"] header .since,
 [data-viewmode="add"] section.edit,
 [data-viewmode="edit"] section.edit {
 	display:block;
 }
 
-[data-viewmode="edit"] header button.edit-btn {
+[data-viewmode="edit"] header button.edit-btn
+{
 	display:inline-block;
 }
 
