@@ -4,7 +4,8 @@
   import { debounce } from 'lodash'
   import { TypesEnum, DurationEnum } from './lib/enums'
   import SaveIcon from './lib/icons/save.svelte'
-  import EditIcon from './lib/icons/edit.svelte'
+  import BinIcon from './lib/icons/bin.svelte'
+  import TargetIcon from './lib/icons/target.svelte'
 
   const dispatch = createEventDispatcher()
 
@@ -37,46 +38,66 @@
 </script>
 
 <style>
-  .is-complete {
-    text-decoration: line-through;
-    color: green;
-    width: 440px;
-    display: inline-block;
-  }
-  input[type="text"] {
-    width: 440px;
-  }
-/*  input[disabled] {
-    background: none;
-    border: 1px solid #0000;
-  }*/
-  button {
-    border-radius: 50%;
-    width: 2.25em;
-    height: 2.25em;
-    line-height: 1.3em;
-    text-align: center;
-    margin-left: 0.75em;
-    padding: 0;
-  }
+    li { 
+        padding: 5px;
+        margin: 5px 0;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+    }
+    header {
+        display: flex;
+        justify-content: space-between;
+        width: 100%;
+    }
+    .is-complete {
+        text-decoration: line-through;
+        color: green;
+    }
+
+    button {
+        margin-bottom: 0;
+        line-height: 1.5em;
+        padding:0;
+    }
+    button.icon {
+        border-radius: 50%;
+        width: 2.75em;
+        height: 2.75em;
+        line-height: 1.5em;
+        text-align: center;
+    }
+    button.done {
+        border-radius: 50%;
+        width: 2.75em;
+        height: 2.75em;
+    }
+    button.title {
+        height: 2.75em;
+        background-color: transparent;
+        border-width: 0px;
+    }
 </style>
 
 <li transition:fade data-viewmode={viewmode}>
     <header>
-        {#if doc.complete}
-            <h3 class='is-complete'>{doc.name}</h3>
-            <button on:click={toggleStatus}>❌</button>
-        {:else}
-            <h3>{doc.name}</h3>
-            <button on:click={toggleStatus}>✔️</button>
-        {/if}
-        <button on:click={debouncedSave}>
-            <SaveIcon/>
-        </button>
-        <button on:click={()=> toggleMode('edit')}>
-            <EditIcon/>
-        </button>
-        <button on:click={remove}>💥</button>
+        <div>
+            <button class="done" on:click={toggleStatus}>
+               <TargetIcon/> 
+            </button>
+        </div>
+        <div>
+            <button class={ doc.complete ? 'is-complete title' : 'title'} on:click={()=> toggleMode('edit')}>
+                {doc.name}
+            </button >
+        </div>
+        <div>
+            <button class="icon" on:click={debouncedSave}>
+                <SaveIcon/>
+            </button>
+            <button class="icon" on:click={remove}>
+                <BinIcon/>
+            </button>
+        </div>
     </header>
     <section class="edit">
         <div class="input-group">

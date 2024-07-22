@@ -86,8 +86,12 @@
   
   <style>
     ul {
-      list-style: none;
+      display: flex;
+      flex-flow: column nowrap;
+      max-width: 320px;
+      margin: 10px 0;
       padding: 0;
+      list-style: none;
     }
     button {
       margin-left: 0.75em;
@@ -107,28 +111,31 @@
       </h1>
   {/if}
   
-  <div>
-    <label for="sort-item">Sort by :</label>
-    <select name="sort-item" bind:value={sortByWhat}>
-      <option value='createdAt'>Time</option>
-      <option value='text'>Name</option>
-      <option value='complete'>Completion</option>
-    </select>
-  </div>
-  <div>
-    <label for="filter-item">Filter :</label>
-    <select name="filter-item" bind:value={filterByWhat}>
-      <option value=''>Show all todos</option>
-      <option value='complete:true'>Show completed todos</option>
-      <option value='complete:false'>Show open todos</option>
-    </select>
-  </div>
-  
-  <ul>
-    {#each sortedAndFilteredItems as todo (todo._id)}
+  <section>  
+    <div>
+      <label for="sort-item">Sort by :</label>
+      <select name="sort-item" bind:value={sortByWhat}>
+        <option value='createdAt'>Time</option>
+        <option value='text'>Name</option>
+        <option value='complete'>Completion</option>
+      </select>
+    </div>
+    <div>
+      <label for="filter-item">Filter :</label>
+      <select name="filter-item" bind:value={filterByWhat}>
+        <option value=''>Show all todos</option>
+        <option value='complete:true'>Show completed todos</option>
+        <option value='complete:false'>Show open todos</option>
+      </select>
+    </div>
+  </section>
+  <section>
+    <ul>
+      {#each sortedAndFilteredItems as todo (todo._id)}
       <Activity doc={todo} on:remove={removeDoc} on:update={updateDoc}/>
-    {/each}
-  </ul>
+      {/each}
+    </ul>
+  </section>
   
   <form on:submit|preventDefault={addDoc}>
     <input type='text' bind:value={newItemText}>
