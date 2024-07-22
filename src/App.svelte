@@ -1,5 +1,10 @@
 <script>
-  import DocBrowser from './DocBrowser.svelte';
+    import DocBrowser from './DocBrowser.svelte';
+    import Toasts from './Toasts.svelte';
 </script>
 
-<DocBrowser/>
+<Toasts/>
+
+<main>
+    <DocBrowser/>
+</main>

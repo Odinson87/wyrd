@@ -1,5 +1,5 @@
 <script>
-    import { onMount } from 'svelte'
+    import { onMount, getContext } from 'svelte'
     import { sortBy } from 'lodash'
     import PouchDB from 'pouchdb-browser'
   
@@ -7,6 +7,8 @@
     import Activity from './Activity.svelte'
     import AddIcon from './lib/icons/plus.svelte'
   
+
+    let notifications = getContext('app');
     // Set up local PouchDB and continuous replication to remote CouchDB
     let db = new PouchDB('db')
   
@@ -103,7 +105,6 @@
     }
 </style>
 
-<main>  
 {#if isLoading}
     <h1>
         Loading your todos…
@@ -113,6 +114,14 @@
         {sortedAndFilteredItems.length} Activities ({items.length})
     </h1>
 {/if}
+
+<button class="icon addItem" on:click={toggleNewItem}>
+    <AddIcon/>
+</button>
+    <section>
+        <Activity doc={newDoc} viewmode={addNewItem ? 'add' : 'hidden'} on:add={addDoc}/>
+    </section>
+
 {#if items.length > 0}    
     <section>  
         <div>
@@ -142,10 +151,3 @@
         </ul>
     </section>
 {/if}
-    <section>
-        <button class="icon addItem" on:click={toggleNewItem}>
-            <AddIcon/>
-        </button>
-        <Activity doc={newDoc} viewmode={addNewItem ? 'add' : 'hidden'} on:add={addDoc}/>
-    </section>
-</main>

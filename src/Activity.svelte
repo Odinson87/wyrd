@@ -2,7 +2,9 @@
   import { createEventDispatcher } from 'svelte'
   import { fade } from 'svelte/transition'
   import { debounce } from 'lodash'
+
   import { TypesEnum, DurationEnum } from './lib/enums'
+  import { addToast } from "./lib/store";
   import SaveIcon from './lib/icons/save.svelte'
   import BinIcon from './lib/icons/bin.svelte'
   import TargetIcon from './lib/icons/target.svelte'
@@ -10,14 +12,26 @@
   const dispatch = createEventDispatcher()
 
   function add(){
+    addToast({
+        message: 'Created Activity "' + doc.name + '"',
+        timeout: 3000 
+    });
     dispatch('add',{todo: doc})
   }
 
   function remove() {
-    dispatch('remove', {todo: doc})
-  }
-
+    addToast({
+        message: 'Deleted "' + doc.name + '" ',
+        timeout: 3000 
+    });
+      dispatch('remove', {todo: doc})
+    }
+    
   function save() {
+    addToast({
+        message: 'Updated "' + doc.name + '" ',
+        timeout: 3000 
+    });
     dispatch('update', {todo: doc})
   }
   // only fire once, debouncing multiple clicks, reducing revisions
