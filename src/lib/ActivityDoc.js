@@ -8,6 +8,7 @@ class ActivityDoc {
         this.recur = false;
         this.recurrence = null;
         this.occuredAt = null;
+        this.occurences= 0;
         this.tags = [];
         this.suggestedIds = [];
         this.keepHistory = {

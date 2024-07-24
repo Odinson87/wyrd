@@ -8,6 +8,8 @@
   import SaveIcon from './lib/icons/save.svelte'
   import BinIcon from './lib/icons/bin.svelte'
   import TargetIcon from './lib/icons/target.svelte'
+  import NumberInput from './lib/input/Number.svelte';
+  import CheckboxInput from './lib/input/Checkbox.svelte';
 
   const dispatch = createEventDispatcher()
 
@@ -90,6 +92,7 @@
     }
     .since p:first-child { top: -5px;}
     .since p:last-child { bottom: -5px;}
+   
 </style>
 
 <article 
@@ -143,7 +146,17 @@
                     <option value={duration.key}>{duration.name}</option>
                 {/each}
             </select>
-            <input type="number" bind:value={doc.durationIncrement} name="activity-duration-inc">
+            <NumberInput val={doc.durationIncrement} name="activity-duration-inc"/>
+        </div>
+        <div class="input-group">
+            <NumberInput val={doc.occurrences} label="Ocurrences" name="activity-ocurrences"/>
+        </div>
+        <div class="input-group">
+            <label for=activity-ocurrences>OcurredAt :</label>
+            <input name="activity-ocurredAt" type='date' bind:value={doc.ocurrredAt}>
+        </div>
+        <div class="input-group">
+            <CheckboxInput val={doc.recur} label="recur"/>
         </div>
     </section>
 </article>
