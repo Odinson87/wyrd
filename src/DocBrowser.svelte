@@ -10,7 +10,7 @@
 
     let notifications = getContext('app');
     // Set up local PouchDB and continuous replication to remote CouchDB
-    let db = new PouchDB('db')
+    let db = new PouchDB('db', {revs_limit: 1, auto_compaction: true})
   
   /*
     const replication = PouchDB.sync('db', 'http://localhost:5984/svelte-todo-db', {
