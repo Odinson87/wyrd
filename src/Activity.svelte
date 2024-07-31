@@ -9,7 +9,8 @@
   import BinIcon from './lib/icons/bin.svelte'
   import TargetIcon from './lib/icons/target.svelte'
   import NumberInput from './lib/input/Number.svelte';
-  import CheckboxInput from './lib/input/Checkbox.svelte';
+  import Recurrence from './lib/input/Recurrence.svelte';
+  import RecurrencePattern from './lib/RecurrencePattern';
 
   const dispatch = createEventDispatcher()
 
@@ -55,7 +56,7 @@
     })
   }
 
-  $: duration = doc.durationIncrement + doc.durationType;
+  $: durationStr = doc.durationIncrement + doc.durationType;
 
   export let doc;
   export let viewmode = 'list';
@@ -116,7 +117,7 @@
         <div>
             <div class="since">
                 <p>N ago</p>
-                <p>{duration}</p>
+                <p>{durationStr}</p>
             </div>
             <button class="icon edit-btn" on:click={debouncedSave}>
                 <SaveIcon/>
@@ -155,8 +156,6 @@
             <label for=activity-ocurrences>OcurredAt :</label>
             <input name="activity-ocurredAt" type='date' bind:value={doc.ocurrredAt}>
         </div>
-        <div class="input-group">
-            <CheckboxInput val={doc.recur} label="recur"/>
-        </div>
+        <Recurrence recur={doc.recur} recurrence={doc.recurrence ?? new RecurrencePattern}/>
     </section>
 </article>

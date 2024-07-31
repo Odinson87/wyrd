@@ -10,6 +10,7 @@ class ActivityDoc {
         this.occuredAt = null;
         this.occurences= 0;
         this.tags = [];
+        this.ignore = true;
         this.suggestedIds = [];
         this.keepHistory = {
             'occuredAt': false
