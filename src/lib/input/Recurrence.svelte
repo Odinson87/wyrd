@@ -9,35 +9,44 @@
     export let recur;
     export let recurrence;
 
-    let selectedDays = {
-        0: false,
-        1: false,
-        2: false,
-        3: false,
-        4: false,
-        5: false,
-        6: false,
+    $: {
+        updateRecurrence(recur)
+    }
+
+    function updateRecurrence(recur) {
+        if (!recur) {
+            recurrence = {};
+        } else if (Object.hasOwn(recurrence, 'byday')){
+            recurrence = recurrence;
+        } else {
+            recurrence = new RecurrencePattern;
+        }
     }
     
 </script>
 
 <div class="input-group">
-    <CheckboxInput val={recur} label="recur"/>
-    <NumberInput val={recurrence.interval} name="activity-recurrence-interval" label='Every'/>
-    <select bind:value={recurrence.freq} name="activity-reucurrence-freq">
-        {#each RecurrenceEnumerables.freq as fStr, i}
-            <option value={fStr}>{fStr}</option>
-        {/each}
-    </select>
-    <div class="weekdays">
-        {#each RecurrenceEnumerables.byday as DayStr2Chr, i}
-            <DayCheckboxInput 
-                val={selectedDays[i]}
-                name="activity-recurrence-byday"
-                group='byday'
-                label={DayStr2Chr.substring(0,1)}/>
-        {/each}
-    </div>
+    <CheckboxInput bind:val={recur} label="recur"/>
+    {#if recur == true}
+        <NumberInput bind:val={recurrence.interval} name="activity-recurrence-interval" label='Every'/>
+        <select bind:value={recurrence.freq} name="activity-recurrence-freq">
+            {#each RecurrenceEnumerables.freq as fStr, i}
+                <option value={fStr}>{fStr}</option>
+            {/each}
+        </select>
+
+        {#if recurrence.freq == RecurrenceEnumerables.freq[1]}
+            <div class="weekdays">
+                {#each RecurrenceEnumerables.byday as DayStr2Chr, i}
+                    <DayCheckboxInput 
+                        val={DayStr2Chr}
+                        bind:group={recurrence.byday}
+                        name="activity-recurrence-byday"
+                        label={DayStr2Chr.substring(0,1)}/>
+                {/each}
+            </div>
+        {/if}
+    {/if}
 </div>
 
 

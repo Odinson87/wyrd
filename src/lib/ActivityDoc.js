@@ -6,9 +6,9 @@ class ActivityDoc {
         this.durationType = 'm';
         this.durationIncrement = 10;
         this.recur = false;
-        this.recurrence = null;
-        this.occuredAt = null;
-        this.occurences= 0;
+        this.recurrence = {};
+        this.occurredAt = null;
+        this.occurrences= 0;
         this.tags = [];
         this.ignore = true;
         this.suggestedIds = [];

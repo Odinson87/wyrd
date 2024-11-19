@@ -61,7 +61,7 @@
     {#if typeof(group) !== "undefined" }
     <input type='checkbox' bind:group={selected} bind:checked={val}>
     {:else}
-    <input type='checkbox' bind:checked={val} bind:value={val}>
+    <input type='checkbox' bind:checked={val}>
     {/if}
     <span class="checkmark"></span>
 </label>

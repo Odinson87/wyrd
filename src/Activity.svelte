@@ -19,7 +19,7 @@
         message: 'Created Activity "' + doc.name + '"',
         timeout: 3000 
     });
-    dispatch('add',{todo: doc})
+    dispatch('add', {todo: doc})
   }
 
   function remove() {
@@ -35,9 +35,14 @@
         message: 'Updated "' + doc.name + '" ',
         timeout: 3000 
     });
+    output();
     dispatch('update', {todo: doc})
   }
   
+  function output() {
+    console.log(doc);
+  }
+
   // only fire once, debouncing multiple clicks, reducing revisions
   const debouncedSave = debounce(save, 1000)
   const debouncedAdd = debounce(add, 1000)
@@ -48,12 +53,14 @@
   }
 
   function toggleStatus() {
-    dispatch('update', {
-      todo: {
-        ...doc,
-        complete: !doc.complete
-      }
-    })
+      
+    if (!doc.recur) {
+        doc.complete = !doc.complete
+    } else {
+        doc.occurrences++;
+    }
+    doc.occurredAt = (new Date()).toISOString().substr(0, 19);
+    save();
   }
 
   $: durationStr = doc.durationIncrement + doc.durationType;
@@ -147,15 +154,15 @@
                     <option value={duration.key}>{duration.name}</option>
                 {/each}
             </select>
-            <NumberInput val={doc.durationIncrement} name="activity-duration-inc"/>
+            <NumberInput bind:val={doc.durationIncrement} name="activity-duration-inc"/>
         </div>
         <div class="input-group">
-            <NumberInput val={doc.occurrences} label="Ocurrences" name="activity-ocurrences"/>
+            <NumberInput bind:val={doc.occurrences} label="Ocurrences" name="activity-ocurrences"/>
         </div>
         <div class="input-group">
-            <label for=activity-ocurrences>OcurredAt :</label>
-            <input name="activity-ocurredAt" type='date' bind:value={doc.ocurrredAt}>
+            <label for=activity-ocurrences>OccurredAt :</label>
+            <input name="activity-occurredAt" type='datetime-local' bind:value={doc.occurredAt}>
         </div>
-        <Recurrence recur={doc.recur} recurrence={doc.recurrence ?? new RecurrencePattern}/>
+        <Recurrence bind:recur={doc.recur} bind:recurrence={doc.recurrence}/>
     </section>
 </article>

@@ -1,8 +1,30 @@
 <script>
-    export let val = false;
+    export let val;
     export let label;
+    export let checked;
     export let group;
-    let selected = []
+
+    $: updateCheckbox(group)
+	$: updateGroup(checked)
+
+    function updateCheckbox(group) {
+		checked = group.indexOf(val) >= 0
+	}
+	
+	function updateGroup(checked) {
+		const index = group.indexOf(val)
+		if (checked) {
+			if (index < 0) {
+				group.push(val)
+				group = group
+			}
+		} else {
+			if (index >= 0) {
+				group.splice(index, 1)
+				group = group
+			}
+		}
+	}
 </script>
 
 <style>
@@ -43,6 +65,6 @@
 </style>
 
 <label>
-    <input type='checkbox' checkgroup={group} bind:group={selected} bind:checked={val} bind:value={val}>
+    <input type='checkbox' bind:checked={checked} bind:value={val}>
     <span class="checkmark">{label}</span>
 </label>

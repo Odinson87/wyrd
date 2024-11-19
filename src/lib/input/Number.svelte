@@ -1,7 +1,22 @@
 <script>
+    import { addToast } from "../store";
+
     export let val = 0;
     export let name;
     export let label;
+
+    function increment() {
+        val++;
+        console.log(val)
+    }
+
+    function decrement() {
+        if (val > 0) {
+            val--;
+        }
+        console.log(val)
+    }
+
 </script>
 
 <style>
@@ -21,8 +36,8 @@
 </style>
 
 {#if typeof(label) !== "undefined" }
-<label for={name}>{label} :</label>
+<label for={name}>{label}:</label>
 {/if}
-<button class="leftArrow" on:click={ () => val !== 0 ? val-- : null }> - </button>
+<button class="leftArrow" on:click={ () => decrement() }> - </button>
 <input name={name} type='number' bind:value={val}>
-<button class="rightArrow" on:click={ () => val++ }> + </button>
+<button class="rightArrow" on:click={ () => increment() }> + </button>
