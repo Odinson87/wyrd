@@ -1,20 +1,34 @@
 <script>
-    import { addToast } from "../store";
 
-    export let val = 0;
+    export let min = 0;
+    export let max;
+    export let val;
     export let name;
     export let label;
 
-    function increment() {
-        val++;
-        console.log(val)
-    }
 
-    function decrement() {
-        if (val > 0) {
-            val--;
+    function increment() {
+        if(!val){
+            val = min;
+        } else {
+            if (max) {
+                if (val < max) {
+                    val++;
+                }
+            } else {
+                val ++
+            }
         }
-        console.log(val)
+    }
+    
+    function decrement() {
+        if (!val){
+            val = min;
+        } else {
+            if (val > min) {
+                val--;
+            }
+        }
     }
 
 </script>
@@ -39,5 +53,5 @@
 <label for={name}>{label}:</label>
 {/if}
 <button class="leftArrow" on:click={ () => decrement() }> - </button>
-<input name={name} type='number' bind:value={val}>
+<input min={min} name={name} type='number' bind:value={val}>
 <button class="rightArrow" on:click={ () => increment() }> + </button>

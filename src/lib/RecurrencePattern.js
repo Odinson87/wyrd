@@ -9,7 +9,7 @@ class RecurrencePattern {
         this.dtstart = (new Date()).toISOString();
         this.dtend = null;
         this.freq = RecurrenceEnumerables.freq[0];
-        this.interval = 0;
+        this.interval;
         this.byday = [];
     }
 }
