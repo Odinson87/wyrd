@@ -2,6 +2,7 @@
   import { createEventDispatcher } from 'svelte'
   import { fade } from 'svelte/transition'
   import { debounce } from 'lodash'
+  import { since } from './lib/time.js';
 
   import { TypesEnum, DurationEnum } from './lib/enums'
   import { addToast } from "./lib/store";
@@ -10,7 +11,6 @@
   import TargetIcon from './lib/icons/target.svelte'
   import NumberInput from './lib/input/Number.svelte';
   import Recurrence from './lib/input/Recurrence.svelte';
-  import RecurrencePattern from './lib/RecurrencePattern';
 
   const dispatch = createEventDispatcher()
 
@@ -65,6 +65,7 @@
   }
 
   $: durationStr = doc.durationIncrement + doc.durationType;
+  $: agoStr = since(doc.occurredAt);
 
   export let doc;
   export let viewmode = 'list';
@@ -101,6 +102,9 @@
     }
     .since p:first-child { top: -5px;}
     .since p:last-child { bottom: -5px;}
+    [name="activity-occurred-at"] {
+        font-size: 15px;
+    }
    
 </style>
 
@@ -124,7 +128,9 @@
         </div>
         <div>
             <div class="since">
-                <p>N ago</p>
+                {#if doc.occurredAt}
+                <p>{agoStr} ago</p>
+                {/if}
                 <p>{durationStr}</p>
             </div>
             <button class="icon edit-btn" on:click={debouncedSave}>
@@ -160,7 +166,7 @@
 
         <div class="input-group">
             <label for=activity-ocurrences>OccurredAt :</label>
-            <input name="activity-occurredAt" type='datetime-local' bind:value={doc.occurredAt}>
+            <input name="activity-occurred-at" type='datetime-local' bind:value={doc.occurredAt}>
             {#if doc.recur}
             <div class="input-group">
                 <NumberInput bind:val={doc.occurrences} label="Ocurrences" name="activity-ocurrences"/>

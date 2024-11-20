@@ -11,10 +11,10 @@ export const GroupsEnum = Object.freeze({
 });
 
 export const DurationEnum = Object.freeze({
-    s: { key: "s", name: "Seconds", seconds: 1 },
-    m: { key: "m", name: "Minutes", seconds: 60 },
+    d: { key: "d", name: "Days", seconds: 86400 },
     h: { key: "h", name: "Hours", seconds: 3600 },
-    d: { key: "d", name: "Days", seconds: 86400 }
+    m: { key: "m", name: "Minutes", seconds: 60 },
+    s: { key: "s", name: "Seconds", seconds: 1 }
 });
 
 export const RecurrenceEnumerables = Object.freeze({
