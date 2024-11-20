@@ -52,11 +52,12 @@
     viewmode = viewmode === mode ? 'list' : mode;
   }
 
-  function toggleStatus() {
+  function ocurred() {
       
     if (!doc.recur) {
         doc.complete = !doc.complete
     } else {
+        doc.complete = false
         doc.occurrences++;
     }
     doc.occurredAt = (new Date()).toISOString().substr(0, 19);
@@ -109,7 +110,7 @@
 >
     <header>
         <div>
-            <button class="icon list-btn" on:click={toggleStatus}>
+            <button class="icon list-btn" on:click={ocurred}>
                <TargetIcon/> 
             </button>
         </div>
@@ -156,13 +157,17 @@
             </select>
             <NumberInput bind:val={doc.durationIncrement} name="activity-duration-inc"/>
         </div>
-        <div class="input-group">
-            <NumberInput bind:val={doc.occurrences} label="Ocurrences" name="activity-ocurrences"/>
-        </div>
+
         <div class="input-group">
             <label for=activity-ocurrences>OccurredAt :</label>
             <input name="activity-occurredAt" type='datetime-local' bind:value={doc.occurredAt}>
+            {#if doc.recur}
+            <div class="input-group">
+                <NumberInput bind:val={doc.occurrences} label="Ocurrences" name="activity-ocurrences"/>
+            </div>
+            {/if}
         </div>
-        <Recurrence bind:recur={doc.recur} bind:recurrence={doc.recurrence}/>
+
+        <Recurrence bind:doc={doc}/>
     </section>
 </article>
