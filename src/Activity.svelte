@@ -2,7 +2,7 @@
   import { createEventDispatcher } from 'svelte'
   import { fade } from 'svelte/transition'
   import { debounce } from 'lodash'
-  import { since } from './lib/time.js';
+  import { ago } from './lib/time.js';
 
   import { TypesEnum, DurationEnum } from './lib/enums'
   import { addToast } from "./lib/store";
@@ -65,7 +65,7 @@
   }
 
   $: durationStr = doc.durationIncrement + doc.durationType;
-  $: agoStr = since(doc.occurredAt);
+  $: agoStr = ago(doc.occurredAt);
 
   export let doc;
   export let viewmode = 'list';
@@ -100,8 +100,8 @@
         line-height: 1em;
         width:100%;
     }
-    .since p:first-child { top: -5px;}
-    .since p:last-child { bottom: -5px;}
+    .since p:first-child { top: -8px;}
+    .since p:last-child { bottom: -8px;}
     [name="activity-occurred-at"] {
         font-size: 15px;
     }
@@ -128,9 +128,11 @@
         </div>
         <div>
             <div class="since">
-                {#if doc.occurredAt}
-                <p>{agoStr} ago</p>
-                {/if}
+                <p>
+                    {#if doc.occurredAt && (doc.complete || doc.recur)}
+                        {agoStr}
+                    {/if}
+                </p>
                 <p>{durationStr}</p>
             </div>
             <button class="icon edit-btn" on:click={debouncedSave}>
@@ -165,14 +167,22 @@
         </div>
 
         <div class="input-group">
-            <label for=activity-ocurrences>OccurredAt :</label>
+            <label for=activity-occurred-at>OccurredAt :</label>
             <input name="activity-occurred-at" type='datetime-local' bind:value={doc.occurredAt}>
-            {#if doc.recur}
-            <div class="input-group">
-                <NumberInput bind:val={doc.occurrences} label="Ocurrences" name="activity-ocurrences"/>
-            </div>
-            {/if}
         </div>
+
+        {#if doc.occurredAt && (doc.complete || doc.recur)}
+            <div class="input-group">
+                <label for=activity-occurred-at>Occurred :</label>
+                <p>{agoStr}</p>
+            </div>
+        {/if}
+
+        {#if doc.recur}
+        <div class="input-group">
+            <NumberInput bind:val={doc.occurrences} label="Ocurrences" name="activity-ocurrences"/>
+        </div>
+        {/if}
 
         <Recurrence bind:doc={doc}/>
     </section>

@@ -31,7 +31,7 @@ main {
 section { margin-top: 10px; min-width:320px}
 
 article { 
-	padding: 5px;
+	padding: 7px;
 	margin: 5px 0;
 	border: 1px solid #ccc;
 	border-radius: 4px;
@@ -56,6 +56,11 @@ label {
   text-transform: uppercase;
   font-size: 0.75rem;
   font-weight: bold;
+}
+
+label + p {
+	display:inline-block;
+	height: 35px;
 }
 
 input, button, select, textarea {
@@ -106,7 +111,7 @@ button.title {
 	background-color: transparent;
 	border-width: 0px;
 	width:100%;
-	max-width: 170px;
+	max-width: 168px;
 }
 
 [data-viewmode="hidden"],
