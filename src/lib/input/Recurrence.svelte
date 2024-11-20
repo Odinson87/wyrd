@@ -6,41 +6,40 @@
     import DayCheckboxInput from './DayCheckbox.svelte';
     import NumberInput from './Number.svelte';
 
-    export let recur;
-    export let recurrence;
+    export let doc;
 
     $: {
-        updateRecurrence(recur)
+        updateRecurrence(doc.recur)
     }
 
     function updateRecurrence(recur) {
         if (!recur) {
-            recurrence = {};
-        } else if (Object.hasOwn(recurrence, 'byday')){
-            recurrence = recurrence;
-        } else {
-            recurrence = new RecurrencePattern;
+            // remove recurrence data
+            doc.recurrence = {};
+        } else if (!Object.hasOwn(doc.recurrence, 'byday')){
+            // add new oject when existing pattern doesn't exist
+            doc.recurrence = new RecurrencePattern;
         }
     }
     
 </script>
 
 <div class="input-group">
-    <CheckboxInput bind:val={recur} label="recur"/>
-    {#if recur == true}
-        <NumberInput bind:val={recurrence.interval} name="activity-recurrence-interval" label='Every'/>
-        <select bind:value={recurrence.freq} name="activity-recurrence-freq">
+    <CheckboxInput bind:val={doc.recur} label="recur"/>
+    {#if doc.recur == true}
+        <NumberInput min=1 bind:val={doc.recurrence.interval} name="activity-recurrence-interval" label='Every'/>
+        <select bind:value={doc.recurrence.freq} name="activity-recurrence-freq">
             {#each RecurrenceEnumerables.freq as fStr, i}
                 <option value={fStr}>{fStr}</option>
             {/each}
         </select>
 
-        {#if recurrence.freq == RecurrenceEnumerables.freq[1]}
+        {#if doc.recurrence.freq == RecurrenceEnumerables.freq[1]}
             <div class="weekdays">
                 {#each RecurrenceEnumerables.byday as DayStr2Chr, i}
                     <DayCheckboxInput 
                         val={DayStr2Chr}
-                        bind:group={recurrence.byday}
+                        bind:group={doc.recurrence.byday}
                         name="activity-recurrence-byday"
                         label={DayStr2Chr.substring(0,1)}/>
                 {/each}
