@@ -2,6 +2,7 @@
     import { onMount, getContext } from 'svelte'
     import { sortBy } from 'lodash'
     import { GroupsEnum, TypesEnum } from './lib/enums'
+    import Filters from './lib/filters'
     import PouchDB from 'pouchdb-browser'
   
     import ActivityDoc from './lib/ActivityDoc'
@@ -27,7 +28,7 @@
     // Set up
     let newDoc = new ActivityDoc
     let sortByWhat = 'createdAt'
-    let filterByWhat = ''
+    let completedFilter = ''
     let isLoading = true
     let addNewItem = false
     let tags = Object.keys(GroupsEnum)
@@ -38,27 +39,13 @@
     // All the todos directly from the PouchDB. Sorting and filtering comes later
     export let items = []
     $: sortedAndFilteredItems = sortBy(items, [sortByWhat]).filter((todo) => {
-      const [filterKey, filterValue] = filterByWhat.split(':')
 
-      // Only filter if there’s a proper filter set
-      if ((filterKey && filterKey ==='all') || (filterKey && filterValue)) {
-          let filterBy = (filterKey ==='all') || todo[filterKey].toString() === filterValue;
-          let isActivityType = true;
-          let hasTags = true;
-
-          if(selectedActivityTypes.length > 0) {
-              selectedActivityTypes.forEach((t) => {
-                  isActivityType = selectedActivityTypes.indexOf(todo['type']) > -1
-              })
-          }
-
-          if(selectedTags.length > 0) {
-              selectedTags.forEach((t) => {
-                  hasTags = todo['tags'].indexOf(t) > -1
-              })
-          }
-          return filterBy && isActivityType && hasTags;
+      let filters = new Filters(completedFilter, selectedActivityTypes, selectedTags); 
+      
+      if (filters.hasActiveFilters()) {
+        return filters.matches(todo);
       }
+
       return true;
     })
 
@@ -147,9 +134,9 @@
     <Activity doc={newDoc} viewmode={addNewItem ? 'add' : 'hidden'} on:add={addDoc}/>
 </section>
 
-<Tags bind:tags={activityTypes} bind:selected={selectedActivityTypes}></Tags>
+<Tags id='activityTypes' classes={['tagBar']} selectMax=1 bind:tags={activityTypes} bind:selected={selectedActivityTypes}></Tags>
 
-<Tags bind:tags={tags} bind:selected={selectedTags}></Tags>
+<Tags id='tags' classes={['tagBar']} bind:tags={tags} bind:selected={selectedTags}></Tags>
 
 {#if items.length > 0}    
     <section>  
@@ -162,11 +149,11 @@
             </select>
         </div>
         <div>
-            <label for="filter-item">Filter :</label>
-            <select name="filter-item" bind:value={filterByWhat}>
-            <option value='all'>Show all todos</option>
-            <option value='complete:true'>Show completed todos</option>
-            <option value='complete:false'>Show open todos</option>
+            <label for="filter-item">Show :</label>
+            <select name="filter-item" bind:value={completedFilter}>
+            <option value=''>all</option>
+            <option value='complete'>completed</option>
+            <option value='open'>open</option>
             </select>
         </div>
     </section>
