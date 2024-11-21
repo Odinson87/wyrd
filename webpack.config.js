@@ -3,6 +3,7 @@ const path = require('path');
 
 const mode = process.env.NODE_ENV || 'development';
 const prod = mode === 'production';
+const outputDir = 'docs';
 
 module.exports = {
 	entry: {
@@ -16,7 +17,7 @@ module.exports = {
 		conditionNames: ['svelte']
 	},
 	output: {
-		path: __dirname + '/public',
+		path: __dirname + '/' + outputDir,
 		filename: '[name].js',
 		chunkFilename: '[name].[id].js'
 	},
@@ -55,7 +56,7 @@ module.exports = {
 	devtool: prod ? false: 'source-map',
 	devServer: {
 		static: {
-		    directory: path.join(__dirname, 'public'),
+		    directory: path.join(__dirname, outputDir),
 		},
 		compress: true,
 		port: 9000,
