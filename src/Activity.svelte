@@ -39,20 +39,15 @@
         message: 'Updated "' + doc.name + '" ',
         timeout: 3000 
     });
-    output();
     dispatch('update', {todo: doc})
   }
   
-  function output() {
-    console.log(doc);
-  }
 
   // only fire once, debouncing multiple clicks, reducing revisions
   const debouncedSave = debounce(save, 1000)
   const debouncedAdd = debounce(add, 1000)
 
   function toggleMode(mode) {
-    console.log(mode);
     viewmode = viewmode === mode ? 'list' : mode;
   }
 
