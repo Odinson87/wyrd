@@ -75,6 +75,7 @@
     header {
         display: flex;
         justify-content: space-between;
+        align-items: center;
         width: 100%;
     }
     header :nth-child(2) {
@@ -100,7 +101,12 @@
         line-height: 1em;
         width:100%;
     }
-    .since p:first-child { top: -8px;}
+    .since p:first-child { 
+        top: -8px;
+        width: 130%;
+        margin-left: -6px;
+
+    }
     .since p:last-child { bottom: -8px;}
     [name="activity-occurred-at"] {
         font-size: 15px;
@@ -166,15 +172,14 @@
             <NumberInput bind:val={doc.durationIncrement} name="activity-duration-inc"/>
         </div>
 
-        <div class="input-group">
-            <label for=activity-occurred-at>OccurredAt :</label>
-            <input name="activity-occurred-at" type='datetime-local' bind:value={doc.occurredAt}>
-        </div>
-
         {#if doc.occurredAt && (doc.complete || doc.recur)}
             <div class="input-group">
                 <label for=activity-occurred-at>Occurred :</label>
                 <p>{agoStr}</p>
+            </div>
+            <div class="input-group">
+                <label for=activity-occurred-at>At :</label>
+                <input name="activity-occurred-at" type='datetime-local' bind:value={doc.occurredAt}>
             </div>
         {/if}
 
