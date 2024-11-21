@@ -1,12 +1,13 @@
 <script>
     import { onMount, getContext } from 'svelte'
     import { sortBy } from 'lodash'
+    import { GroupsEnum, TypesEnum } from './lib/enums'
     import PouchDB from 'pouchdb-browser'
   
     import ActivityDoc from './lib/ActivityDoc'
     import Activity from './Activity.svelte'
     import AddIcon from './lib/icons/plus.svelte'
-  
+    import Tags from './lib/Tags.svelte'
 
     let notifications = getContext('app');
     // Set up local PouchDB and continuous replication to remote CouchDB
@@ -23,12 +24,16 @@
     })
   */
   
-    // Set up our vars and defaults
+    // Set up
     let newDoc = new ActivityDoc
     let sortByWhat = 'createdAt'
     let filterByWhat = ''
     let isLoading = true
     let addNewItem = false
+    let tags = Object.keys(GroupsEnum)
+    let selectedTags = [];
+    let activityTypes = Object.keys(TypesEnum)
+    let selectedActivityTypes = [];
 
     // All the todos directly from the PouchDB. Sorting and filtering comes later
     export let items = []
@@ -37,7 +42,7 @@
       // Only filter if there’s a proper filter set
       return filterKey && filterValue ? todo[filterKey].toString() === filterValue : true
     })
-  
+
     // Helper for reloading all todos from the local PouchDB. It’s on-device and has basically zero latency,
     // so we can use it quite liberally instead of keeping our local state up to date like you’d do
     // in a Redux reducer. It also saves us from having to rebuild the local state todos from the data we sent
@@ -118,9 +123,13 @@
 <button class="icon addItem" on:click={toggleNewItem}>
     <AddIcon/>
 </button>
-    <section>
-        <Activity doc={newDoc} viewmode={addNewItem ? 'add' : 'hidden'} on:add={addDoc}/>
-    </section>
+
+<section>
+    <Activity doc={newDoc} viewmode={addNewItem ? 'add' : 'hidden'} on:add={addDoc}/>
+</section>
+
+<Tags bind:tags={tags} bind:select={selectedTags}></Tags>
+<Tags bind:tags={activityTypes} bind:selectedTags={selectedActivityTypes}></Tags>
 
 {#if items.length > 0}    
     <section>  
