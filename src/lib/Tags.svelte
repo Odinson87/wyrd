@@ -1,7 +1,7 @@
 <script>
     import Tag from "./input/Tag.svelte";
 
-    export let id;
+    export let name;
     export let classes = ['tags'];
 	export let tags;
     export let selected = [];
@@ -13,7 +13,7 @@
 <style>
 </style>
 
-<section class='{['tags'].concat(classes).join(' ')}' id={id}>
+<section class='{['tags'].concat(classes).join(' ')}' name={name}>
     {#each tags as tag}
 		<Tag tagName={tag} selectMax={selectMax} bind:group={selected} disabled={disabled}></Tag>
 	{/each}

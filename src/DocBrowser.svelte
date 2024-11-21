@@ -134,9 +134,9 @@
     <Activity doc={newDoc} viewmode={addNewItem ? 'add' : 'hidden'} on:add={addDoc}/>
 </section>
 
-<Tags id='activityTypes' classes={['tagBar']} selectMax=1 bind:tags={activityTypes} bind:selected={selectedActivityTypes}></Tags>
+<Tags name='activityTypes' classes={['tagBar']} selectMax=1 bind:tags={activityTypes} bind:selected={selectedActivityTypes}></Tags>
 
-<Tags id='tags' classes={['tagBar']} bind:tags={tags} bind:selected={selectedTags}></Tags>
+<Tags name='tags' classes={['tagBar']} bind:tags={tags} bind:selected={selectedTags}></Tags>
 
 {#if items.length > 0}    
     <section>  

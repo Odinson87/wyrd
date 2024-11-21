@@ -33,6 +33,9 @@ section { margin-top: 10px; min-width:320px}
 section.tagBar {
 	margin:0;
 }
+section.tagBar[name='activityTypes'] {
+	text-align: center;
+}
 
 article { 
 	padding: 7px;
