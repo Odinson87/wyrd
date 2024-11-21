@@ -32,15 +32,34 @@
     let addNewItem = false
     let tags = Object.keys(GroupsEnum)
     let selectedTags = [];
-    let activityTypes = Object.keys(TypesEnum)
+    let activityTypes = Object.keys(TypesEnum);
     let selectedActivityTypes = [];
 
     // All the todos directly from the PouchDB. Sorting and filtering comes later
     export let items = []
     $: sortedAndFilteredItems = sortBy(items, [sortByWhat]).filter((todo) => {
       const [filterKey, filterValue] = filterByWhat.split(':')
+
       // Only filter if there’s a proper filter set
-      return filterKey && filterValue ? todo[filterKey].toString() === filterValue : true
+      if ((filterKey && filterKey ==='all') || (filterKey && filterValue)) {
+          let filterBy = (filterKey ==='all') || todo[filterKey].toString() === filterValue;
+          let isActivityType = true;
+          let hasTags = true;
+
+          if(selectedActivityTypes.length > 0) {
+              selectedActivityTypes.forEach((t) => {
+                  isActivityType = selectedActivityTypes.indexOf(todo['type']) > -1
+              })
+          }
+
+          if(selectedTags.length > 0) {
+              selectedTags.forEach((t) => {
+                  hasTags = todo['tags'].indexOf(t) > -1
+              })
+          }
+          return filterBy && isActivityType && hasTags;
+      }
+      return true;
     })
 
     // Helper for reloading all todos from the local PouchDB. It’s on-device and has basically zero latency,
@@ -128,8 +147,9 @@
     <Activity doc={newDoc} viewmode={addNewItem ? 'add' : 'hidden'} on:add={addDoc}/>
 </section>
 
-<Tags bind:tags={tags} bind:select={selectedTags}></Tags>
-<Tags bind:tags={activityTypes} bind:selectedTags={selectedActivityTypes}></Tags>
+<Tags bind:tags={activityTypes} bind:selected={selectedActivityTypes}></Tags>
+
+<Tags bind:tags={tags} bind:selected={selectedTags}></Tags>
 
 {#if items.length > 0}    
     <section>  
@@ -144,7 +164,7 @@
         <div>
             <label for="filter-item">Filter :</label>
             <select name="filter-item" bind:value={filterByWhat}>
-            <option value=''>Show all todos</option>
+            <option value='all'>Show all todos</option>
             <option value='complete:true'>Show completed todos</option>
             <option value='complete:false'>Show open todos</option>
             </select>
