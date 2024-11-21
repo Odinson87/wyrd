@@ -1,22 +1,20 @@
 <script>
     import Tag from "./input/Tag.svelte";
 
+    export let id;
+    export let classes = ['tags'];
 	export let tags;
-    export let selected = []
+    export let selected = [];
     export let disabled = false;
+    export let selectMax = 0;
 
-    $: output(selected)
-
-    function output(selected) {
-        console.log(selected);
-    }
 </script>
 
 <style>
 </style>
 
-<section class='tags'>
+<section class='{['tags'].concat(classes).join(' ')}' id={id}>
     {#each tags as tag}
-		<Tag tagName={tag} bind:group={selected} disabled={disabled}></Tag>
+		<Tag tagName={tag} selectMax={selectMax} bind:group={selected} disabled={disabled}></Tag>
 	{/each}
 </section>

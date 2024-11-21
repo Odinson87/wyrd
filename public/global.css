@@ -30,6 +30,10 @@ main {
 
 section { margin-top: 10px; min-width:320px}
 
+section.tagBar {
+	margin:0;
+}
+
 article { 
 	padding: 7px;
 	margin: 5px 0;
