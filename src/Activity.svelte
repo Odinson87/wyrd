@@ -125,7 +125,7 @@
         </div>
         <div>
             <button class={ doc.complete ? 'is-complete title' : 'title'} on:click={()=> toggleMode('edit')}>
-                {doc.name}
+                <strong>{doc.name}</strong>
             </button >
             <button class="icon add-btn" on:click={debouncedAdd}>
                 <SaveIcon/>
