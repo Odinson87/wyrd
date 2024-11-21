@@ -31,6 +31,10 @@
     }
     
   function save() {
+    // reset complete flag for recurring activity
+    if (doc.recur) {
+        doc.complete = false;
+    } 
     addToast({
         message: 'Updated "' + doc.name + '" ',
         timeout: 3000 
