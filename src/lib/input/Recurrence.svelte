@@ -1,6 +1,6 @@
 <script>
     import { onMount } from "svelte";
-    import { RecurrenceEnumerables } from "../enums";
+    import { RecurrenceEnums } from "../enums";
     import RecurrencePattern from '../RecurrencePattern';
     import CheckboxInput from './Checkbox.svelte';
     import DayCheckboxInput from './DayCheckbox.svelte';
@@ -29,14 +29,14 @@
     {#if doc.recur == true}
         <NumberInput min=1 bind:val={doc.recurrence.interval} name="activity-recurrence-interval" label='Every'/>
         <select bind:value={doc.recurrence.freq} name="activity-recurrence-freq">
-            {#each RecurrenceEnumerables.freq as fStr, i}
+            {#each RecurrenceEnums.freq as fStr, i}
                 <option value={fStr}>{fStr}</option>
             {/each}
         </select>
 
-        {#if doc.recurrence.freq == RecurrenceEnumerables.freq[1]}
+        {#if doc.recurrence.freq == RecurrenceEnums.freq[1]}
             <div class="weekdays">
-                {#each RecurrenceEnumerables.byday as DayStr2Chr, i}
+                {#each RecurrenceEnums.byday as DayStr2Chr, i}
                     <DayCheckboxInput 
                         val={DayStr2Chr}
                         bind:group={doc.recurrence.byday}

@@ -17,7 +17,7 @@ export const DurationEnum = Object.freeze({
     s: { key: "s", name: "Seconds", seconds: 1 }
 });
 
-export const RecurrenceEnumerables = Object.freeze({
+export const RecurrenceEnums = Object.freeze({
   freq: ['Days', 'Weeks', 'Months', 'Years'],
   byday: ['SU','MO','TU','WE','TH','FR','SA'],
 });
