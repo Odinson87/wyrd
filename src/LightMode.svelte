@@ -11,9 +11,6 @@
 
 <style>
     button#light-mode {
-        position: absolute;
-        bottom: 0;
-        left: 0;
         border-radius: 50%;
         margin:10px;
     }

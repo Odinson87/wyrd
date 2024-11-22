@@ -12,7 +12,7 @@ img, picture, video, canvas, svg {
 h1 { line-height:2em; }
 
 /* Global */
-html, body{
+html, body, [data-light-mode]{
 	height: 100%;
 	display: flex;
 	flex-direction: column;
@@ -27,20 +27,35 @@ body {
 }
 
 main {
+	z-index:10;
 	padding:1em;
 	display:flex;
 	flex: 1;
 	flex-flow: column nowrap;
 	align-items: center;
 }
+aside {
+	z-index:11;
+}
 
-main[data-light-mode='1'] {
+[data-light-mode='1'] {
 	color:#333;
 }
-main[data-light-mode='0'] {
+[data-light-mode='0'] {
 	color:#eee;
 	background-color: #333;
 }
+
+[data-light-mode='0'] > header,
+[data-light-mode='0'] header > aside {
+	background-color: #444;
+}
+
+[data-light-mode='1'] > header,
+[data-light-mode='1'] > header > aside {
+	background-color: #eee;
+}
+
 
 section { margin-top: 10px; min-width:320px}
 
@@ -92,11 +107,11 @@ label.tag {
 input, button, select, textarea {
 	font-family: inherit;
 	font-size: inherit;
-	padding: 0.4em;
+	padding: 0.3em;
 	margin: 0 0 0.5em 0;
 	box-sizing: border-box;
 	border: 1px solid #ccc;
-	border-radius: 2px;
+	border-radius: 4px;
 }
 input:disabled {
 	color: #ccc;
@@ -105,6 +120,7 @@ input[type="range"] {
 	height: 0;
 }
 input[type="number"] {
+	padding: 0.2em;
 	width:4em;
 }
 
@@ -156,6 +172,7 @@ button.title {
 	display:none;
 }
 
+[data-viewmode="open"]
 [data-viewmode="list"] header .since,
 [data-viewmode="add"] section.edit,
 [data-viewmode="edit"] section.edit {

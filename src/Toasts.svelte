@@ -4,7 +4,7 @@
 </script>
 
 {#if $toasts}
-  <section>
+  <section name='toasts'>
     {#each $toasts as toast (toast.id)}
       <Toast
         type={toast.type}
