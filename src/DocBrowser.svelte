@@ -2,9 +2,10 @@
     import { onMount, getContext } from 'svelte'
     import { sortBy } from 'lodash'
     import { GroupsEnum, TypesEnum } from './lib/enums'
+    import { settings } from './lib/stores'
     import Filters from './lib/filters'
     import PouchDB from 'pouchdb-browser'
-  
+    
     import ActivityDoc from './lib/ActivityDoc'
     import Activity from './Activity.svelte'
     import AddIcon from './lib/icons/plus.svelte'

@@ -1,12 +1,12 @@
 import Tag from './Tag';
 
-export const TypesEnum = Object.freeze({
+export const TypesEnum = {
     Todo: new Tag("Todo", "Todo", "#B18FDD"),
     Activity: new Tag("Activity", "Activity", "#44BBFF"),
     Trigger:  new Tag("Trigger", "Trigger", "#FF6000")
-});
+}
 
-export const GroupsEnum = Object.freeze({
+export const GroupsEnum = {
     Reward: new Tag("Reward", "Activity", "#99EE00"),
     Garden: new Tag("Garden", "Activity", "#BBD686"),
     Project: new Tag("Project", "Activity", "#348aa7"),
@@ -14,7 +14,7 @@ export const GroupsEnum = Object.freeze({
     Shopping: new Tag("Shopping", "Activity", "#C57B57"),
     Health: new Tag("Health", "Activity", "#179889"),
     Distraction: new Tag("Distraction", "Activity", "#FFCA3A")
-});
+}
 
 export const DurationEnum = Object.freeze({
     d: { key: "d", name: "Days", seconds: 86400 },

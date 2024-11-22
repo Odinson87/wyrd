@@ -1,6 +1,8 @@
 import { writable } from "svelte/store";
 import {v4 as uuidv4} from "uuid"
+import Conf from './Conf.js'
 
+// Toasts Store
 export const toasts = writable([]);
 
 export const addToast = (toast) => {
@@ -26,3 +28,16 @@ export const addToast = (toast) => {
 export const dismissToast = (id) => {
   toasts.update((all) => all.filter((t) => t.id !== id));
 };
+
+
+
+// Settings Store in Local Storage
+// Get the value out of storage on load
+// Update & set defaults using Conf
+const stored = new Conf(JSON.parse(localStorage.getItem('settings') ?? '{}'));
+
+// Set the stored value
+export const settings = writable(stored)
+
+// Anytime the store changes, update the local storage value.
+settings.subscribe((value) => localStorage.settings = JSON.stringify(value))

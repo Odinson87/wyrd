@@ -2,13 +2,13 @@
     import DocBrowser from './DocBrowser.svelte';
     import Navigation from './Navigation.svelte';
     import Toasts from './Toasts.svelte';
+    import { settings } from './lib/stores.js';
 
-    export let lightMode = 0;
 </script>
 
 <Toasts/>
-<div data-light-mode={lightMode}>
-    <Navigation bind:lightMode={lightMode}/>
+<div data-light-mode={$settings.lightMode}>
+    <Navigation/>
     
     <main>
         <DocBrowser/>

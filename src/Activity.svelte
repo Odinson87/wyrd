@@ -5,7 +5,7 @@
   import { ago } from './lib/time.js';
 
   import { TypesEnum, DurationEnum } from './lib/enums'
-  import { addToast } from "./lib/store";
+  import { addToast } from "./lib/stores.js";
   import SaveIcon from './lib/icons/save.svelte'
   import BinIcon from './lib/icons/bin.svelte'
   import TargetIcon from './lib/icons/target.svelte'
