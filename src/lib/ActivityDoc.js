@@ -12,12 +12,7 @@ class ActivityDoc {
         this.tags = [];
         this.ignore = true;
         this.suggestedIds = [];
-        this.keepHistory = {
-            'occuredAt': false
-        };
-        this.history = {
-            ocurredAt: []
-        }
+        this.logs = [];
     }
 }
 

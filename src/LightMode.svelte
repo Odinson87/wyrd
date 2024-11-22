@@ -5,7 +5,6 @@
 
     function toggle() {
         mode = mode === 0 ? 1 : 0;
-        console.log(mode);
     }
 </script>
 
