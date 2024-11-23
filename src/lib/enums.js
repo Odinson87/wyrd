@@ -6,7 +6,7 @@ export const TypesEnum = {
     Trigger:  new Tag("Trigger", "Trigger", "#FF6000")
 }
 
-export const GroupsEnum = {
+export const TagsEnum = {
     Reward: new Tag("Reward", "Activity", "#99EE00"),
     Garden: new Tag("Garden", "Activity", "#BBD686"),
     Project: new Tag("Project", "Activity", "#348aa7"),

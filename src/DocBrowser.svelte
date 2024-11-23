@@ -1,7 +1,6 @@
 <script>
     import { onMount, getContext } from 'svelte'
     import { sortBy } from 'lodash'
-    import { GroupsEnum, TypesEnum } from './lib/enums'
     import { settings } from './lib/stores'
     import Filters from './lib/filters'
     import PouchDB from 'pouchdb-browser'

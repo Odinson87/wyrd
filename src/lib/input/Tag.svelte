@@ -1,7 +1,6 @@
 <script>
     import { onMount } from "svelte";
-    import { GroupsEnum, TypesEnum } from "../enums";
-
+    import { settings } from '../stores.js';
 
     let tag;
     export let tagName;
@@ -13,11 +12,11 @@
     // get tag object if available
     onMount(() => {
         if (tagName) {
-            if (Object.hasOwn(GroupsEnum, tagName)) {
-                tag = GroupsEnum[tagName];
+            if (Object.hasOwn($settings.tags, tagName)) {
+                tag = $settings.tags[tagName];
             }
-            if (Object.hasOwn(TypesEnum, tagName)) {
-                tag = TypesEnum[tagName];
+            if (Object.hasOwn($settings.activityTypes, tagName)) {
+                tag = $settings.activityTypes[tagName];
             }
         }
     })

@@ -1,10 +1,10 @@
-import { TypesEnum, GroupsEnum} from "./enums";
+import { TypesEnum, TagsEnum} from "./enums";
 
 const defaults = {
     lightMode: 0,
     logs: false,
     activityTypes: TypesEnum,
-    tags: GroupsEnum
+    tags: TagsEnum
 }
 
 class Conf {
