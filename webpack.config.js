@@ -1,3 +1,4 @@
+const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const path = require('path');
 
@@ -18,8 +19,9 @@ module.exports = {
 	},
 	output: {
 		path: __dirname + '/' + outputDir,
-		filename: '[name].js',
-		chunkFilename: '[name].[id].js'
+		filename: '[name].[chunkhash].js',
+		chunkFilename: '[name].[id].[chunkhash].js',
+		clean: true
 	},
 	module: {
 		rules: [
@@ -50,7 +52,14 @@ module.exports = {
 	mode,
 	plugins: [
 		new MiniCssExtractPlugin({
-			filename: '[name].css'
+			filename: '[name].[chunkhash].css'
+		}),
+		new HtmlWebpackPlugin({
+			title: 'Wyrd',
+			filename: path.join(__dirname, outputDir, 'index.html'),
+			template: path.join(__dirname, 'static','index_template.html'),
+			inject: 'body',
+
 		})
 	],
 	devtool: prod ? false: 'source-map',
