@@ -32,9 +32,9 @@
     let completedFilter = ''
     let isLoading = true
     let addNewItem = false
-    let tags = Object.keys(GroupsEnum)
+    let tags = Object.keys($settings.tags)
     let selectedTags = [];
-    let activityTypes = Object.keys(TypesEnum);
+    let activityTypes = Object.keys($settings.activityTypes);
     let selectedActivityTypes = [];
 
     // All the todos directly from the PouchDB. Sorting and filtering comes later
