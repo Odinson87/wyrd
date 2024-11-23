@@ -1,5 +1,5 @@
 <script>
-    import DarkLightIcon from "./lib/icons/dark-light.svelte";
+    import DarkLightIcon from "../icons/dark-light.svelte";
  
     export let value = 0;
 

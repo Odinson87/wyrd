@@ -1,6 +1,6 @@
 <script>
     import { settings } from './lib/stores.js';
-    import LightMode from "./LightMode.svelte";
+    import LightModeBtn from "./lib/input/LightModeBtn.svelte";
 </script>
 
 <style>
@@ -9,5 +9,5 @@
 
 <section>
     <h2>Settings</h2>
-    <LightMode bind:value={$settings.lightMode}></LightMode>
+    <LightModeBtn bind:value={$settings.lightMode}></LightModeBtn>
 </section>
