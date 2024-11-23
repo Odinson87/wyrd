@@ -1,7 +1,9 @@
 <script>
-    import Burger from "./lib/icons/burger.svelte";
-    import Cog from "./lib/icons/cog.svelte";
+    import ActiveIcon from "./lib/icons/active.svelte";
+    import BurgerIcon from "./lib/icons/burger.svelte";
+    import CogIcon from "./lib/icons/cog.svelte";
     import Menu from "./lib/Menu.svelte";
+    import MenuItem from './lib/MenuItem.svelte';
     import Settings from "./Settings.svelte"
 </script>
 
@@ -14,17 +16,16 @@
 
 <header>
     <Menu viewmode='hidden' align='left'>
-        <Burger slot='icon'/>
-        <ul slot='items'>
-            <li>Item 1</li>
-            <li>Item 2</li>
-            <li>Item 3</li>
-            <li>Item 4</li>
-        </ul>
+        <BurgerIcon slot='icon'/>
+        <section slot='items'>
+            <MenuItem label='Activities'>
+                <ActiveIcon slot='icon'></ActiveIcon>
+            </MenuItem>
+        </section>
     </Menu>
     <div id=logo></div>
     <Menu viewmode='hidden' align='right'>
-        <Cog slot='icon'/>
+        <CogIcon slot='icon'/>
         <Settings slot='items'/>
     </Menu>
 </header>

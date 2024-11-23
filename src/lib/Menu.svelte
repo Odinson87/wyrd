@@ -20,7 +20,7 @@
     }
     aside {
         position:absolute;
-        top:2.75em;
+        top:2.8em;
         width: 320px;
     }
     aside.left {

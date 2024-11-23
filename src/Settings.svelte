@@ -4,10 +4,10 @@
 </script>
 
 <style>
-
+    h2 { text-align: center; }
 </style>
 
-<h2>Settings</h2>
 <section>
-    <LightMode bind:mode={$settings.lightMode}></LightMode>
+    <h2>Settings</h2>
+    <LightMode bind:value={$settings.lightMode}></LightMode>
 </section>

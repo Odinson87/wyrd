@@ -37,6 +37,23 @@ main {
 aside {
 	z-index:11;
 }
+aside section {
+	margin:10px;
+}
+
+button.menu-item {
+	display: flex;
+	border: none;
+	background-color: transparent;
+	cursor: pointer;
+	color: inherit;
+}
+button.menu-item:active {
+	background-color: transparent;
+}
+button.menu-item:hover {
+	filter: brightness(130%);
+}
 
 [data-light-mode='1'] {
 	color:#333;
