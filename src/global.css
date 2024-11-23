@@ -12,8 +12,8 @@ img, picture, video, canvas, svg {
 h1 { line-height:2em; }
 
 /* Global */
-html {
-	background-color:#222;
+body {
+	background-image: url('../static/druid-pattern-bg2.jpg');
 }
 
 html, body, [data-light-mode]{
@@ -76,7 +76,12 @@ button.menu-item:hover {
 }
 [data-light-mode='0'] {
 	color:#eee;
+}
+[data-light-mode='0'] main {
 	background-color: #333;
+}
+[data-light-mode='1'] main {
+	background-color: #fff;
 }
 
 [data-light-mode='0'] > header,
