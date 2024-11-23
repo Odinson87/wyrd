@@ -29,7 +29,9 @@ class Filters {
 
         // match completed status
         if (this.completedStatus !== '') {
-            matchesCompleteStatus = obj['complete'] === this.completedStatus
+            let completedVal = this.completedStatus === 'complete';
+            console.log(completedVal);
+            matchesCompleteStatus = obj.complete === completedVal;
         } else {
             matchesCompleteStatus = true;
         }
@@ -37,7 +39,7 @@ class Filters {
         // match a single type
         if(this.activityTypes.length > 0) {
             this.activityTypes.forEach((t) => {
-                isActivityType = !(t !== (obj['type']))
+                isActivityType = !(t !== (obj.type))
             })
         } else {
           isActivityType = true;
@@ -46,7 +48,7 @@ class Filters {
         // match all tags
         if(this.tags.length > 0) {
             this.tags.forEach((t) => {
-                hasTags = obj['tags'].indexOf(t) > -1
+                hasTags = obj.tags.indexOf(t) > -1
             })
         } else {
             hasTags = true;
