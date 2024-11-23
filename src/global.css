@@ -12,6 +12,10 @@ img, picture, video, canvas, svg {
 h1 { line-height:2em; }
 
 /* Global */
+html {
+	background-color:#222;
+}
+
 html, body, [data-light-mode]{
 	height: 100%;
 	display: flex;

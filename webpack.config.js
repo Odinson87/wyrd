@@ -1,5 +1,7 @@
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
+
 const path = require('path');
 
 const mode = process.env.NODE_ENV || 'development';
@@ -8,7 +10,7 @@ const outputDir = 'docs';
 
 module.exports = {
 	entry: {
-		bundle: ['./src/main.js']
+		bundle: ['./src/global.css', './src/main.js']
 	},
 	resolve: {
 		alias: {
@@ -20,7 +22,6 @@ module.exports = {
 	output: {
 		path: __dirname + '/' + outputDir,
 		filename: '[name].[chunkhash].js',
-		chunkFilename: '[name].[id].[chunkhash].js',
 		clean: true
 	},
 	module: {
@@ -49,6 +50,13 @@ module.exports = {
 			}
 		]
 	},
+	optimization: {
+		minimizer: [
+		    // For webpack@5 you can use the `...` syntax to extend existing minimizers (i.e. `terser-webpack-plugin`), uncomment the next line
+		    // `...`,
+		    new CssMinimizerPlugin(),
+		],
+	},
 	mode,
 	plugins: [
 		new MiniCssExtractPlugin({
@@ -60,7 +68,7 @@ module.exports = {
 			template: path.join(__dirname, 'static','index_template.html'),
 			inject: 'body',
 
-		})
+		}),
 	],
 	devtool: prod ? false: 'source-map',
 	devServer: {
