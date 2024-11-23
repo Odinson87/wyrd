@@ -2,7 +2,7 @@
     import Tag from "./Tag.svelte";
 
     export let name;
-    export let classes = ['tags'];
+    export let classes = [];
 	export let tags;
     export let selected = [];
     export let value;

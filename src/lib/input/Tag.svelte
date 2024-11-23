@@ -59,7 +59,7 @@
 <style>
     label {
         position: relative;
-        margin: 3px 6px 0px 0px;
+        margin: 2px;
         cursor: pointer;
         -webkit-user-select: none;
         -moz-user-select: none;
@@ -72,10 +72,6 @@
         opacity: 0;
         height:0;
         width:0;
-    }
-
-    label[data-checked="true"] {
-        box-shadow: 5px 0px #666;
     }
 
     label:hover{
