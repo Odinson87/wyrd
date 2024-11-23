@@ -8,6 +8,7 @@
     export let group;
     export let disabled = false;
     export let selectMax = 0;
+    export let selectedVal;
 
     // get tag object if available
     onMount(() => {
@@ -36,6 +37,7 @@
                 if (intSelectMax > 0) {
                     if (intSelectMax === 1) {
                         group = [tagName];
+                        selectedVal = tagName;
                     } else if (group.length <= intSelectMax) {
                         group.push(tagName);
                     }

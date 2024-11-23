@@ -8,7 +8,7 @@
     import ActivityDoc from './lib/ActivityDoc'
     import Activity from './Activity.svelte'
     import AddIcon from './lib/icons/plus.svelte'
-    import Tags from './lib/Tags.svelte'
+    import Tags from './lib/input/Tags.svelte'
 
     let notifications = getContext('app');
     // Set up local PouchDB and continuous replication to remote CouchDB

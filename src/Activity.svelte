@@ -11,6 +11,7 @@
   import TargetIcon from './lib/icons/target.svelte'
   import NumberInput from './lib/input/Number.svelte';
   import Recurrence from './lib/input/Recurrence.svelte';
+  import Tags from './lib/input/Tags.svelte';
 
   const dispatch = createEventDispatcher()
 
@@ -65,6 +66,8 @@
 
   $: durationStr = doc.durationIncrement + doc.durationType;
   $: agoStr = ago(doc.occurredAt);
+
+  let activityTypes = Object.keys($settings.activityTypes);
 
   export let doc;
   export let viewmode = 'list';

@@ -1,10 +1,11 @@
 <script>
-    import Tag from "./input/Tag.svelte";
+    import Tag from "./Tag.svelte";
 
     export let name;
     export let classes = ['tags'];
 	export let tags;
     export let selected = [];
+    export let value;
     export let disabled = false;
     export let selectMax = 0;
 
@@ -15,6 +16,6 @@
 
 <section class='{['tags'].concat(classes).join(' ')}' name={name}>
     {#each tags as tag}
-		<Tag tagName={tag} selectMax={selectMax} bind:group={selected} disabled={disabled}></Tag>
+		<Tag tagName={tag} selectMax={selectMax} bind:selectedVal={value} bind:group={selected} disabled={disabled}></Tag>
 	{/each}
 </section>
