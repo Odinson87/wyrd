@@ -4,8 +4,8 @@
   import { debounce } from 'lodash'
   import { ago } from './lib/time.js';
 
-  import { TypesEnum, DurationEnum } from './lib/enums'
-  import { addToast } from "./lib/stores.js";
+  import { DurationEnum } from './lib/enums'
+  import { settings, addToast } from "./lib/stores.js";
   import SaveIcon from './lib/icons/save.svelte'
   import BinIcon from './lib/icons/bin.svelte'
   import TargetIcon from './lib/icons/target.svelte'
@@ -19,7 +19,7 @@
         message: 'Created Activity "' + doc.name + '"',
         timeout: 3000 
     });
-    dispatch('add', {todo: doc})
+    dispatch('add', {doc: doc})
   }
 
   function remove() {
@@ -27,7 +27,7 @@
         message: 'Deleted "' + doc.name + '" ',
         timeout: 3000 
     });
-      dispatch('remove', {todo: doc})
+      dispatch('remove', {doc: doc})
     }
     
   function save() {
@@ -39,7 +39,7 @@
         message: 'Updated "' + doc.name + '" ',
         timeout: 3000 
     });
-    dispatch('update', {todo: doc})
+    dispatch('update', {doc: doc})
   }
   
 
@@ -51,7 +51,7 @@
     viewmode = viewmode === mode ? 'list' : mode;
   }
 
-  function ocurred() {
+  function occurred() {
       
     if (!doc.recur) {
         doc.complete = !doc.complete
@@ -119,7 +119,7 @@
 >
     <header>
         <div>
-            <button class="icon list-btn" on:click={ocurred}>
+            <button class="icon list-btn" on:click={occurred}>
                <TargetIcon/> 
             </button>
         </div>
@@ -149,19 +149,19 @@
         </div>
     </header>
     <section class="edit">
-        <div class="input-group">
+        <div class="input-group" data-group="name">
             <label for=activity-name>Name :</label>
             <input name="activity-name" type='text' bind:value={doc.name}>
         </div>
-        <div class="input-group">
+        <div class="input-group" data-group="activity-type">
             <label for="activity-type">Type :</label>
             <select bind:value={doc.type} name="activity-type">
-                {#each Object.entries(TypesEnum) as [_, type]}
+                {#each Object.entries($settings.activityTypes) as [_, type]}
                     <option value={type.type}>{type.name}</option>
                 {/each}
             </select>
         </div>
-        <div class="input-group">
+        <div class="input-group" data-group="duration">
             <label for="activity-duration">Duration :</label>
             <select bind:value={doc.durationType} name="activity-duration">
                 {#each Object.entries(DurationEnum) as [_, duration]}
@@ -172,18 +172,20 @@
         </div>
 
         {#if doc.occurredAt && (doc.complete || doc.recur)}
-            <div class="input-group">
+        <div class="input-group" data-group="occurrence">
+            <div>
                 <label for=activity-occurred-at>Occurred :</label>
                 <p>{agoStr}</p>
             </div>
-            <div class="input-group">
+            <div>
                 <label for=activity-occurred-at>At :</label>
                 <input name="activity-occurred-at" type='datetime-local' bind:value={doc.occurredAt}>
             </div>
+        </div>
         {/if}
 
         {#if doc.recur}
-        <div class="input-group">
+        <div class="input-group" data-group="occurrence">
             <NumberInput bind:val={doc.occurrences} label="Ocurrences" name="activity-ocurrences"/>
         </div>
         {/if}

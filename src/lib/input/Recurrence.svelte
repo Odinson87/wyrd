@@ -24,7 +24,7 @@
     
 </script>
 
-<div class="input-group">
+<div class="input-group" data-group="recurrence" >
     <CheckboxInput bind:val={doc.recur} label="recur"/>
     {#if doc.recur == true}
         <NumberInput min=1 bind:val={doc.recurrence.interval} name="activity-recurrence-interval" label='Every'/>

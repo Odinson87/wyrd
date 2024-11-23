@@ -1,7 +1,7 @@
 class ActivityDoc {
     constructor(name = ''){
         this.name = name;
-        this.type = 'Activity';
+        this.type = 'Todo';
         this.complete = false;
         this.durationType = 'm';
         this.durationIncrement = 10;

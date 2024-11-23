@@ -205,7 +205,9 @@ button.title {
 [data-viewmode="add"] header button.title,
 [data-viewmode="add"] header button.list-btn,
 [data-viewmode="add"] header button.edit-btn,
-[data-viewmode="add"] header .since
+[data-viewmode="add"] header .since,
+[data-viewmode="add"] section.edit [data-group="duration"],
+[data-viewmode="add"] section.edit [data-group="recurrence"]
 {
 	display:none;
 }

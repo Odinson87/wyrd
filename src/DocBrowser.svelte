@@ -63,11 +63,11 @@
   
     // Event handlers for adding, updating and removing todos
     async function addDoc(event) {
-        const { todo: activity} = event.detail;
-        activity.complete = false; 
-        activity.createdAt = new Date().toISOString()
+        const { doc: doc} = event.detail;
+        doc.complete = false; 
+        doc.createdAt = new Date().toISOString()
 
-        const addition = await db.post(activity)
+        const addition = await db.post(doc)
         if (addition.ok) {
             await updateItems()
         }
@@ -76,21 +76,21 @@
     }
   
     async function updateDoc(event) {
-      const { todo } = event.detail
-      const update = await db.put(todo)
+      const { doc: doc } = event.detail
+      const update = await db.put(doc)
       if (update.ok) {
         await updateItems()
       }
     }
   
     async function removeDoc(event) {
-      const { todo: todoToRemove } = event.detail
-      const removal = await db.remove(todoToRemove)
+      const { doc: doc } = event.detail
+      const removal = await db.remove(doc)
       if (removal.ok) {
         // For removal, we can just update the local state instead of reloading everything from PouchDB,
         // since we no longer care about the doc’s revision.
-        items = items.filter((todo) => {
-          return todo._id !== todoToRemove._id
+        items = items.filter((activityDoc) => {
+          return activityDoc._id !== doc._id
           })
       }
     }
@@ -118,7 +118,7 @@
 
 {#if isLoading}
     <h1>
-        Loading your todos…
+        Loading…
     </h1>
 {:else}
     <h1>
