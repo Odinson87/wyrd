@@ -9,7 +9,6 @@
     import Activity from './Activity.svelte'
     import AddIcon from './lib/icons/plus.svelte'
     import Tags from './lib/input/Tags.svelte'
-    import Modal from './Modal.svelte';
 
     let notifications = getContext('app');
     // Set up local PouchDB and continuous replication to remote CouchDB
@@ -168,5 +167,3 @@
         </ul>
     </section>
 {/if}
-
-<Modal modalName={'tageditor'}/>
