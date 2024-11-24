@@ -10,17 +10,19 @@
     export let selectMax = 0;
     export let selectedVal;
 
+    $: setTag(tagName);
+
     // get tag object if available
-    onMount(() => {
-        if (tagName) {
-            if (Object.hasOwn($settings.tags, tagName)) {
-                tag = $settings.tags[tagName];
+    function setTag(name) {
+        if (name) {
+            if (Object.hasOwn($settings.tags, name)) {
+                tag = $settings.tags[name];
             }
-            if (Object.hasOwn($settings.activityTypes, tagName)) {
-                tag = $settings.activityTypes[tagName];
+            if (Object.hasOwn($settings.activityTypes, name)) {
+                tag = $settings.activityTypes[name];
             }
         }
-    })
+    }
 
     $: updateCheckbox(group)
 	$: updateGroup(checked)
