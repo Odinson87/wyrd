@@ -1,19 +1,18 @@
 
 const defaults = {
-    name: null,
+    id: null,
     title: 'New Page',
     message: '',
-    data: {},
     component: null
 }
 
 class Modal {
     constructor(obj){
         let options = Object.assign(defaults, obj);
-        this.name = options.name;
+        this.id = options.id;
         this.title = options.title;
         this.message = options.message;
-        this.data = options.data;
+        this.source = null;
         this.component = options.component;
     }
 }

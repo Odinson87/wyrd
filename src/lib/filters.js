@@ -30,7 +30,6 @@ class Filters {
         // match completed status
         if (this.completedStatus !== '') {
             let completedVal = this.completedStatus === 'complete';
-            console.log(completedVal);
             matchesCompleteStatus = obj.complete === completedVal;
         } else {
             matchesCompleteStatus = true;

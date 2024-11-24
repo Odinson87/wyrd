@@ -2,6 +2,24 @@ import { writable } from "svelte/store";
 import {v4 as uuidv4} from "uuid"
 import Conf from './Conf.js'
 
+//  Modals Store
+export const modals = writable([]); 
+
+export const addModal = (modal) => {
+  // Create a unique ID so we can easily find/remove it
+  // if it is dismissible/has a timeout.
+  modal.id = uuidv4();
+    
+  // Push the modal to the top of the list of modala
+  modals.update((all) => [{ ...modal }, ...all]);
+
+  return modal;
+};
+
+export const dismissModal = (id) => {
+  modals.update((all) => all.filter((t) => t.id !== id));
+};
+
 // Toasts Store
 export const toasts = writable([]);
 

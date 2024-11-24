@@ -53,6 +53,7 @@
 				group = group;
 			}
 		}
+//        console.log(group);
 	}
 </script>
 

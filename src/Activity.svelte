@@ -12,6 +12,7 @@
   import NumberInput from './lib/input/Number.svelte';
   import Recurrence from './lib/input/Recurrence.svelte';
   import Tags from './lib/input/Tags.svelte';
+  import ModalBtn from './lib/input/ModalBtn.svelte';
 
   const dispatch = createEventDispatcher()
 
@@ -62,6 +63,10 @@
     }
     doc.occurredAt = (new Date()).toISOString().substr(0, 19);
     save();
+  }
+
+  function output(){
+    console.log(doc);
   }
 
   $: durationStr = doc.durationIncrement + doc.durationType;
@@ -164,6 +169,10 @@
                 {/each}
             </select>
         </div>
+        <div class="input-group" data-group="tags">
+            <ModalBtn modalName={'tageditor'} bind:source={doc}/>
+            <Tags bind:tags={doc.tags} disabled={true}/>
+        </div>
         <div class="input-group" data-group="duration">
             <label for="activity-duration">Duration :</label>
             <select bind:value={doc.durationType} name="activity-duration">
@@ -195,4 +204,5 @@
 
         <Recurrence bind:doc={doc}/>
     </section>
+    <button on:click={output}>Log</button>
 </article>

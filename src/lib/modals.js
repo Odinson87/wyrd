@@ -1,16 +1,23 @@
 import Modal from './Modal.js';
 import TagEditor from '../TagEditor.svelte';
 
-export const modals = {
+export const modalConfig = {
     tageditor: new Modal({
         name: 'tageditor',
         title: 'Tags',
         message: 'Add and remove tags',
-        data: {
-            tags: ['Tag 1', 'Tag 2']
-        },
+        source: null,
         component: TagEditor
     })
 }
 
-export const modalNames = Object.keys(modals);
+export function getNewModal(modalName) {
+    let modal;
+    if (Object.hasOwn(modalConfig, modalName)) {
+        modal = modalConfig[modalName];
+    } else {
+        modal = {};
+    }
+    return modal;
+}
+

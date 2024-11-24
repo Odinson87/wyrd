@@ -8,7 +8,6 @@
     export let value;
     export let disabled = false;
     export let selectMax = 0;
-
 </script>
 
 <style>
