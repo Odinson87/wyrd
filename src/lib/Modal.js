@@ -1,9 +1,11 @@
 
 const defaults = {
     id: null,
-    title: 'New Page',
+    name: null,
+    title: '',
     message: '',
-    component: null
+    component: null,
+    data: {}
 }
 
 class Modal {
@@ -12,8 +14,9 @@ class Modal {
         this.id = options.id;
         this.title = options.title;
         this.message = options.message;
-        this.source = null;
         this.component = options.component;
+        this.data = options.data;
+        this.source = null;
     }
 }
 

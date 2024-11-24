@@ -9,7 +9,7 @@
         modal.source = source;
         modal = addModal(modal);
         
-        // add reactivity
+        // add reactivity to re-render when modal object is updated
         modals.subscribe((value) => {
             source = source;
         }); 

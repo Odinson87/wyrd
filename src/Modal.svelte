@@ -22,7 +22,7 @@
   {/if}
   
   {#if modal.component }
-      <svelte:component bind:source={source} this={modal.component}/>
+      <svelte:component bind:source={source} this={modal.component} {...modal.data}/>
   {/if}
 
   <button class="close" on:click={() => dispatch("dismiss")}>

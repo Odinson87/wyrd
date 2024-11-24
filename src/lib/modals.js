@@ -11,10 +11,14 @@ export const modalConfig = {
     })
 }
 
-export function getNewModal(modalName) {
+
+// retrive configured modal by name
+// merge/override default data
+export function getNewModal(modalName, modalData = {}) {
     let modal;
     if (Object.hasOwn(modalConfig, modalName)) {
         modal = modalConfig[modalName];
+        modal.data = Object.assign(modal.data, modalData)
     } else {
         modal = {};
     }
