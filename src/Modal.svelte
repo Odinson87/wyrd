@@ -1,6 +1,5 @@
 <script>
   import { createEventDispatcher } from "svelte";
-  import { fade } from "svelte/transition";
   import CloseIcon from "./lib/icons/close.svelte";
 
 
@@ -12,8 +11,8 @@
 
 {#if modal }
 
-<section name={modal.title} transition:fade>
-
+<section name={modal.title}>
+<div class="content">
   {#if modal.title }
     <h2>{ modal.title }</h2>
   {/if}
@@ -27,17 +26,17 @@
   {/if}
 
   <button class="close" on:click={() => dispatch("dismiss")}>
-    <CloseIcon width="0.8em" />
+    <CloseIcon width="1.5em" />
   </button>
-
+</div>
 </section>
 
 {:else}
 
-<section transition:fade>
+<section>
     <p>This is not the modal you're looking for....</p>
     <button class="close" on:click={() => dispatch("dismiss")}>
-      <CloseIcon width="0.8em" />
+      <CloseIcon width="1.5em" />
     </button>
 </section>
 

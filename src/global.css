@@ -232,4 +232,42 @@ button.title {
 }
 
 
+[data-light-mode="0"] section[name='modals'] > section {
+	background-color: rgba(50,50,50,0.97);
+}
+[data-light-mode="1"] section[name='modals'] > section {
+	background-color: rgba(255,255,255,0.92);
+}
+
+section[name='modals'] > section {
+	position: fixed;
+	top: 0;
+	margin-top:0;
+	width: 100%;
+	height:100%;
+	display: flex;
+	align-items: center;
+    flex-direction: column;
+    z-index: 1000;
+}
+
+section[name='modals'] > section > .content {
+	flex: 1;
+
+	display: flex;
+    justify-content: center;
+	align-items: center;
+    flex-direction: column;
+	max-width: 320px;
+}
+
+section[name='modals'] > section > .content button.close {
+	margin-top: 1em;
+	width: 40px;
+	height: 40px;
+	padding: 2px;
+	border-radius: 50%;
+}
+
+
 

@@ -10,9 +10,7 @@
 </script>
 
 {#if sourceHasTags}
-    <section name='tag-editor'>
-        <Tags tags={availableTags} bind:selected={source.tags}/>
-    </section>
+    <Tags tags={availableTags} bind:selected={source.tags}/>
 {:else}
     <p>This provided source has no tags</p>
 {/if}

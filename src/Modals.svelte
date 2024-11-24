@@ -1,10 +1,11 @@
 <script>
+  import { fade } from "svelte/transition";
   import Modal from "./Modal.svelte";
   import { dismissModal, modals} from "./lib/stores.js";
 </script>
 
 {#if $modals}
-  <section name='modals'>
+  <section name='modals' transition:fade>
     {#each $modals as modal (modal.id)}
       <Modal
         modal={modal}
@@ -13,18 +14,3 @@
     {/each}
   </section>
 {/if}
-
-<style lang="postcss">
-  section {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    width: 100%;
-    display: flex;
-    margin-top: 1rem;
-    justify-content: center;
-    flex-direction: column;
-    z-index: 1000;
-  }
-</style>
