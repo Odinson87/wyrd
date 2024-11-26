@@ -89,32 +89,31 @@
         flex-grow: 1;
         text-align: center;
     }
+
     .is-complete {
         text-decoration: line-through;
-        color: green;
     }
     .since {
         position:relative;
         width: 45px;
         height: 45px;
-        border-radius: 50%;
-        border: solid 1px #ccc;
         text-align: center;
     }
     .since p {
         position: absolute;
         font-size: 0.6em;
-        text-align: center;
+        text-align: right;
         line-height: 1em;
         width:100%;
+        text-shadow: 1px 0px 3px #000;
     }
     .since p:first-child { 
-        top: -8px;
-        width: 130%;
-        margin-left: -6px;
-
+        top: -4px;
+        width: 140%;
+        right: -3px;
     }
-    .since p:last-child { bottom: -8px;}
+
+    .since p:last-child { bottom: -3px;}
     [name="activity-occurred-at"] {
         font-size: 15px;
     }
@@ -146,6 +145,9 @@
                         {agoStr}
                     {/if}
                 </p>
+                <ModalBtn classes={'small'} modalName={'tageditor'} bind:source={doc}>
+                    <TagIcon slot="icon"/>
+                </ModalBtn>
                 <p>{durationStr}</p>
             </div>
             <button class="icon edit-btn" on:click={debouncedSave}>

@@ -198,6 +198,13 @@ button.icon {
 	background-color: #f4f4f4;
 	outline: none;
 }
+
+button.icon.small {
+	border-radius: 50%;
+	width: 1.7em;
+	height: 1.7em;
+}
+
 button.addItem {
 	display: block;
 	margin: 0 auto;
@@ -214,6 +221,12 @@ button.title {
 	width:100%;
 	max-width: 168px;
 	color:inherit;
+}
+
+.since button.icon {
+	position: absolute;
+	top: 9px;
+	right: -2px;
 }
 
 [data-viewmode="hidden"],
