@@ -14,7 +14,7 @@ class Filters {
             activityTypeActive = true;
         }
 
-        if (selectedTagsActive.length > 0) {
+        if (this.tags.length > 0) {
             selectedTagsActive = true;
         }
 
@@ -47,7 +47,9 @@ class Filters {
         // match all tags
         if(this.tags.length > 0) {
             this.tags.forEach((t) => {
-                hasTags = obj.tags.indexOf(t) > -1
+                if (obj.tags.indexOf(t) > -1) {
+                    hasTags = true;
+                }
             })
         } else {
             hasTags = true;

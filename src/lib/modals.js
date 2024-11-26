@@ -4,8 +4,8 @@ import TagEditor from '../TagEditor.svelte';
 export const modalConfig = {
     tageditor: new Modal({
         name: 'tageditor',
-        title: 'Tags',
-        message: 'Add and remove tags',
+        title: 'Edit Tags',
+        message: 'Add tags to help group and organise things',
         source: null,
         component: TagEditor
     })

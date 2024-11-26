@@ -1,20 +1,21 @@
 <script>
-  import { createEventDispatcher } from 'svelte'
-  import { fade } from 'svelte/transition'
-  import { debounce } from 'lodash'
+  import { createEventDispatcher } from 'svelte';
+  import { fade } from 'svelte/transition';
+  import { debounce } from 'lodash';
   import { ago } from './lib/time.js';
 
-  import { DurationEnum } from './lib/enums'
+  import { DurationEnum } from './lib/enums';
   import { settings, addToast } from "./lib/stores.js";
-  import SaveIcon from './lib/icons/save.svelte'
-  import BinIcon from './lib/icons/bin.svelte'
-  import TargetIcon from './lib/icons/target.svelte'
+  import SaveIcon from './lib/icons/save.svelte';
+  import BinIcon from './lib/icons/bin.svelte';
+  import TargetIcon from './lib/icons/target.svelte';
+  import TagIcon from './lib/icons/tagIcon.svelte';
   import NumberInput from './lib/input/Number.svelte';
   import Recurrence from './lib/input/Recurrence.svelte';
   import Tags from './lib/input/Tags.svelte';
   import ModalBtn from './lib/input/ModalBtn.svelte';
 
-  const dispatch = createEventDispatcher()
+  const dispatch = createEventDispatcher();
 
   function add(){
     addToast({
@@ -46,15 +47,14 @@
   
 
   // only fire once, debouncing multiple clicks, reducing revisions
-  const debouncedSave = debounce(save, 1000)
-  const debouncedAdd = debounce(add, 1000)
+  const debouncedSave = debounce(save, 1000);
+  const debouncedAdd = debounce(add, 1000);
 
   function toggleMode(mode) {
     viewmode = viewmode === mode ? 'list' : mode;
   }
 
   function occurred() {
-      
     if (!doc.recur) {
         doc.complete = !doc.complete
     } else {
@@ -170,7 +170,9 @@
             </select>
         </div>
         <div class="input-group" data-group="tags">
-            <ModalBtn modalName={'tageditor'} bind:source={doc}/>
+            <ModalBtn modalName={'tageditor'} bind:source={doc}>
+                <TagIcon slot="icon"/>
+            </ModalBtn>
             <Tags bind:tags={doc.tags} disabled={true}/>
         </div>
         <div class="input-group" data-group="duration">
@@ -204,5 +206,5 @@
 
         <Recurrence bind:doc={doc}/>
     </section>
-    <button on:click={output}>Log</button>
+    <!--button on:click={output}>Log</button-->
 </article>

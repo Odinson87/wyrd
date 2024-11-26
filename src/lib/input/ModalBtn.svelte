@@ -17,9 +17,13 @@
 
     export let modalName;
     export let source;
+    export let btnTitle;
 
 </script>
 
 <button on:click={loadModal}>
-   Manage Tags
+    <slot name='icon'></slot>
+    {#if btnTitle }
+        { btnTitle }
+    {/if}
 </button>

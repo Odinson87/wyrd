@@ -9,8 +9,19 @@
 
 </script>
 
+<style>
+    h3 {
+        margin-top:10px;
+    }
+</style>
+
 {#if sourceHasTags}
-    <Tags tags={availableTags} bind:selected={source.tags}/>
+    <h3>Selected</h3>
+    <Tags tags={source.tags} disabled={true}/>
+
+
+    <h3>Choose Tags</h3>
+    <Tags name='edit-tags' tags={availableTags} bind:selected={source.tags}/>
 {:else}
     <p>This provided source has no tags</p>
 {/if}

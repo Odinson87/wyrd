@@ -39,7 +39,6 @@
     // All the todos directly from the PouchDB. Sorting and filtering comes later
     export let items = []
     $: sortedAndFilteredItems = sortBy(items, [sortByWhat]).filter((todo) => {
-
       let filters = new Filters(completedFilter, selectedActivityTypes, selectedTags); 
       
       if (filters.hasActiveFilters()) {
