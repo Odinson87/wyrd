@@ -1,5 +1,5 @@
 <script>
-  import { createEventDispatcher } from "svelte";
+  import { createEventDispatcher, onMount } from "svelte";
   import CloseIcon from "./lib/icons/close.svelte";
 
 
@@ -7,6 +7,10 @@
 
     export let source;
     export let modal;
+
+    function dismissModal() {
+        dispatch("dismiss");
+    }
 </script>
 
 {#if modal }
@@ -25,7 +29,7 @@
       <svelte:component bind:source={source} this={modal.component} {...modal.data}/>
   {/if}
 
-  <button class="close" on:click={() => dispatch("dismiss")}>
+  <button class="close" on:click={dismissModal}>
     <CloseIcon width="1.5em" />
   </button>
 </div>
@@ -35,7 +39,7 @@
 
 <section>
     <p>This is not the modal you're looking for....</p>
-    <button class="close" on:click={() => dispatch("dismiss")}>
+    <button class="close" on:click={dismissModal}>
       <CloseIcon width="1.5em" />
     </button>
 </section>

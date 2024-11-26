@@ -1,81 +1,81 @@
 <script>
-  import { createEventDispatcher } from 'svelte';
-  import { fade } from 'svelte/transition';
-  import { debounce } from 'lodash';
-  import { ago } from './lib/time.js';
+    import { createEventDispatcher } from 'svelte';
+    import { fade } from 'svelte/transition';
+    import { debounce } from 'lodash';
+    import { ago } from './lib/time.js';
 
-  import { DurationEnum } from './lib/enums';
-  import { settings, addToast } from "./lib/stores.js";
-  import SaveIcon from './lib/icons/save.svelte';
-  import BinIcon from './lib/icons/bin.svelte';
-  import TargetIcon from './lib/icons/target.svelte';
-  import TagIcon from './lib/icons/tagIcon.svelte';
-  import NumberInput from './lib/input/Number.svelte';
-  import Recurrence from './lib/input/Recurrence.svelte';
-  import Tags from './lib/input/Tags.svelte';
-  import ModalBtn from './lib/input/ModalBtn.svelte';
+    import { DurationEnum } from './lib/enums';
+    import { settings, addToast } from "./lib/stores.js";
+    import SaveIcon from './lib/icons/save.svelte';
+    import BinIcon from './lib/icons/bin.svelte';
+    import TargetIcon from './lib/icons/target.svelte';
+    import TagIcon from './lib/icons/tagIcon.svelte';
+    import NumberInput from './lib/input/Number.svelte';
+    import Recurrence from './lib/input/Recurrence.svelte';
+    import Tags from './lib/input/Tags.svelte';
+    import ModalBtn from './lib/input/ModalBtn.svelte';
 
-  const dispatch = createEventDispatcher();
+    const dispatch = createEventDispatcher();
 
-  function add(){
-    addToast({
-        message: 'Created Activity "' + doc.name + '"',
-        timeout: 3000 
-    });
-    dispatch('add', {doc: doc})
-  }
-
-  function remove() {
-    addToast({
-        message: 'Deleted "' + doc.name + '" ',
-        timeout: 3000 
-    });
-      dispatch('remove', {doc: doc})
+    function add(){
+        addToast({
+            message: 'Created Activity "' + doc.name + '"',
+            timeout: 3000 
+        });
+        dispatch('add', {doc: doc})
     }
-    
-  function save() {
-    // reset complete flag for recurring activity
-    if (doc.recur) {
-        doc.complete = false;
-    } 
-    addToast({
-        message: 'Updated "' + doc.name + '" ',
-        timeout: 3000 
-    });
-    dispatch('update', {doc: doc})
-  }
+
+    function remove() {
+        addToast({
+            message: 'Deleted "' + doc.name + '" ',
+            timeout: 3000 
+        });
+        dispatch('remove', {doc: doc})
+    }
+
+    function save() {
+        // reset complete flag for recurring activity
+        if (doc.recur) {
+            doc.complete = false;
+        } 
+        addToast({
+            message: 'Saved "' + doc.name + '" ',
+            timeout: 3000 
+        });
+        dispatch('update', {doc: doc})
+    }
   
 
-  // only fire once, debouncing multiple clicks, reducing revisions
-  const debouncedSave = debounce(save, 1000);
-  const debouncedAdd = debounce(add, 1000);
+    // only fire once, debouncing multiple clicks, reducing revisions
+    const debouncedSave = debounce(save, 1000);
+    const debouncedAdd = debounce(add, 1000);
 
-  function toggleMode(mode) {
-    viewmode = viewmode === mode ? 'list' : mode;
-  }
-
-  function occurred() {
-    if (!doc.recur) {
-        doc.complete = !doc.complete
-    } else {
-        doc.complete = false
-        doc.occurrences++;
+    function toggleMode(mode) {
+        viewmode = viewmode === mode ? 'list' : mode;
     }
-    doc.occurredAt = (new Date()).toISOString().substr(0, 19);
-    save();
-  }
 
-  function output(){
-    console.log(doc);
-  }
+    function occurred() {
+        if (!doc.recur) {
+            doc.complete = !doc.complete
+        } else {
+            doc.complete = false
+            doc.occurrences++;
+        }
+        doc.occurredAt = (new Date()).toISOString().substr(0, 19);
+        save();
+    }
 
-  $: durationStr = doc.durationIncrement + doc.durationType;
-  $: agoStr = ago(doc.occurredAt);
+    function output(){
+        console.log(doc);
+    }
 
-  let activityTypes = Object.keys($settings.activityTypes);
+    $: durationStr = doc.durationIncrement + doc.durationType;
+    $: agoStr = ago(doc.occurredAt);
 
-  export let doc;
-  export let viewmode = 'list';
+    let activityTypes = Object.keys($settings.activityTypes);
+
+    export let doc;
+    export let viewmode = 'list';
 </script>
 
 <style>
@@ -145,7 +145,7 @@
                         {agoStr}
                     {/if}
                 </p>
-                <ModalBtn classes={'small'} modalName={'tageditor'} bind:source={doc}>
+                <ModalBtn classes={'small'} modalName={'tageditor'} bind:source={doc} on:save={debouncedSave} >
                     <TagIcon slot="icon"/>
                 </ModalBtn>
                 <p>{durationStr}</p>
@@ -172,7 +172,7 @@
             </select>
         </div>
         <div class="input-group" data-group="tags">
-            <ModalBtn modalName={'tageditor'} bind:source={doc}>
+            <ModalBtn modalName={'tageditor'} bind:source={doc} on:save={debouncedSave}>
                 <TagIcon slot="icon"/>
             </ModalBtn>
             <Tags bind:tags={doc.tags} disabled={true}/>
