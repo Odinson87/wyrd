@@ -41,7 +41,7 @@
             doc.complete = false;
         } 
         addToast({
-            message: msg +' "' + doc.name + '" ',
+            message: 'Saved "' + doc.name + '" ',
             timeout: 3000 
         });
         dispatch('update', {doc: doc})

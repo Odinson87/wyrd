@@ -96,20 +96,26 @@ button.menu-item:hover {
 	background-color: #eee;
 }
 
-[data-light-mode='1'] button svg,
-[data-light-mode='1'] button svg .fill {
+[data-light-mode='1'] section[name="modals"] button svg,
+[data-light-mode='1'] main button svg,
+[data-light-mode='1'] section[name="modals"] button svg .fill,
+[data-light-mode='1'] main button svg .fill {
 	fill: #333;
 }
-[data-light-mode='1'] button svg .stroke {
+[data-light-mode='1'] section[name="modals"] button svg .stroke,
+[data-light-mode='1'] main button svg .stroke {
 	stroke: #333;
 }
 
-[data-light-mode='0'] button svg,
-[data-light-mode='0'] button svg .fill{
+[data-light-mode='0'] section[name="modals"] button svg,
+[data-light-mode='0'] main button svg,
+[data-light-mode='0'] section[name="modals"] button svg .fill,
+[data-light-mode='0'] main button svg .fill{
 	fill: #eee;
 }
 
-[data-light-mode='0'] button svg .stroke {
+[data-light-mode='0'] section[name="modals"] button svg .stroke,
+[data-light-mode='0'] main button svg .stroke {
 	stroke: #eee;
 }
 
@@ -232,6 +238,9 @@ button.icon.small {
 	width: 1.7em;
 	height: 1.7em;
 }
+
+[data-light-mode="0"]button.icon:hover {filter: brightness(120%);}
+[data-light-mode="1"]button.icon:hover {filter: brightness(70%);}
 
 button.addItem {
 	display: block;
