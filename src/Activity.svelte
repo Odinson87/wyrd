@@ -41,7 +41,7 @@
             doc.complete = false;
         } 
         addToast({
-            message: 'Saved "' + doc.name + '" ',
+            message: msg +' "' + doc.name + '" ',
             timeout: 3000 
         });
         dispatch('update', {doc: doc})
@@ -50,6 +50,7 @@
     // only fire once, debouncing multiple clicks, reducing revisions
     const debouncedSave = debounce(save, 1000);
     const debouncedAdd = debounce(add, 1000);
+    const debounceOccur= debounce(occurred, 500);
 
     function toggleMode(mode) {
         viewmode = viewmode === mode ? 'list' : mode;
@@ -64,14 +65,21 @@
     }
 
     function occurred() {
+        let msg = 'Occurred'
         if (!doc.recur) {
             doc.complete = !doc.complete
+            msg = doc.complete ? 'Completed' : 'Uncompleted'
         } else {
             doc.complete = false
             doc.occurrences++;
         }
-        doc.occurredAt = (new Date()).toISOString().substr(0, 19);
-        save();
+        doc.occurredAt = (new Date()).toISOString().substring(0, 19);
+        
+        addToast({
+            message: '"' + doc.name + '" ' + msg,
+            timeout: 3000 
+        });
+        dispatch('update', {doc: doc})
     }
 
 
@@ -138,7 +146,7 @@
 >
     <header>
         <div>
-            <button class="icon list-btn" on:click={occurred}>
+            <button class="icon list-btn" on:click={debounceOccur}>
                <TargetIcon/> 
             </button>
         </div>
@@ -212,8 +220,12 @@
                 </select>
                 <NumberInput bind:val={doc.durationIncrement} name="activity-duration-inc"/>
             </div>
-
-            {#if doc.occurredAt && (doc.complete || doc.recur)}
+            {#if doc.recur}
+            <div class="input-group" data-group="occurrence">
+                <NumberInput bind:val={doc.occurrences} label="Ocurrences" name="activity-ocurrences"/>
+            </div>
+            {/if}
+            {#if doc.occurredAt}
             <div class="input-group" data-group="occurrence">
                 <div>
                     <label for=activity-occurred-at>Occurred :</label>
@@ -223,12 +235,6 @@
                     <label for=activity-occurred-at>At :</label>
                     <input name="activity-occurred-at" type='datetime-local' bind:value={doc.occurredAt}>
                 </div>
-            </div>
-            {/if}
-
-            {#if doc.recur}
-            <div class="input-group" data-group="occurrence">
-                <NumberInput bind:val={doc.occurrences} label="Ocurrences" name="activity-ocurrences"/>
             </div>
             {/if}
 
