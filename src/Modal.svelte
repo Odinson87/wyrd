@@ -29,7 +29,7 @@
       <svelte:component bind:source={source} this={modal.component} {...modal.data}/>
   {/if}
 
-  <button class="close" on:click={dismissModal}>
+  <button class="icon close" on:click={dismissModal}>
     <CloseIcon width="1.5em" />
   </button>
 </div>

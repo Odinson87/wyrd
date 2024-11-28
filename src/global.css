@@ -77,6 +77,8 @@ button.menu-item:hover {
 [data-light-mode='0'] {
 	color:#eee;
 }
+
+
 [data-light-mode='0'] main {
 	background-color: #333;
 }
@@ -92,6 +94,29 @@ button.menu-item:hover {
 [data-light-mode='1'] > header,
 [data-light-mode='1'] > header > aside {
 	background-color: #eee;
+}
+
+[data-light-mode='1'] button svg,
+[data-light-mode='1'] button svg .fill {
+	fill: #333;
+}
+[data-light-mode='1'] button svg .stroke {
+	stroke: #333;
+}
+
+[data-light-mode='0'] button svg,
+[data-light-mode='0'] button svg .fill{
+	fill: #eee;
+}
+
+[data-light-mode='0'] button svg .stroke {
+	stroke: #eee;
+}
+
+[data-light-mode='0'] section[name="modals"] button.icon,
+[data-light-mode='0'] main button.icon {
+	background-color: #252525;
+	border-color:#222;
 }
 
 
@@ -188,6 +213,7 @@ button {
 	line-height: 1.5em;
 	padding:0;
 	text-align: center;
+	cursor: pointer;
 }
 
 button.icon {
@@ -198,9 +224,11 @@ button.icon {
 	background-color: #f4f4f4;
 	outline: none;
 }
-
+button.icon.medium {
+	width: 2.3em;
+	height: 2.3em;
+}
 button.icon.small {
-	border-radius: 50%;
 	width: 1.7em;
 	height: 1.7em;
 }
@@ -239,9 +267,7 @@ button.title {
 [data-viewmode="add"] header button.title,
 [data-viewmode="add"] header button.list-btn,
 [data-viewmode="add"] header button.edit-btn,
-[data-viewmode="add"] header .since,
-[data-viewmode="add"] section.edit [data-group="duration"],
-[data-viewmode="add"] section.edit [data-group="recurrence"]
+[data-viewmode="add"] header .since
 {
 	display:none;
 }
@@ -265,6 +291,22 @@ button.title {
 [data-light-mode="1"] section[name='modals'] > section {
 	background-color: rgba(255,255,255,0.92);
 }
+
+
+article [data-tab="tags"] .tab-group[data-group="tags"],
+article [data-tab="time"] .tab-group[data-group="time"],
+article [data-tab="logs"] .tab-group[data-group="logs"] 
+{
+	display:block;
+}
+
+article [data-tab="tags"] .tab-group[data-group="time"],
+article [data-tab="tags"] .tab-group[data-group="logs"],
+article [data-tab="time"] .tab-group[data-group="tags"],
+article [data-tab="time"] .tab-group[data-group="logs"],
+article [data-tab="logs"] .tab-group[data-group="time"],
+article [data-tab="logs"] .tab-group[data-group="tags"],
+article [data-tab="hidden"] .tab-group { display:none; }
 
 section[name='modals'] > section {
 	position: fixed;

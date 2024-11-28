@@ -10,10 +10,12 @@
     import BinIcon from './lib/icons/bin.svelte';
     import TargetIcon from './lib/icons/target.svelte';
     import TagIcon from './lib/icons/tagIcon.svelte';
+    import TimeIcon from './lib/icons/timeForward.svelte';
+    import LogIcon from './lib/icons/notes.svelte';
     import NumberInput from './lib/input/Number.svelte';
     import Recurrence from './lib/input/Recurrence.svelte';
-    import Tags from './lib/input/Tags.svelte';
     import ModalBtn from './lib/input/ModalBtn.svelte';
+    import TagEditor from './TagEditor.svelte';
 
     const dispatch = createEventDispatcher();
 
@@ -44,7 +46,6 @@
         });
         dispatch('update', {doc: doc})
     }
-  
 
     // only fire once, debouncing multiple clicks, reducing revisions
     const debouncedSave = debounce(save, 1000);
@@ -52,6 +53,14 @@
 
     function toggleMode(mode) {
         viewmode = viewmode === mode ? 'list' : mode;
+    }
+
+    function toggleTab(t) {
+        if (t === tab) {
+            tab = 'hidden';
+        } else {
+            tab = t;
+        }
     }
 
     function occurred() {
@@ -65,17 +74,13 @@
         save();
     }
 
-    function output(){
-        console.log(doc);
-    }
 
     $: durationStr = doc.durationIncrement + doc.durationType;
     $: agoStr = ago(doc.occurredAt);
 
-    let activityTypes = Object.keys($settings.activityTypes);
-
     export let doc;
     export let viewmode = 'list';
+    let tab = 'hidden';
 </script>
 
 <style>
@@ -105,7 +110,6 @@
         text-align: right;
         line-height: 1em;
         width:100%;
-        text-shadow: 1px 0px 3px #000;
     }
     .since p:first-child { 
         top: -4px;
@@ -116,6 +120,14 @@
     .since p:last-child { bottom: -3px;}
     [name="activity-occurred-at"] {
         font-size: 15px;
+    }
+
+    .tab-buttons {
+        display: flex;
+        justify-content: center
+    }
+    .tab-buttons button {
+        margin:5px;
     }
    
 </style>
@@ -146,7 +158,7 @@
                     {/if}
                 </p>
                 <ModalBtn classes={'small'} modalName={'tageditor'} bind:source={doc} on:save={debouncedSave} >
-                    <TagIcon slot="icon"/>
+                    <TagIcon size={20} slot="icon"/>
                 </ModalBtn>
                 <p>{durationStr}</p>
             </div>
@@ -158,7 +170,7 @@
             </button>
         </div>
     </header>
-    <section class="edit">
+    <section class="edit" data-tab={tab}>
         <div class="input-group" data-group="name">
             <label for=activity-name>Name :</label>
             <input name="activity-name" type='text' bind:value={doc.name}>
@@ -171,42 +183,60 @@
                 {/each}
             </select>
         </div>
-        <div class="input-group" data-group="tags">
-            <ModalBtn modalName={'tageditor'} bind:source={doc} on:save={debouncedSave}>
-                <TagIcon slot="icon"/>
-            </ModalBtn>
-            <Tags bind:tags={doc.tags} disabled={true}/>
-        </div>
-        <div class="input-group" data-group="duration">
-            <label for="activity-duration">Duration :</label>
-            <select bind:value={doc.durationType} name="activity-duration">
-                {#each Object.entries(DurationEnum) as [_, duration]}
-                    <option value={duration.key}>{duration.name}</option>
-                {/each}
-            </select>
-            <NumberInput bind:val={doc.durationIncrement} name="activity-duration-inc"/>
-        </div>
+        <div>
 
-        {#if doc.occurredAt && (doc.complete || doc.recur)}
-        <div class="input-group" data-group="occurrence">
-            <div>
-                <label for=activity-occurred-at>Occurred :</label>
-                <p>{agoStr}</p>
+        </div>
+        <div class="tab-buttons">
+            <button class="medium icon" on:click={() => toggleTab('tags')}>
+                <TagIcon/>
+            </button>
+            <button class="medium icon" on:click={() => toggleTab('time')}>
+                <TimeIcon/>
+            </button>
+            <button class="medium icon" on:click={() => toggleTab('logs')}>
+                <LogIcon/>
+            </button>
+        </div>
+        <div class="tab-group" data-group="tags">
+            <h3>Tags</h3>
+            <TagEditor bind:source={doc}/>
+        </div>
+        <div class="tab-group" data-group="time">
+            <h3>Time</h3>
+            <div class="input-group" data-group="duration">
+                <label for="activity-duration">Duration :</label>
+                <select bind:value={doc.durationType} name="activity-duration">
+                    {#each Object.entries(DurationEnum) as [_, duration]}
+                        <option value={duration.key}>{duration.name}</option>
+                    {/each}
+                </select>
+                <NumberInput bind:val={doc.durationIncrement} name="activity-duration-inc"/>
             </div>
-            <div>
-                <label for=activity-occurred-at>At :</label>
-                <input name="activity-occurred-at" type='datetime-local' bind:value={doc.occurredAt}>
+
+            {#if doc.occurredAt && (doc.complete || doc.recur)}
+            <div class="input-group" data-group="occurrence">
+                <div>
+                    <label for=activity-occurred-at>Occurred :</label>
+                    <p>{agoStr}</p>
+                </div>
+                <div>
+                    <label for=activity-occurred-at>At :</label>
+                    <input name="activity-occurred-at" type='datetime-local' bind:value={doc.occurredAt}>
+                </div>
             </div>
-        </div>
-        {/if}
+            {/if}
 
-        {#if doc.recur}
-        <div class="input-group" data-group="occurrence">
-            <NumberInput bind:val={doc.occurrences} label="Ocurrences" name="activity-ocurrences"/>
-        </div>
-        {/if}
+            {#if doc.recur}
+            <div class="input-group" data-group="occurrence">
+                <NumberInput bind:val={doc.occurrences} label="Ocurrences" name="activity-ocurrences"/>
+            </div>
+            {/if}
 
-        <Recurrence bind:doc={doc}/>
+            <Recurrence bind:doc={doc}/>
+        </div>
+        <div class='tab-group' data-group="logs">
+            <h3>Logs</h3>
+        </div>
     </section>
     <!--button on:click={output}>Log</button-->
 </article>
