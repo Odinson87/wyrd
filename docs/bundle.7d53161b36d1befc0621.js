@@ -21657,6 +21657,43 @@ function validate_each_keys(ctx, list, get_context, get_key) {
 	}
 }
 
+;// ./node_modules/svelte/src/runtime/internal/spread.js
+/** @returns {{}} */
+function get_spread_update(levels, updates) {
+	const update = {};
+	const to_null_out = {};
+	const accounted_for = { $$scope: 1 };
+	let i = levels.length;
+	while (i--) {
+		const o = levels[i];
+		const n = updates[i];
+		if (n) {
+			for (const key in o) {
+				if (!(key in n)) to_null_out[key] = 1;
+			}
+			for (const key in n) {
+				if (!accounted_for[key]) {
+					update[key] = n[key];
+					accounted_for[key] = 1;
+				}
+			}
+			levels[i] = n;
+		} else {
+			for (const key in o) {
+				accounted_for[key] = 1;
+			}
+		}
+	}
+	for (const key in to_null_out) {
+		if (!(key in update)) update[key] = undefined;
+	}
+	return update;
+}
+
+function get_spread_object(spread_props) {
+	return typeof spread_props === 'object' && spread_props !== null ? spread_props : {};
+}
+
 ;// ./node_modules/svelte/src/shared/boolean_attributes.js
 const _boolean_attributes = /** @type {const} */ ([
 	'allowfullscreen',
@@ -23128,6 +23165,24 @@ class Conf {
 
 
 
+//  Modals Store
+const modals = writable([]); 
+
+const addModal = (modal) => {
+  // Create a unique ID so we can easily find/remove it
+  // if it is dismissible/has a timeout.
+  modal.id = esm_browser_v4();
+    
+  // Push the modal to the top of the list of modala
+  modals.update((all) => [{ ...modal }, ...all]);
+
+  return modal;
+};
+
+const dismissModal = (id) => {
+  modals.update((all) => all.filter((t) => t.id !== id));
+};
+
 // Toasts Store
 const toasts = writable([]);
 
@@ -23184,7 +23239,7 @@ class Filters {
             activityTypeActive = true;
         }
 
-        if (selectedTagsActive.length > 0) {
+        if (this.tags.length > 0) {
             selectedTagsActive = true;
         }
 
@@ -23200,7 +23255,6 @@ class Filters {
         // match completed status
         if (this.completedStatus !== '') {
             let completedVal = this.completedStatus === 'complete';
-            console.log(completedVal);
             matchesCompleteStatus = obj.complete === completedVal;
         } else {
             matchesCompleteStatus = true;
@@ -23218,7 +23272,9 @@ class Filters {
         // match all tags
         if(this.tags.length > 0) {
             this.tags.forEach((t) => {
-                hasTags = obj.tags.indexOf(t) > -1
+                if (obj.tags.indexOf(t) > -1) {
+                    hasTags = true;
+                }
             })
         } else {
             hasTags = true;
@@ -33916,7 +33972,7 @@ PouchDB.plugin(IDBPouch)
 class ActivityDoc {
     constructor(name = ''){
         this.name = name;
-        this.type = 'Activity';
+        this.type = 'Todo';
         this.complete = false;
         this.durationType = 'm';
         this.durationIncrement = 10;
@@ -34566,12 +34622,12 @@ function create_fragment(ctx) {
 		c() {
 			svg = svg_element("svg");
 			path = svg_element("path");
+			dom_attr(path, "class", "fill");
 			dom_attr(path, "d", "M3 5.75C3 4.23122 4.23122 3 5.75 3H15.7145C16.5764 3 17.4031 3.34241 18.0126 3.9519L20.0481 5.98744C20.6576 6.59693 21 7.42358 21 8.28553V18.25C21 19.7688 19.7688 21 18.25 21H5.75C4.23122 21 3 19.7688 3 18.25V5.75ZM5.75 4.5C5.05964 4.5 4.5 5.05964 4.5 5.75V18.25C4.5 18.9404 5.05964 19.5 5.75 19.5H6V14.25C6 13.0074 7.00736 12 8.25 12H15.75C16.9926 12 18 13.0074 18 14.25V19.5H18.25C18.9404 19.5 19.5 18.9404 19.5 18.25V8.28553C19.5 7.8214 19.3156 7.37629 18.9874 7.0481L16.9519 5.01256C16.6918 4.75246 16.3582 4.58269 16 4.52344V7.25C16 8.49264 14.9926 9.5 13.75 9.5H9.25C8.00736 9.5 7 8.49264 7 7.25V4.5H5.75ZM16.5 19.5V14.25C16.5 13.8358 16.1642 13.5 15.75 13.5H8.25C7.83579 13.5 7.5 13.8358 7.5 14.25V19.5H16.5ZM8.5 4.5V7.25C8.5 7.66421 8.83579 8 9.25 8H13.75C14.1642 8 14.5 7.66421 14.5 7.25V4.5H8.5Z");
-			dom_attr(path, "fill", "#212121");
+			dom_attr(path, "fill", "#333");
 			dom_attr(svg, "width", "26px");
 			dom_attr(svg, "height", "26px");
 			dom_attr(svg, "viewBox", "0 0 24 24");
-			dom_attr(svg, "fill", "none");
 			dom_attr(svg, "xmlns", "http://www.w3.org/2000/svg");
 		},
 		m(target, anchor) {
@@ -34670,35 +34726,52 @@ class Bin extends SvelteComponent {
 function target_svelte_create_fragment(ctx) {
 	let svg;
 	let g;
-	let path0;
-	let path1;
-	let path2;
+	let circle0;
+	let circle1;
+	let circle2;
 
 	return {
 		c() {
 			svg = svg_element("svg");
 			g = svg_element("g");
-			path0 = svg_element("path");
-			path1 = svg_element("path");
-			path2 = svg_element("path");
-			dom_attr(path0, "d", "M245,490C109.906,490,0,380.094,0,245S109.906,0,245,0s245,109.906,245,245S380.094,490,245,490z M245,20.851\r\n\t\tC121.4,20.851,20.851,121.405,20.851,245S121.4,469.149,245,469.149c123.599,0,224.149-100.554,224.149-224.149\r\n\t\tS368.599,20.851,245,20.851z");
-			dom_attr(path1, "d", "M245,421.261c-97.19,0-176.257-79.071-176.257-176.261c0-97.195,79.067-176.267,176.257-176.267\r\n\t\tc97.189,0,176.267,79.071,176.267,176.267C421.267,342.19,342.189,421.261,245,421.261z M245,89.585\r\n\t\tc-85.696,0-155.406,69.721-155.406,155.415S159.304,400.41,245,400.41c85.695,0,155.416-69.716,155.416-155.41\r\n\t\tS330.695,89.585,245,89.585z");
-			dom_attr(path2, "d", "M245,341.247c-53.065,0-96.243-43.178-96.243-96.247c0-53.074,43.178-96.253,96.243-96.253\r\n\t\tc53.074,0,96.253,43.178,96.253,96.253C341.253,298.069,298.074,341.247,245,341.247z M245,169.598\r\n\t\tc-41.57,0-75.392,33.827-75.392,75.402S203.43,320.396,245,320.396c41.579,0,75.402-33.821,75.402-75.396\r\n\t\tS286.579,169.598,245,169.598z");
-			dom_attr(svg, "fill", "#000000");
+			circle0 = svg_element("circle");
+			circle1 = svg_element("circle");
+			circle2 = svg_element("circle");
+			dom_attr(circle0, "class", "stroke");
+			dom_attr(circle0, "stroke", "#333");
+			dom_attr(circle0, "stroke-width", "1.4");
+			dom_attr(circle0, "fill", "none");
+			dom_attr(circle0, "r", "11");
+			dom_attr(circle0, "cx", "12");
+			dom_attr(circle0, "cy", "12");
+			dom_attr(circle1, "class", "stroke");
+			dom_attr(circle1, "stroke", "#333");
+			dom_attr(circle1, "stroke-width", "1.4");
+			dom_attr(circle1, "fill", "none");
+			dom_attr(circle1, "r", "7");
+			dom_attr(circle1, "cx", "12");
+			dom_attr(circle1, "cy", "12");
+			dom_attr(circle2, "class", "stroke");
+			dom_attr(circle2, "stroke", "#333");
+			dom_attr(circle2, "stroke-width", "1.4");
+			dom_attr(circle2, "fill", "none");
+			dom_attr(circle2, "r", "3");
+			dom_attr(circle2, "cx", "12");
+			dom_attr(circle2, "cy", "12");
 			dom_attr(svg, "height", "34px");
 			dom_attr(svg, "width", "34px");
 			dom_attr(svg, "version", "1.1");
 			dom_attr(svg, "xmlns", "http://www.w3.org/2000/svg");
 			dom_attr(svg, "xmlns:xlink", "http://www.w3.org/1999/xlink");
-			dom_attr(svg, "viewBox", "0 0 490 490");
+			dom_attr(svg, "viewBox", "0 0 24 24");
 			dom_attr(svg, "xml:space", "preserve");
 		},
 		m(target, anchor) {
 			dom_insert(target, svg, anchor);
 			dom_append(svg, g);
-			dom_append(g, path0);
-			dom_append(g, path1);
-			dom_append(g, path2);
+			dom_append(g, circle0);
+			dom_append(g, circle1);
+			dom_append(g, circle2);
 		},
 		p: utils_noop,
 		i: utils_noop,
@@ -34719,6 +34792,263 @@ class Target extends SvelteComponent {
 }
 
 /* harmony default export */ const target_svelte = (Target);
+;// ./src/lib/icons/tagIcon.svelte
+/* src/lib/icons/tagIcon.svelte generated by Svelte v4.2.19 */
+
+
+
+
+function tagIcon_svelte_create_fragment(ctx) {
+	let svg;
+	let path0;
+	let path1;
+	let path2;
+	let path3;
+	let svg_width_value;
+	let svg_height_value;
+
+	return {
+		c() {
+			svg = svg_element("svg");
+			path0 = svg_element("path");
+			path1 = svg_element("path");
+			path2 = svg_element("path");
+			path3 = svg_element("path");
+			dom_attr(path0, "class", "fill");
+			dom_attr(path0, "d", "M8.49999 10C9.32842 10 9.99999 9.32844 9.99999 8.50001C9.99999 7.67159 9.32842 7.00001 8.49999 7.00001C7.67156 7.00001 6.99999 7.67159 6.99999 8.50001C6.99999 9.32844 7.67156 10 8.49999 10Z");
+			dom_attr(path0, "fill", "#000000");
+			dom_attr(path0, "id", "tag1");
+			dom_attr(path1, "class", "fill");
+			dom_attr(path1, "fill-rule", "evenodd");
+			dom_attr(path1, "clip-rule", "evenodd");
+			dom_attr(path1, "d", "M4.4497 1.94984C3.06898 1.94985 1.94969 3.06915 1.94971 4.44987L1.94978 12.0209C1.94979 12.8166 2.26586 13.5796 2.82846 14.1422L10.728 22.0417C12.2901 23.6038 14.8227 23.6038 16.3848 22.0417L22.0417 16.3849C23.6038 14.8228 23.6038 12.2901 22.0417 10.728L14.1422 2.82851C13.5796 2.2659 12.8165 1.94983 12.0209 1.94983L4.4497 1.94984ZM3.94971 4.44985C3.9497 4.17371 4.17356 3.94985 4.44971 3.94984L12.0209 3.94983C12.2861 3.94983 12.5404 4.05518 12.728 4.24272L20.6275 12.1422C21.4085 12.9233 21.4085 14.1896 20.6275 14.9706L14.9706 20.6275C14.1896 21.4085 12.9232 21.4085 12.1422 20.6275L4.24268 12.728C4.05514 12.5405 3.94979 12.2861 3.94978 12.0209L3.94971 4.44985Z");
+			dom_attr(path1, "fill", "#000000");
+			dom_attr(path1, "id", "tag2");
+			dom_attr(path2, "class", "stroke");
+			dom_attr(path2, "fill", "none");
+			dom_attr(path2, "stroke", "#000000");
+			dom_attr(path2, "stroke-width", "1.6");
+			dom_attr(path2, "stroke-linecap", "round");
+			dom_attr(path2, "stroke-linejoin", "miter");
+			dom_attr(path2, "stroke-miterlimit", "4");
+			dom_attr(path2, "stroke-dasharray", "none");
+			dom_attr(path2, "stroke-opacity", "1");
+			dom_attr(path2, "d", "m 13.820368,17.17504 -0.02491,-7.158811");
+			dom_attr(path2, "id", "plus1");
+			dom_attr(path3, "class", "stroke");
+			dom_attr(path3, "fill", "none");
+			dom_attr(path3, "stroke", "#000000");
+			dom_attr(path3, "stroke-width", "1.6");
+			dom_attr(path3, "stroke-linecap", "round");
+			dom_attr(path3, "stroke-linejoin", "miter");
+			dom_attr(path3, "stroke-miterlimit", "4");
+			dom_attr(path3, "stroke-dasharray", "none");
+			dom_attr(path3, "stroke-opacity", "1");
+			dom_attr(path3, "d", "m 10.228507,13.60809 7.158811,-0.02491");
+			dom_attr(path3, "id", "plus2");
+			dom_attr(svg, "width", svg_width_value = "" + (/*size*/ ctx[0] + "px"));
+			dom_attr(svg, "height", svg_height_value = "" + (/*size*/ ctx[0] + "px"));
+			dom_attr(svg, "viewBox", "0 0 24 24");
+			dom_attr(svg, "version", "1.1");
+			dom_attr(svg, "id", "svg29");
+			dom_attr(svg, "xmlns", "http://www.w3.org/2000/svg");
+			dom_attr(svg, "xmlns:svg", "http://www.w3.org/2000/svg");
+		},
+		m(target, anchor) {
+			dom_insert(target, svg, anchor);
+			dom_append(svg, path0);
+			dom_append(svg, path1);
+			dom_append(svg, path2);
+			dom_append(svg, path3);
+		},
+		p(ctx, [dirty]) {
+			if (dirty & /*size*/ 1 && svg_width_value !== (svg_width_value = "" + (/*size*/ ctx[0] + "px"))) {
+				dom_attr(svg, "width", svg_width_value);
+			}
+
+			if (dirty & /*size*/ 1 && svg_height_value !== (svg_height_value = "" + (/*size*/ ctx[0] + "px"))) {
+				dom_attr(svg, "height", svg_height_value);
+			}
+		},
+		i: utils_noop,
+		o: utils_noop,
+		d(detaching) {
+			if (detaching) {
+				dom_detach(svg);
+			}
+		}
+	};
+}
+
+function instance($$self, $$props, $$invalidate) {
+	let { size = 24 } = $$props;
+
+	$$self.$$set = $$props => {
+		if ('size' in $$props) $$invalidate(0, size = $$props.size);
+	};
+
+	return [size];
+}
+
+class TagIcon extends SvelteComponent {
+	constructor(options) {
+		super();
+		init(this, options, instance, tagIcon_svelte_create_fragment, safe_not_equal, { size: 0 });
+	}
+}
+
+/* harmony default export */ const tagIcon_svelte = (TagIcon);
+;// ./src/lib/icons/timeForward.svelte
+/* src/lib/icons/timeForward.svelte generated by Svelte v4.2.19 */
+
+
+
+
+function timeForward_svelte_create_fragment(ctx) {
+	let svg;
+	let path;
+	let svg_width_value;
+	let svg_height_value;
+
+	return {
+		c() {
+			svg = svg_element("svg");
+			path = svg_element("path");
+			dom_attr(path, "d", "M23,11a1,1,0,0,0-1,1,10.034,10.034,0,1,1-2.9-7.021A.862.862,0,0,1,19,5H16a1,1,0,0,0,0,2h3a3,3,0,0,0,3-3V1a1,1,0,0,0-2,0V3.065A11.994,11.994,0,1,0,24,12,1,1,0,0,0,23,11Z\r\nM12,6a1,1,0,0,0-1,1v5a1,1,0,0,0,.293.707l3,3a1,1,0,0,0,1.414-1.414L13,11.586V7A1,1,0,0,0,12,6Z");
+			dom_attr(svg, "fill", "#000000");
+			dom_attr(svg, "width", svg_width_value = "" + (/*size*/ ctx[0] + "px"));
+			dom_attr(svg, "height", svg_height_value = "" + (/*size*/ ctx[0] + "px"));
+			dom_attr(svg, "viewBox", "0 0 24 24");
+			dom_attr(svg, "id", "Layer_1");
+			dom_attr(svg, "data-name", "Layer 1");
+			dom_attr(svg, "xmlns", "http://www.w3.org/2000/svg");
+		},
+		m(target, anchor) {
+			dom_insert(target, svg, anchor);
+			dom_append(svg, path);
+		},
+		p(ctx, [dirty]) {
+			if (dirty & /*size*/ 1 && svg_width_value !== (svg_width_value = "" + (/*size*/ ctx[0] + "px"))) {
+				dom_attr(svg, "width", svg_width_value);
+			}
+
+			if (dirty & /*size*/ 1 && svg_height_value !== (svg_height_value = "" + (/*size*/ ctx[0] + "px"))) {
+				dom_attr(svg, "height", svg_height_value);
+			}
+		},
+		i: utils_noop,
+		o: utils_noop,
+		d(detaching) {
+			if (detaching) {
+				dom_detach(svg);
+			}
+		}
+	};
+}
+
+function timeForward_svelte_instance($$self, $$props, $$invalidate) {
+	let { size = 24 } = $$props;
+
+	$$self.$$set = $$props => {
+		if ('size' in $$props) $$invalidate(0, size = $$props.size);
+	};
+
+	return [size];
+}
+
+class TimeForward extends SvelteComponent {
+	constructor(options) {
+		super();
+		init(this, options, timeForward_svelte_instance, timeForward_svelte_create_fragment, safe_not_equal, { size: 0 });
+	}
+}
+
+/* harmony default export */ const timeForward_svelte = (TimeForward);
+;// ./src/lib/icons/notes.svelte
+/* src/lib/icons/notes.svelte generated by Svelte v4.2.19 */
+
+
+
+
+function notes_svelte_create_fragment(ctx) {
+	let svg;
+	let g;
+	let path0;
+	let defs;
+	let clipPath;
+	let path1;
+	let svg_width_value;
+	let svg_height_value;
+
+	return {
+		c() {
+			svg = svg_element("svg");
+			g = svg_element("g");
+			path0 = svg_element("path");
+			defs = svg_element("defs");
+			clipPath = svg_element("clipPath");
+			path1 = svg_element("path");
+			dom_attr(path0, "d", "M55 139.591 61.173 171l26.432-17.816L136 35.594 103.394 22 55 139.591ZM22 42h72m40 0h36M22 78h57m41 0h50M22 114h41m41 0h66M22 150h34m34 0h32");
+			dom_attr(g, "class", "stroke");
+			dom_attr(g, "stroke", "#000000");
+			dom_attr(g, "stroke-linecap", "round");
+			dom_attr(g, "stroke-linejoin", "round");
+			dom_attr(g, "stroke-width", "12");
+			dom_attr(g, "clip-path", "url(#a)");
+			dom_attr(path1, "fill", "#ffffff");
+			dom_attr(path1, "d", "M0 0h192v192H0z");
+			dom_attr(clipPath, "id", "a");
+			dom_attr(svg, "width", svg_width_value = "" + (/*size*/ ctx[0] + "px"));
+			dom_attr(svg, "height", svg_height_value = "" + (/*size*/ ctx[0] + "px"));
+			dom_attr(svg, "viewBox", "0 0 192 192");
+			dom_attr(svg, "xmlns", "http://www.w3.org/2000/svg");
+			dom_attr(svg, "fill", "none");
+		},
+		m(target, anchor) {
+			dom_insert(target, svg, anchor);
+			dom_append(svg, g);
+			dom_append(g, path0);
+			dom_append(svg, defs);
+			dom_append(defs, clipPath);
+			dom_append(clipPath, path1);
+		},
+		p(ctx, [dirty]) {
+			if (dirty & /*size*/ 1 && svg_width_value !== (svg_width_value = "" + (/*size*/ ctx[0] + "px"))) {
+				dom_attr(svg, "width", svg_width_value);
+			}
+
+			if (dirty & /*size*/ 1 && svg_height_value !== (svg_height_value = "" + (/*size*/ ctx[0] + "px"))) {
+				dom_attr(svg, "height", svg_height_value);
+			}
+		},
+		i: utils_noop,
+		o: utils_noop,
+		d(detaching) {
+			if (detaching) {
+				dom_detach(svg);
+			}
+		}
+	};
+}
+
+function notes_svelte_instance($$self, $$props, $$invalidate) {
+	let { size = 24 } = $$props;
+
+	$$self.$$set = $$props => {
+		if ('size' in $$props) $$invalidate(0, size = $$props.size);
+	};
+
+	return [size];
+}
+
+class Notes extends SvelteComponent {
+	constructor(options) {
+		super();
+		init(this, options, notes_svelte_instance, notes_svelte_create_fragment, safe_not_equal, { size: 0 });
+	}
+}
+
+/* harmony default export */ const notes_svelte = (Notes);
 ;// ./src/lib/input/Number.svelte
 /* src/lib/input/Number.svelte generated by Svelte v4.2.19 */
 
@@ -34851,7 +35181,7 @@ function Number_svelte_create_fragment(ctx) {
 	};
 }
 
-function instance($$self, $$props, $$invalidate) {
+function Number_svelte_instance($$self, $$props, $$invalidate) {
 	let { min = 0 } = $$props;
 	let { max } = $$props;
 	let { val } = $$props;
@@ -34917,7 +35247,7 @@ class Number_svelte_Number extends SvelteComponent {
 	constructor(options) {
 		super();
 
-		init(this, options, instance, Number_svelte_create_fragment, safe_not_equal, {
+		init(this, options, Number_svelte_instance, Number_svelte_create_fragment, safe_not_equal, {
 			min: 1,
 			max: 6,
 			val: 0,
@@ -35636,6 +35966,7 @@ function Recurrence_svelte_create_fragment(ctx) {
 			t = space();
 			if (if_block) if_block.c();
 			dom_attr(div, "class", "input-group");
+			dom_attr(div, "data-group", "recurrence");
 		},
 		m(target, anchor) {
 			dom_insert(target, div, anchor);
@@ -35768,6 +36099,1685 @@ class Recurrence extends SvelteComponent {
 }
 
 /* harmony default export */ const Recurrence_svelte = (Recurrence);
+;// ./src/lib/Modal.js
+
+const Modal_defaults = {
+    id: null,
+    name: null,
+    title: '',
+    message: '',
+    component: null,
+    data: {}
+}
+
+class Modal {
+    constructor(obj){
+        let options = Object.assign(Modal_defaults, obj);
+        this.id = options.id;
+        this.title = options.title;
+        this.message = options.message;
+        this.component = options.component;
+        this.data = options.data;
+        this.source = null;
+    }
+}
+
+/* harmony default export */ const lib_Modal = (Modal);
+;// ./src/lib/input/TagCheckbox.svelte
+/* src/lib/input/TagCheckbox.svelte generated by Svelte v4.2.19 */
+
+
+
+
+
+
+function TagCheckbox_svelte_create_fragment(ctx) {
+	let label;
+	let input;
+	let t0;
+	let span;
+	let t1;
+	let mounted;
+	let dispose;
+
+	return {
+		c() {
+			label = dom_element("label");
+			input = dom_element("input");
+			t0 = space();
+			span = dom_element("span");
+			t1 = dom_text(/*tagName*/ ctx[0]);
+			dom_attr(input, "name", /*tagName*/ ctx[0]);
+			dom_attr(input, "type", "checkbox");
+			input.disabled = /*disabled*/ ctx[2];
+			dom_attr(input, "class", "svelte-yr11cf");
+			dom_attr(label, "class", "tag svelte-yr11cf");
+			dom_attr(label, "data-checked", /*checked*/ ctx[1]);
+			set_style(label, "background-color", /*tag*/ ctx[3] ? /*tag*/ ctx[3].hex : 'transparent');
+		},
+		m(target, anchor) {
+			dom_insert(target, label, anchor);
+			dom_append(label, input);
+			input.checked = /*checked*/ ctx[1];
+			set_input_value(input, /*tagName*/ ctx[0]);
+			dom_append(label, t0);
+			dom_append(label, span);
+			dom_append(span, t1);
+
+			if (!mounted) {
+				dispose = dom_listen(input, "change", /*input_change_handler*/ ctx[7]);
+				mounted = true;
+			}
+		},
+		p(ctx, [dirty]) {
+			if (dirty & /*tagName*/ 1) {
+				dom_attr(input, "name", /*tagName*/ ctx[0]);
+			}
+
+			if (dirty & /*disabled*/ 4) {
+				input.disabled = /*disabled*/ ctx[2];
+			}
+
+			if (dirty & /*checked*/ 2) {
+				input.checked = /*checked*/ ctx[1];
+			}
+
+			if (dirty & /*tagName*/ 1) {
+				set_input_value(input, /*tagName*/ ctx[0]);
+			}
+
+			if (dirty & /*tagName*/ 1) set_data(t1, /*tagName*/ ctx[0]);
+
+			if (dirty & /*checked*/ 2) {
+				dom_attr(label, "data-checked", /*checked*/ ctx[1]);
+			}
+
+			if (dirty & /*tag*/ 8) {
+				set_style(label, "background-color", /*tag*/ ctx[3] ? /*tag*/ ctx[3].hex : 'transparent');
+			}
+		},
+		i: utils_noop,
+		o: utils_noop,
+		d(detaching) {
+			if (detaching) {
+				dom_detach(label);
+			}
+
+			mounted = false;
+			dispose();
+		}
+	};
+}
+
+function TagCheckbox_svelte_instance($$self, $$props, $$invalidate) {
+	let $settings;
+	component_subscribe($$self, settings, $$value => $$invalidate(8, $settings = $$value));
+	let tag;
+	let { tagName } = $$props;
+	let { checked } = $$props;
+	let { group } = $$props;
+	let { disabled = false } = $$props;
+	let { selectMax = 0 } = $$props;
+	let { selectedVal } = $$props;
+
+	// get tag object if available
+	function setTag(name) {
+		if (name) {
+			if (Object.hasOwn($settings.tags, name)) {
+				$$invalidate(3, tag = $settings.tags[name]);
+			}
+
+			if (Object.hasOwn($settings.activityTypes, name)) {
+				$$invalidate(3, tag = $settings.activityTypes[name]);
+			}
+		}
+	}
+
+	function updateCheckbox(group) {
+		$$invalidate(1, checked = group.indexOf(tagName) >= 0);
+	}
+
+	function updateGroup(checked) {
+		const intSelectMax = parseInt(selectMax);
+		const index = group.indexOf(tagName);
+
+		if (checked) {
+			if (index < 0) {
+				if (intSelectMax > 0) {
+					if (intSelectMax === 1) {
+						$$invalidate(4, group = [tagName]);
+						$$invalidate(5, selectedVal = tagName);
+					} else if (group.length <= intSelectMax) {
+						group.push(tagName);
+					}
+				} else {
+					group.push(tagName);
+				}
+
+				$$invalidate(4, group);
+			}
+		} else {
+			if (index >= 0) {
+				group.splice(index, 1);
+				$$invalidate(4, group);
+			}
+		}
+	} //        console.log(group);
+
+	function input_change_handler() {
+		checked = this.checked;
+		tagName = this.value;
+		$$invalidate(1, checked);
+		$$invalidate(0, tagName);
+	}
+
+	$$self.$$set = $$props => {
+		if ('tagName' in $$props) $$invalidate(0, tagName = $$props.tagName);
+		if ('checked' in $$props) $$invalidate(1, checked = $$props.checked);
+		if ('group' in $$props) $$invalidate(4, group = $$props.group);
+		if ('disabled' in $$props) $$invalidate(2, disabled = $$props.disabled);
+		if ('selectMax' in $$props) $$invalidate(6, selectMax = $$props.selectMax);
+		if ('selectedVal' in $$props) $$invalidate(5, selectedVal = $$props.selectedVal);
+	};
+
+	$$self.$$.update = () => {
+		if ($$self.$$.dirty & /*tagName*/ 1) {
+			$: setTag(tagName);
+		}
+
+		if ($$self.$$.dirty & /*group*/ 16) {
+			$: updateCheckbox(group);
+		}
+
+		if ($$self.$$.dirty & /*checked*/ 2) {
+			$: updateGroup(checked);
+		}
+	};
+
+	return [
+		tagName,
+		checked,
+		disabled,
+		tag,
+		group,
+		selectedVal,
+		selectMax,
+		input_change_handler
+	];
+}
+
+class TagCheckbox extends SvelteComponent {
+	constructor(options) {
+		super();
+
+		init(this, options, TagCheckbox_svelte_instance, TagCheckbox_svelte_create_fragment, safe_not_equal, {
+			tagName: 0,
+			checked: 1,
+			group: 4,
+			disabled: 2,
+			selectMax: 6,
+			selectedVal: 5
+		});
+	}
+}
+
+/* harmony default export */ const TagCheckbox_svelte = (TagCheckbox);
+
+;// ./src/lib/input/TagCheckboxBar.svelte
+/* src/lib/input/TagCheckboxBar.svelte generated by Svelte v4.2.19 */
+
+
+
+
+
+function TagCheckboxBar_svelte_get_each_context(ctx, list, i) {
+	const child_ctx = ctx.slice();
+	child_ctx[9] = list[i];
+	return child_ctx;
+}
+
+// (17:4) {#each tags as tag}
+function TagCheckboxBar_svelte_create_each_block(ctx) {
+	let tagcheckbox;
+	let updating_selectedVal;
+	let updating_group;
+	let current;
+
+	function tagcheckbox_selectedVal_binding(value) {
+		/*tagcheckbox_selectedVal_binding*/ ctx[7](value);
+	}
+
+	function tagcheckbox_group_binding(value) {
+		/*tagcheckbox_group_binding*/ ctx[8](value);
+	}
+
+	let tagcheckbox_props = {
+		tagName: /*tag*/ ctx[9],
+		selectMax: /*selectMax*/ ctx[6],
+		disabled: /*disabled*/ ctx[5]
+	};
+
+	if (/*value*/ ctx[1] !== void 0) {
+		tagcheckbox_props.selectedVal = /*value*/ ctx[1];
+	}
+
+	if (/*selected*/ ctx[0] !== void 0) {
+		tagcheckbox_props.group = /*selected*/ ctx[0];
+	}
+
+	tagcheckbox = new TagCheckbox_svelte({ props: tagcheckbox_props });
+	binding_callbacks.push(() => bind(tagcheckbox, 'selectedVal', tagcheckbox_selectedVal_binding));
+	binding_callbacks.push(() => bind(tagcheckbox, 'group', tagcheckbox_group_binding));
+
+	return {
+		c() {
+			create_component(tagcheckbox.$$.fragment);
+		},
+		m(target, anchor) {
+			mount_component(tagcheckbox, target, anchor);
+			current = true;
+		},
+		p(ctx, dirty) {
+			const tagcheckbox_changes = {};
+			if (dirty & /*tags*/ 16) tagcheckbox_changes.tagName = /*tag*/ ctx[9];
+			if (dirty & /*selectMax*/ 64) tagcheckbox_changes.selectMax = /*selectMax*/ ctx[6];
+			if (dirty & /*disabled*/ 32) tagcheckbox_changes.disabled = /*disabled*/ ctx[5];
+
+			if (!updating_selectedVal && dirty & /*value*/ 2) {
+				updating_selectedVal = true;
+				tagcheckbox_changes.selectedVal = /*value*/ ctx[1];
+				add_flush_callback(() => updating_selectedVal = false);
+			}
+
+			if (!updating_group && dirty & /*selected*/ 1) {
+				updating_group = true;
+				tagcheckbox_changes.group = /*selected*/ ctx[0];
+				add_flush_callback(() => updating_group = false);
+			}
+
+			tagcheckbox.$set(tagcheckbox_changes);
+		},
+		i(local) {
+			if (current) return;
+			transitions_transition_in(tagcheckbox.$$.fragment, local);
+			current = true;
+		},
+		o(local) {
+			transitions_transition_out(tagcheckbox.$$.fragment, local);
+			current = false;
+		},
+		d(detaching) {
+			destroy_component(tagcheckbox, detaching);
+		}
+	};
+}
+
+function TagCheckboxBar_svelte_create_fragment(ctx) {
+	let section;
+	let section_class_value;
+	let current;
+	let each_value = each_ensure_array_like(/*tags*/ ctx[4]);
+	let each_blocks = [];
+
+	for (let i = 0; i < each_value.length; i += 1) {
+		each_blocks[i] = TagCheckboxBar_svelte_create_each_block(TagCheckboxBar_svelte_get_each_context(ctx, each_value, i));
+	}
+
+	const out = i => transitions_transition_out(each_blocks[i], 1, 1, () => {
+		each_blocks[i] = null;
+	});
+
+	return {
+		c() {
+			section = dom_element("section");
+
+			for (let i = 0; i < each_blocks.length; i += 1) {
+				each_blocks[i].c();
+			}
+
+			dom_attr(section, "class", section_class_value = ['tags'].concat(/*classes*/ ctx[3]).join(' '));
+			dom_attr(section, "name", /*name*/ ctx[2]);
+		},
+		m(target, anchor) {
+			dom_insert(target, section, anchor);
+
+			for (let i = 0; i < each_blocks.length; i += 1) {
+				if (each_blocks[i]) {
+					each_blocks[i].m(section, null);
+				}
+			}
+
+			current = true;
+		},
+		p(ctx, [dirty]) {
+			if (dirty & /*tags, selectMax, disabled, value, selected*/ 115) {
+				each_value = each_ensure_array_like(/*tags*/ ctx[4]);
+				let i;
+
+				for (i = 0; i < each_value.length; i += 1) {
+					const child_ctx = TagCheckboxBar_svelte_get_each_context(ctx, each_value, i);
+
+					if (each_blocks[i]) {
+						each_blocks[i].p(child_ctx, dirty);
+						transitions_transition_in(each_blocks[i], 1);
+					} else {
+						each_blocks[i] = TagCheckboxBar_svelte_create_each_block(child_ctx);
+						each_blocks[i].c();
+						transitions_transition_in(each_blocks[i], 1);
+						each_blocks[i].m(section, null);
+					}
+				}
+
+				transitions_group_outros();
+
+				for (i = each_value.length; i < each_blocks.length; i += 1) {
+					out(i);
+				}
+
+				transitions_check_outros();
+			}
+
+			if (!current || dirty & /*classes*/ 8 && section_class_value !== (section_class_value = ['tags'].concat(/*classes*/ ctx[3]).join(' '))) {
+				dom_attr(section, "class", section_class_value);
+			}
+
+			if (!current || dirty & /*name*/ 4) {
+				dom_attr(section, "name", /*name*/ ctx[2]);
+			}
+		},
+		i(local) {
+			if (current) return;
+
+			for (let i = 0; i < each_value.length; i += 1) {
+				transitions_transition_in(each_blocks[i]);
+			}
+
+			current = true;
+		},
+		o(local) {
+			each_blocks = each_blocks.filter(Boolean);
+
+			for (let i = 0; i < each_blocks.length; i += 1) {
+				transitions_transition_out(each_blocks[i]);
+			}
+
+			current = false;
+		},
+		d(detaching) {
+			if (detaching) {
+				dom_detach(section);
+			}
+
+			destroy_each(each_blocks, detaching);
+		}
+	};
+}
+
+function TagCheckboxBar_svelte_instance($$self, $$props, $$invalidate) {
+	let { name } = $$props;
+	let { classes = [] } = $$props;
+	let { tags } = $$props;
+	let { selected = [] } = $$props;
+	let { value } = $$props;
+	let { disabled = false } = $$props;
+	let { selectMax = 0 } = $$props;
+
+	function tagcheckbox_selectedVal_binding(value$1) {
+		value = value$1;
+		$$invalidate(1, value);
+	}
+
+	function tagcheckbox_group_binding(value) {
+		selected = value;
+		$$invalidate(0, selected);
+	}
+
+	$$self.$$set = $$props => {
+		if ('name' in $$props) $$invalidate(2, name = $$props.name);
+		if ('classes' in $$props) $$invalidate(3, classes = $$props.classes);
+		if ('tags' in $$props) $$invalidate(4, tags = $$props.tags);
+		if ('selected' in $$props) $$invalidate(0, selected = $$props.selected);
+		if ('value' in $$props) $$invalidate(1, value = $$props.value);
+		if ('disabled' in $$props) $$invalidate(5, disabled = $$props.disabled);
+		if ('selectMax' in $$props) $$invalidate(6, selectMax = $$props.selectMax);
+	};
+
+	return [
+		selected,
+		value,
+		name,
+		classes,
+		tags,
+		disabled,
+		selectMax,
+		tagcheckbox_selectedVal_binding,
+		tagcheckbox_group_binding
+	];
+}
+
+class TagCheckboxBar extends SvelteComponent {
+	constructor(options) {
+		super();
+
+		init(this, options, TagCheckboxBar_svelte_instance, TagCheckboxBar_svelte_create_fragment, safe_not_equal, {
+			name: 2,
+			classes: 3,
+			tags: 4,
+			selected: 0,
+			value: 1,
+			disabled: 5,
+			selectMax: 6
+		});
+	}
+}
+
+/* harmony default export */ const TagCheckboxBar_svelte = (TagCheckboxBar);
+;// ./src/TagEditor.svelte
+/* src/TagEditor.svelte generated by Svelte v4.2.19 */
+
+
+
+
+
+
+function TagEditor_svelte_create_else_block(ctx) {
+	let p;
+
+	return {
+		c() {
+			p = dom_element("p");
+			p.textContent = "This provided source has no tags";
+		},
+		m(target, anchor) {
+			dom_insert(target, p, anchor);
+		},
+		p: utils_noop,
+		i: utils_noop,
+		o: utils_noop,
+		d(detaching) {
+			if (detaching) {
+				dom_detach(p);
+			}
+		}
+	};
+}
+
+// (18:0) {#if sourceHasTags}
+function TagEditor_svelte_create_if_block(ctx) {
+	let h30;
+	let t1;
+	let tagcheckboxbar0;
+	let t2;
+	let h31;
+	let t4;
+	let tagcheckboxbar1;
+	let updating_selected;
+	let current;
+
+	tagcheckboxbar0 = new TagCheckboxBar_svelte({
+			props: {
+				tags: /*source*/ ctx[0].tags,
+				disabled: true
+			}
+		});
+
+	function tagcheckboxbar1_selected_binding(value) {
+		/*tagcheckboxbar1_selected_binding*/ ctx[3](value);
+	}
+
+	let tagcheckboxbar1_props = {
+		name: "edit-tags",
+		tags: /*availableTags*/ ctx[2]
+	};
+
+	if (/*source*/ ctx[0].tags !== void 0) {
+		tagcheckboxbar1_props.selected = /*source*/ ctx[0].tags;
+	}
+
+	tagcheckboxbar1 = new TagCheckboxBar_svelte({ props: tagcheckboxbar1_props });
+	binding_callbacks.push(() => bind(tagcheckboxbar1, 'selected', tagcheckboxbar1_selected_binding));
+
+	return {
+		c() {
+			h30 = dom_element("h3");
+			h30.textContent = "Selected";
+			t1 = space();
+			create_component(tagcheckboxbar0.$$.fragment);
+			t2 = space();
+			h31 = dom_element("h3");
+			h31.textContent = "Choose Tags";
+			t4 = space();
+			create_component(tagcheckboxbar1.$$.fragment);
+			dom_attr(h30, "class", "svelte-164mia4");
+			dom_attr(h31, "class", "svelte-164mia4");
+		},
+		m(target, anchor) {
+			dom_insert(target, h30, anchor);
+			dom_insert(target, t1, anchor);
+			mount_component(tagcheckboxbar0, target, anchor);
+			dom_insert(target, t2, anchor);
+			dom_insert(target, h31, anchor);
+			dom_insert(target, t4, anchor);
+			mount_component(tagcheckboxbar1, target, anchor);
+			current = true;
+		},
+		p(ctx, dirty) {
+			const tagcheckboxbar0_changes = {};
+			if (dirty & /*source*/ 1) tagcheckboxbar0_changes.tags = /*source*/ ctx[0].tags;
+			tagcheckboxbar0.$set(tagcheckboxbar0_changes);
+			const tagcheckboxbar1_changes = {};
+
+			if (!updating_selected && dirty & /*source*/ 1) {
+				updating_selected = true;
+				tagcheckboxbar1_changes.selected = /*source*/ ctx[0].tags;
+				add_flush_callback(() => updating_selected = false);
+			}
+
+			tagcheckboxbar1.$set(tagcheckboxbar1_changes);
+		},
+		i(local) {
+			if (current) return;
+			transitions_transition_in(tagcheckboxbar0.$$.fragment, local);
+			transitions_transition_in(tagcheckboxbar1.$$.fragment, local);
+			current = true;
+		},
+		o(local) {
+			transitions_transition_out(tagcheckboxbar0.$$.fragment, local);
+			transitions_transition_out(tagcheckboxbar1.$$.fragment, local);
+			current = false;
+		},
+		d(detaching) {
+			if (detaching) {
+				dom_detach(h30);
+				dom_detach(t1);
+				dom_detach(t2);
+				dom_detach(h31);
+				dom_detach(t4);
+			}
+
+			destroy_component(tagcheckboxbar0, detaching);
+			destroy_component(tagcheckboxbar1, detaching);
+		}
+	};
+}
+
+function TagEditor_svelte_create_fragment(ctx) {
+	let current_block_type_index;
+	let if_block;
+	let if_block_anchor;
+	let current;
+	const if_block_creators = [TagEditor_svelte_create_if_block, TagEditor_svelte_create_else_block];
+	const if_blocks = [];
+
+	function select_block_type(ctx, dirty) {
+		if (/*sourceHasTags*/ ctx[1]) return 0;
+		return 1;
+	}
+
+	current_block_type_index = select_block_type(ctx, -1);
+	if_block = if_blocks[current_block_type_index] = if_block_creators[current_block_type_index](ctx);
+
+	return {
+		c() {
+			if_block.c();
+			if_block_anchor = empty();
+		},
+		m(target, anchor) {
+			if_blocks[current_block_type_index].m(target, anchor);
+			dom_insert(target, if_block_anchor, anchor);
+			current = true;
+		},
+		p(ctx, [dirty]) {
+			let previous_block_index = current_block_type_index;
+			current_block_type_index = select_block_type(ctx, dirty);
+
+			if (current_block_type_index === previous_block_index) {
+				if_blocks[current_block_type_index].p(ctx, dirty);
+			} else {
+				transitions_group_outros();
+
+				transitions_transition_out(if_blocks[previous_block_index], 1, 1, () => {
+					if_blocks[previous_block_index] = null;
+				});
+
+				transitions_check_outros();
+				if_block = if_blocks[current_block_type_index];
+
+				if (!if_block) {
+					if_block = if_blocks[current_block_type_index] = if_block_creators[current_block_type_index](ctx);
+					if_block.c();
+				} else {
+					if_block.p(ctx, dirty);
+				}
+
+				transitions_transition_in(if_block, 1);
+				if_block.m(if_block_anchor.parentNode, if_block_anchor);
+			}
+		},
+		i(local) {
+			if (current) return;
+			transitions_transition_in(if_block);
+			current = true;
+		},
+		o(local) {
+			transitions_transition_out(if_block);
+			current = false;
+		},
+		d(detaching) {
+			if (detaching) {
+				dom_detach(if_block_anchor);
+			}
+
+			if_blocks[current_block_type_index].d(detaching);
+		}
+	};
+}
+
+function TagEditor_svelte_instance($$self, $$props, $$invalidate) {
+	let sourceHasTags;
+	let $settings;
+	component_subscribe($$self, settings, $$value => $$invalidate(4, $settings = $$value));
+	let availableTags = Object.keys($settings.tags);
+	let { source = {} } = $$props;
+
+	function tagcheckboxbar1_selected_binding(value) {
+		if ($$self.$$.not_equal(source.tags, value)) {
+			source.tags = value;
+			$$invalidate(0, source);
+		}
+	}
+
+	$$self.$$set = $$props => {
+		if ('source' in $$props) $$invalidate(0, source = $$props.source);
+	};
+
+	$$self.$$.update = () => {
+		if ($$self.$$.dirty & /*source*/ 1) {
+			$: $$invalidate(1, sourceHasTags = Object.hasOwn(source, 'tags'));
+		}
+	};
+
+	return [source, sourceHasTags, availableTags, tagcheckboxbar1_selected_binding];
+}
+
+class TagEditor extends SvelteComponent {
+	constructor(options) {
+		super();
+		init(this, options, TagEditor_svelte_instance, TagEditor_svelte_create_fragment, safe_not_equal, { source: 0 });
+	}
+}
+
+/* harmony default export */ const TagEditor_svelte = (TagEditor);
+
+;// ./src/lib/modals.js
+
+
+
+const modalConfig = {
+    tageditor: new lib_Modal({
+        name: 'tageditor',
+        title: 'Edit Tags',
+        message: 'Add tags to help group and organise things',
+        source: null,
+        component: TagEditor_svelte
+    })
+}
+
+
+// retrive configured modal by name
+// merge/override default data
+function getNewModal(modalName, modalData = {}) {
+    let modal;
+    if (Object.hasOwn(modalConfig, modalName)) {
+        modal = modalConfig[modalName];
+        modal.data = Object.assign(modal.data, modalData)
+    } else {
+        modal = {};
+    }
+    return modal;
+}
+
+
+;// ./src/lib/input/ModalBtn.svelte
+/* src/lib/input/ModalBtn.svelte generated by Svelte v4.2.19 */
+
+
+
+
+
+
+const get_icon_slot_changes = dirty => ({});
+const get_icon_slot_context = ctx => ({});
+
+// (42:4) {#if btnTitle }
+function ModalBtn_svelte_create_if_block(ctx) {
+	let t;
+
+	return {
+		c() {
+			t = dom_text(/*btnTitle*/ ctx[1]);
+		},
+		m(target, anchor) {
+			dom_insert(target, t, anchor);
+		},
+		p(ctx, dirty) {
+			if (dirty & /*btnTitle*/ 2) set_data(t, /*btnTitle*/ ctx[1]);
+		},
+		d(detaching) {
+			if (detaching) {
+				dom_detach(t);
+			}
+		}
+	};
+}
+
+function ModalBtn_svelte_create_fragment(ctx) {
+	let button;
+	let t;
+	let button_class_value;
+	let current;
+	let mounted;
+	let dispose;
+	const icon_slot_template = /*#slots*/ ctx[6].icon;
+	const icon_slot = create_slot(icon_slot_template, ctx, /*$$scope*/ ctx[5], get_icon_slot_context);
+	let if_block = /*btnTitle*/ ctx[1] && ModalBtn_svelte_create_if_block(ctx);
+
+	return {
+		c() {
+			button = dom_element("button");
+			if (icon_slot) icon_slot.c();
+			t = space();
+			if (if_block) if_block.c();
+			dom_attr(button, "class", button_class_value = /*classes*/ ctx[0] + ' icon');
+		},
+		m(target, anchor) {
+			dom_insert(target, button, anchor);
+
+			if (icon_slot) {
+				icon_slot.m(button, null);
+			}
+
+			dom_append(button, t);
+			if (if_block) if_block.m(button, null);
+			current = true;
+
+			if (!mounted) {
+				dispose = dom_listen(button, "click", /*loadModal*/ ctx[2]);
+				mounted = true;
+			}
+		},
+		p(ctx, [dirty]) {
+			if (icon_slot) {
+				if (icon_slot.p && (!current || dirty & /*$$scope*/ 32)) {
+					update_slot_base(
+						icon_slot,
+						icon_slot_template,
+						ctx,
+						/*$$scope*/ ctx[5],
+						!current
+						? get_all_dirty_from_scope(/*$$scope*/ ctx[5])
+						: get_slot_changes(icon_slot_template, /*$$scope*/ ctx[5], dirty, get_icon_slot_changes),
+						get_icon_slot_context
+					);
+				}
+			}
+
+			if (/*btnTitle*/ ctx[1]) {
+				if (if_block) {
+					if_block.p(ctx, dirty);
+				} else {
+					if_block = ModalBtn_svelte_create_if_block(ctx);
+					if_block.c();
+					if_block.m(button, null);
+				}
+			} else if (if_block) {
+				if_block.d(1);
+				if_block = null;
+			}
+
+			if (!current || dirty & /*classes*/ 1 && button_class_value !== (button_class_value = /*classes*/ ctx[0] + ' icon')) {
+				dom_attr(button, "class", button_class_value);
+			}
+		},
+		i(local) {
+			if (current) return;
+			transitions_transition_in(icon_slot, local);
+			current = true;
+		},
+		o(local) {
+			transitions_transition_out(icon_slot, local);
+			current = false;
+		},
+		d(detaching) {
+			if (detaching) {
+				dom_detach(button);
+			}
+
+			if (icon_slot) icon_slot.d(detaching);
+			if (if_block) if_block.d();
+			mounted = false;
+			dispose();
+		}
+	};
+}
+
+function ModalBtn_svelte_instance($$self, $$props, $$invalidate) {
+	let { $$slots: slots = {}, $$scope } = $$props;
+	const dispatch = createEventDispatcher();
+	let modal;
+
+	function loadModal() {
+		modal = getNewModal(modalName);
+		modal.source = source;
+		modal = addModal(modal);
+
+		const unsubscribe = modals.subscribe(value => {
+			// trigger reactivity on source
+			$$invalidate(3, source);
+
+			// check if the modal is still open / in the modals array
+			let m = value.filter(t => {
+				if (t.id === modal.id) {
+					return true;
+				}
+			});
+
+			// auto save source when modal has been closed / no longer in the modals array
+			if (m.length === 0) {
+				unsubscribe();
+				dispatch('save');
+			}
+		});
+	}
+
+	let { classes = '' } = $$props;
+	let { modalName } = $$props;
+	let { source } = $$props;
+	let { btnTitle } = $$props;
+
+	$$self.$$set = $$props => {
+		if ('classes' in $$props) $$invalidate(0, classes = $$props.classes);
+		if ('modalName' in $$props) $$invalidate(4, modalName = $$props.modalName);
+		if ('source' in $$props) $$invalidate(3, source = $$props.source);
+		if ('btnTitle' in $$props) $$invalidate(1, btnTitle = $$props.btnTitle);
+		if ('$$scope' in $$props) $$invalidate(5, $$scope = $$props.$$scope);
+	};
+
+	return [classes, btnTitle, loadModal, source, modalName, $$scope, slots];
+}
+
+class ModalBtn extends SvelteComponent {
+	constructor(options) {
+		super();
+
+		init(this, options, ModalBtn_svelte_instance, ModalBtn_svelte_create_fragment, safe_not_equal, {
+			classes: 0,
+			modalName: 4,
+			source: 3,
+			btnTitle: 1
+		});
+	}
+}
+
+/* harmony default export */ const ModalBtn_svelte = (ModalBtn);
+;// ./src/lib/input/TagButton.svelte
+/* src/lib/input/TagButton.svelte generated by Svelte v4.2.19 */
+
+
+
+
+
+
+function TagButton_svelte_create_fragment(ctx) {
+	let button;
+	let span;
+	let t;
+	let mounted;
+	let dispose;
+
+	return {
+		c() {
+			button = dom_element("button");
+			span = dom_element("span");
+			t = dom_text(/*tagName*/ ctx[0]);
+			dom_attr(button, "class", "tag svelte-z8y88r");
+			set_style(button, "background-color", /*tag*/ ctx[1] ? /*tag*/ ctx[1].hex : 'transparent');
+		},
+		m(target, anchor) {
+			dom_insert(target, button, anchor);
+			dom_append(button, span);
+			dom_append(span, t);
+
+			if (!mounted) {
+				dispose = dom_listen(button, "click", /*click_handler*/ ctx[3]);
+				mounted = true;
+			}
+		},
+		p(ctx, [dirty]) {
+			if (dirty & /*tagName*/ 1) set_data(t, /*tagName*/ ctx[0]);
+
+			if (dirty & /*tag*/ 2) {
+				set_style(button, "background-color", /*tag*/ ctx[1] ? /*tag*/ ctx[1].hex : 'transparent');
+			}
+		},
+		i: utils_noop,
+		o: utils_noop,
+		d(detaching) {
+			if (detaching) {
+				dom_detach(button);
+			}
+
+			mounted = false;
+			dispose();
+		}
+	};
+}
+
+function TagButton_svelte_instance($$self, $$props, $$invalidate) {
+	let $settings;
+	component_subscribe($$self, settings, $$value => $$invalidate(4, $settings = $$value));
+	const dispatch = createEventDispatcher();
+	let tag;
+	let { tagName } = $$props;
+
+	// get tag object if available
+	function setTag(name) {
+		if (name) {
+			if (Object.hasOwn($settings.tags, name)) {
+				$$invalidate(1, tag = $settings.tags[name]);
+			}
+
+			if (Object.hasOwn($settings.activityTypes, name)) {
+				$$invalidate(1, tag = $settings.activityTypes[name]);
+			}
+		}
+	}
+
+	const click_handler = () => dispatch('tagClicked');
+
+	$$self.$$set = $$props => {
+		if ('tagName' in $$props) $$invalidate(0, tagName = $$props.tagName);
+	};
+
+	$$self.$$.update = () => {
+		if ($$self.$$.dirty & /*tagName*/ 1) {
+			$: setTag(tagName);
+		}
+	};
+
+	return [tagName, tag, dispatch, click_handler];
+}
+
+class TagButton extends SvelteComponent {
+	constructor(options) {
+		super();
+		init(this, options, TagButton_svelte_instance, TagButton_svelte_create_fragment, safe_not_equal, { tagName: 0 });
+	}
+}
+
+/* harmony default export */ const TagButton_svelte = (TagButton);
+
+;// ./src/lib/input/SearchArray.svelte
+/* src/lib/input/SearchArray.svelte generated by Svelte v4.2.19 */
+
+
+
+
+function SearchArray_svelte_create_if_block(ctx) {
+	let label_1;
+	let t0;
+	let t1;
+
+	return {
+		c() {
+			label_1 = dom_element("label");
+			t0 = dom_text(/*label*/ ctx[0]);
+			t1 = dom_text(":");
+			dom_attr(label_1, "for", /*name*/ ctx[1]);
+		},
+		m(target, anchor) {
+			dom_insert(target, label_1, anchor);
+			dom_append(label_1, t0);
+			dom_append(label_1, t1);
+		},
+		p(ctx, dirty) {
+			if (dirty & /*label*/ 1) set_data(t0, /*label*/ ctx[0]);
+
+			if (dirty & /*name*/ 2) {
+				dom_attr(label_1, "for", /*name*/ ctx[1]);
+			}
+		},
+		d(detaching) {
+			if (detaching) {
+				dom_detach(label_1);
+			}
+		}
+	};
+}
+
+function SearchArray_svelte_create_fragment(ctx) {
+	let t;
+	let input;
+	let mounted;
+	let dispose;
+	let if_block = typeof /*label*/ ctx[0] !== "undefined" && SearchArray_svelte_create_if_block(ctx);
+
+	return {
+		c() {
+			if (if_block) if_block.c();
+			t = space();
+			input = dom_element("input");
+			dom_attr(input, "name", /*name*/ ctx[1]);
+			dom_attr(input, "type", "search");
+		},
+		m(target, anchor) {
+			if (if_block) if_block.m(target, anchor);
+			dom_insert(target, t, anchor);
+			dom_insert(target, input, anchor);
+			set_input_value(input, /*term*/ ctx[2]);
+
+			if (!mounted) {
+				dispose = [
+					dom_listen(input, "keyup", /*search*/ ctx[3]),
+					dom_listen(input, "input", /*input_input_handler*/ ctx[6])
+				];
+
+				mounted = true;
+			}
+		},
+		p(ctx, [dirty]) {
+			if (typeof /*label*/ ctx[0] !== "undefined") {
+				if (if_block) {
+					if_block.p(ctx, dirty);
+				} else {
+					if_block = SearchArray_svelte_create_if_block(ctx);
+					if_block.c();
+					if_block.m(t.parentNode, t);
+				}
+			} else if (if_block) {
+				if_block.d(1);
+				if_block = null;
+			}
+
+			if (dirty & /*name*/ 2) {
+				dom_attr(input, "name", /*name*/ ctx[1]);
+			}
+
+			if (dirty & /*term*/ 4 && input.value !== /*term*/ ctx[2]) {
+				set_input_value(input, /*term*/ ctx[2]);
+			}
+		},
+		i: utils_noop,
+		o: utils_noop,
+		d(detaching) {
+			if (detaching) {
+				dom_detach(t);
+				dom_detach(input);
+			}
+
+			if (if_block) if_block.d(detaching);
+			mounted = false;
+			utils_run_all(dispose);
+		}
+	};
+}
+
+function SearchArray_svelte_instance($$self, $$props, $$invalidate) {
+	let term;
+	let { source = [] } = $$props;
+	let { results = [] } = $$props;
+	let { label } = $$props;
+	let { name } = $$props;
+
+	function search() {
+		if (term === '') {
+			$$invalidate(4, results = source);
+		} else {
+			if (typeof term !== 'undefined' && term !== null && term !== '') {
+				console.log(term);
+
+				if (source) {
+					$$invalidate(4, results);
+				}
+
+				let termParts = term.toLowerCase().split(' ');
+
+				$$invalidate(4, results = source.filter(val => {
+					let v = val.toLowerCase();
+					let found = 1;
+
+					// check if array value string contains all search term parts
+					termParts.forEach(p => {
+						if (v.indexOf(p) < 0) {
+							found = 0;
+						}
+					});
+
+					return found === 0 ? false : true;
+				}).sort());
+			}
+		}
+	}
+
+	function input_input_handler() {
+		term = this.value;
+		$$invalidate(2, term);
+	}
+
+	$$self.$$set = $$props => {
+		if ('source' in $$props) $$invalidate(5, source = $$props.source);
+		if ('results' in $$props) $$invalidate(4, results = $$props.results);
+		if ('label' in $$props) $$invalidate(0, label = $$props.label);
+		if ('name' in $$props) $$invalidate(1, name = $$props.name);
+	};
+
+	return [label, name, term, search, results, source, input_input_handler];
+}
+
+class SearchArray extends SvelteComponent {
+	constructor(options) {
+		super();
+		init(this, options, SearchArray_svelte_instance, SearchArray_svelte_create_fragment, safe_not_equal, { source: 5, results: 4, label: 0, name: 1 });
+	}
+}
+
+/* harmony default export */ const SearchArray_svelte = (SearchArray);
+;// ./src/TagManager.svelte
+/* src/TagManager.svelte generated by Svelte v4.2.19 */
+
+
+
+
+
+
+
+function TagManager_svelte_get_each_context(ctx, list, i) {
+	const child_ctx = ctx.slice();
+	child_ctx[12] = list[i];
+	return child_ctx;
+}
+
+function TagManager_svelte_get_each_context_1(ctx, list, i) {
+	const child_ctx = ctx.slice();
+	child_ctx[12] = list[i];
+	return child_ctx;
+}
+
+// (65:0) {:else}
+function TagManager_svelte_create_else_block(ctx) {
+	let p;
+
+	return {
+		c() {
+			p = dom_element("p");
+			p.textContent = "This provided source has no tags";
+		},
+		m(target, anchor) {
+			dom_insert(target, p, anchor);
+		},
+		p: utils_noop,
+		i: utils_noop,
+		o: utils_noop,
+		d(detaching) {
+			if (detaching) {
+				dom_detach(p);
+			}
+		}
+	};
+}
+
+// (52:0) {#if sourceHasTags}
+function TagManager_svelte_create_if_block(ctx) {
+	let div0;
+	let t0;
+	let h3;
+	let t2;
+	let searcharray;
+	let updating_results;
+	let t3;
+	let div1;
+	let current;
+	let each_value_1 = each_ensure_array_like(/*source*/ ctx[0].tags);
+	let each_blocks_1 = [];
+
+	for (let i = 0; i < each_value_1.length; i += 1) {
+		each_blocks_1[i] = TagManager_svelte_create_each_block_1(TagManager_svelte_get_each_context_1(ctx, each_value_1, i));
+	}
+
+	const out = i => transitions_transition_out(each_blocks_1[i], 1, 1, () => {
+		each_blocks_1[i] = null;
+	});
+
+	function searcharray_results_binding(value) {
+		/*searcharray_results_binding*/ ctx[8](value);
+	}
+
+	let searcharray_props = {
+		name: "search-tags",
+		source: /*availableTags*/ ctx[4]
+	};
+
+	if (/*searchResults*/ ctx[1] !== void 0) {
+		searcharray_props.results = /*searchResults*/ ctx[1];
+	}
+
+	searcharray = new SearchArray_svelte({ props: searcharray_props });
+	binding_callbacks.push(() => bind(searcharray, 'results', searcharray_results_binding));
+	let each_value = each_ensure_array_like(/*filteredTags*/ ctx[2]);
+	let each_blocks = [];
+
+	for (let i = 0; i < each_value.length; i += 1) {
+		each_blocks[i] = TagManager_svelte_create_each_block(TagManager_svelte_get_each_context(ctx, each_value, i));
+	}
+
+	const out_1 = i => transitions_transition_out(each_blocks[i], 1, 1, () => {
+		each_blocks[i] = null;
+	});
+
+	return {
+		c() {
+			div0 = dom_element("div");
+
+			for (let i = 0; i < each_blocks_1.length; i += 1) {
+				each_blocks_1[i].c();
+			}
+
+			t0 = space();
+			h3 = dom_element("h3");
+			h3.textContent = "Add Tags";
+			t2 = space();
+			create_component(searcharray.$$.fragment);
+			t3 = space();
+			div1 = dom_element("div");
+
+			for (let i = 0; i < each_blocks.length; i += 1) {
+				each_blocks[i].c();
+			}
+
+			dom_attr(div0, "class", "removeTags");
+			dom_attr(h3, "class", "svelte-164mia4");
+			dom_attr(div1, "class", "addTags");
+		},
+		m(target, anchor) {
+			dom_insert(target, div0, anchor);
+
+			for (let i = 0; i < each_blocks_1.length; i += 1) {
+				if (each_blocks_1[i]) {
+					each_blocks_1[i].m(div0, null);
+				}
+			}
+
+			dom_insert(target, t0, anchor);
+			dom_insert(target, h3, anchor);
+			dom_insert(target, t2, anchor);
+			mount_component(searcharray, target, anchor);
+			dom_insert(target, t3, anchor);
+			dom_insert(target, div1, anchor);
+
+			for (let i = 0; i < each_blocks.length; i += 1) {
+				if (each_blocks[i]) {
+					each_blocks[i].m(div1, null);
+				}
+			}
+
+			current = true;
+		},
+		p(ctx, dirty) {
+			if (dirty & /*source, remove*/ 65) {
+				each_value_1 = each_ensure_array_like(/*source*/ ctx[0].tags);
+				let i;
+
+				for (i = 0; i < each_value_1.length; i += 1) {
+					const child_ctx = TagManager_svelte_get_each_context_1(ctx, each_value_1, i);
+
+					if (each_blocks_1[i]) {
+						each_blocks_1[i].p(child_ctx, dirty);
+						transitions_transition_in(each_blocks_1[i], 1);
+					} else {
+						each_blocks_1[i] = TagManager_svelte_create_each_block_1(child_ctx);
+						each_blocks_1[i].c();
+						transitions_transition_in(each_blocks_1[i], 1);
+						each_blocks_1[i].m(div0, null);
+					}
+				}
+
+				transitions_group_outros();
+
+				for (i = each_value_1.length; i < each_blocks_1.length; i += 1) {
+					out(i);
+				}
+
+				transitions_check_outros();
+			}
+
+			const searcharray_changes = {};
+
+			if (!updating_results && dirty & /*searchResults*/ 2) {
+				updating_results = true;
+				searcharray_changes.results = /*searchResults*/ ctx[1];
+				add_flush_callback(() => updating_results = false);
+			}
+
+			searcharray.$set(searcharray_changes);
+
+			if (dirty & /*filteredTags, add*/ 36) {
+				each_value = each_ensure_array_like(/*filteredTags*/ ctx[2]);
+				let i;
+
+				for (i = 0; i < each_value.length; i += 1) {
+					const child_ctx = TagManager_svelte_get_each_context(ctx, each_value, i);
+
+					if (each_blocks[i]) {
+						each_blocks[i].p(child_ctx, dirty);
+						transitions_transition_in(each_blocks[i], 1);
+					} else {
+						each_blocks[i] = TagManager_svelte_create_each_block(child_ctx);
+						each_blocks[i].c();
+						transitions_transition_in(each_blocks[i], 1);
+						each_blocks[i].m(div1, null);
+					}
+				}
+
+				transitions_group_outros();
+
+				for (i = each_value.length; i < each_blocks.length; i += 1) {
+					out_1(i);
+				}
+
+				transitions_check_outros();
+			}
+		},
+		i(local) {
+			if (current) return;
+
+			for (let i = 0; i < each_value_1.length; i += 1) {
+				transitions_transition_in(each_blocks_1[i]);
+			}
+
+			transitions_transition_in(searcharray.$$.fragment, local);
+
+			for (let i = 0; i < each_value.length; i += 1) {
+				transitions_transition_in(each_blocks[i]);
+			}
+
+			current = true;
+		},
+		o(local) {
+			each_blocks_1 = each_blocks_1.filter(Boolean);
+
+			for (let i = 0; i < each_blocks_1.length; i += 1) {
+				transitions_transition_out(each_blocks_1[i]);
+			}
+
+			transitions_transition_out(searcharray.$$.fragment, local);
+			each_blocks = each_blocks.filter(Boolean);
+
+			for (let i = 0; i < each_blocks.length; i += 1) {
+				transitions_transition_out(each_blocks[i]);
+			}
+
+			current = false;
+		},
+		d(detaching) {
+			if (detaching) {
+				dom_detach(div0);
+				dom_detach(t0);
+				dom_detach(h3);
+				dom_detach(t2);
+				dom_detach(t3);
+				dom_detach(div1);
+			}
+
+			destroy_each(each_blocks_1, detaching);
+			destroy_component(searcharray, detaching);
+			destroy_each(each_blocks, detaching);
+		}
+	};
+}
+
+// (54:8) {#each source.tags as tagName}
+function TagManager_svelte_create_each_block_1(ctx) {
+	let tagbutton;
+	let current;
+
+	function tagClicked_handler() {
+		return /*tagClicked_handler*/ ctx[7](/*tagName*/ ctx[12]);
+	}
+
+	tagbutton = new TagButton_svelte({ props: { tagName: /*tagName*/ ctx[12] } });
+	tagbutton.$on("tagClicked", tagClicked_handler);
+
+	return {
+		c() {
+			create_component(tagbutton.$$.fragment);
+		},
+		m(target, anchor) {
+			mount_component(tagbutton, target, anchor);
+			current = true;
+		},
+		p(new_ctx, dirty) {
+			ctx = new_ctx;
+			const tagbutton_changes = {};
+			if (dirty & /*source*/ 1) tagbutton_changes.tagName = /*tagName*/ ctx[12];
+			tagbutton.$set(tagbutton_changes);
+		},
+		i(local) {
+			if (current) return;
+			transitions_transition_in(tagbutton.$$.fragment, local);
+			current = true;
+		},
+		o(local) {
+			transitions_transition_out(tagbutton.$$.fragment, local);
+			current = false;
+		},
+		d(detaching) {
+			destroy_component(tagbutton, detaching);
+		}
+	};
+}
+
+// (61:8) {#each filteredTags as tagName}
+function TagManager_svelte_create_each_block(ctx) {
+	let tagbutton;
+	let current;
+
+	function tagClicked_handler_1() {
+		return /*tagClicked_handler_1*/ ctx[9](/*tagName*/ ctx[12]);
+	}
+
+	tagbutton = new TagButton_svelte({ props: { tagName: /*tagName*/ ctx[12] } });
+	tagbutton.$on("tagClicked", tagClicked_handler_1);
+
+	return {
+		c() {
+			create_component(tagbutton.$$.fragment);
+		},
+		m(target, anchor) {
+			mount_component(tagbutton, target, anchor);
+			current = true;
+		},
+		p(new_ctx, dirty) {
+			ctx = new_ctx;
+			const tagbutton_changes = {};
+			if (dirty & /*filteredTags*/ 4) tagbutton_changes.tagName = /*tagName*/ ctx[12];
+			tagbutton.$set(tagbutton_changes);
+		},
+		i(local) {
+			if (current) return;
+			transitions_transition_in(tagbutton.$$.fragment, local);
+			current = true;
+		},
+		o(local) {
+			transitions_transition_out(tagbutton.$$.fragment, local);
+			current = false;
+		},
+		d(detaching) {
+			destroy_component(tagbutton, detaching);
+		}
+	};
+}
+
+function TagManager_svelte_create_fragment(ctx) {
+	let current_block_type_index;
+	let if_block;
+	let if_block_anchor;
+	let current;
+	const if_block_creators = [TagManager_svelte_create_if_block, TagManager_svelte_create_else_block];
+	const if_blocks = [];
+
+	function select_block_type(ctx, dirty) {
+		if (/*sourceHasTags*/ ctx[3]) return 0;
+		return 1;
+	}
+
+	current_block_type_index = select_block_type(ctx, -1);
+	if_block = if_blocks[current_block_type_index] = if_block_creators[current_block_type_index](ctx);
+
+	return {
+		c() {
+			if_block.c();
+			if_block_anchor = empty();
+		},
+		m(target, anchor) {
+			if_blocks[current_block_type_index].m(target, anchor);
+			dom_insert(target, if_block_anchor, anchor);
+			current = true;
+		},
+		p(ctx, [dirty]) {
+			let previous_block_index = current_block_type_index;
+			current_block_type_index = select_block_type(ctx, dirty);
+
+			if (current_block_type_index === previous_block_index) {
+				if_blocks[current_block_type_index].p(ctx, dirty);
+			} else {
+				transitions_group_outros();
+
+				transitions_transition_out(if_blocks[previous_block_index], 1, 1, () => {
+					if_blocks[previous_block_index] = null;
+				});
+
+				transitions_check_outros();
+				if_block = if_blocks[current_block_type_index];
+
+				if (!if_block) {
+					if_block = if_blocks[current_block_type_index] = if_block_creators[current_block_type_index](ctx);
+					if_block.c();
+				} else {
+					if_block.p(ctx, dirty);
+				}
+
+				transitions_transition_in(if_block, 1);
+				if_block.m(if_block_anchor.parentNode, if_block_anchor);
+			}
+		},
+		i(local) {
+			if (current) return;
+			transitions_transition_in(if_block);
+			current = true;
+		},
+		o(local) {
+			transitions_transition_out(if_block);
+			current = false;
+		},
+		d(detaching) {
+			if (detaching) {
+				dom_detach(if_block_anchor);
+			}
+
+			if_blocks[current_block_type_index].d(detaching);
+		}
+	};
+}
+
+function TagManager_svelte_instance($$self, $$props, $$invalidate) {
+	let sourceHasTags;
+	let $settings;
+	component_subscribe($$self, settings, $$value => $$invalidate(10, $settings = $$value));
+	let availableTags = Object.keys($settings.tags);
+	let searchResults = availableTags;
+	let filteredTags = availableTags;
+	let { source = {} } = $$props;
+
+	function updateTags(sourceTags, resultTags) {
+		$$invalidate(2, filteredTags = availableTags.filter(t => {
+			// exclude if tag is in source
+			if (sourceTags.indexOf(t) > -1) {
+				return false;
+			}
+
+			// include if tag is in tag search results
+			if (resultTags.indexOf(t) > -1) {
+				return true;
+			} else {
+				return false;
+			}
+		}).sort());
+	}
+
+	function add(tagName) {
+		if (source.tags.indexOf(tagName) < 0) {
+			source.tags.push(tagName);
+			$$invalidate(0, source);
+		}
+	}
+
+	function remove(tagName) {
+		let index = source.tags.indexOf(tagName);
+
+		if (index > -1) {
+			source.tags.splice(index, 1);
+			$$invalidate(0, source);
+		}
+	}
+
+	const tagClicked_handler = tagName => remove(tagName);
+
+	function searcharray_results_binding(value) {
+		searchResults = value;
+		$$invalidate(1, searchResults);
+	}
+
+	const tagClicked_handler_1 = tagName => add(tagName);
+
+	$$self.$$set = $$props => {
+		if ('source' in $$props) $$invalidate(0, source = $$props.source);
+	};
+
+	$$self.$$.update = () => {
+		if ($$self.$$.dirty & /*source*/ 1) {
+			$: $$invalidate(3, sourceHasTags = Object.hasOwn(source, 'tags'));
+		}
+
+		if ($$self.$$.dirty & /*source, searchResults*/ 3) {
+			$: {
+				updateTags(source.tags, searchResults);
+			}
+		}
+	};
+
+	return [
+		source,
+		searchResults,
+		filteredTags,
+		sourceHasTags,
+		availableTags,
+		add,
+		remove,
+		tagClicked_handler,
+		searcharray_results_binding,
+		tagClicked_handler_1
+	];
+}
+
+class TagManager extends SvelteComponent {
+	constructor(options) {
+		super();
+		init(this, options, TagManager_svelte_instance, TagManager_svelte_create_fragment, safe_not_equal, { source: 0 });
+	}
+}
+
+/* harmony default export */ const TagManager_svelte = (TagManager);
+
 ;// ./src/Activity.svelte
 /* src/Activity.svelte generated by Svelte v4.2.19 */
 
@@ -35785,33 +37795,38 @@ class Recurrence extends SvelteComponent {
 
 
 
+
+
+
+
+
 function Activity_svelte_get_each_context(ctx, list, i) {
 	const child_ctx = ctx.slice();
-	child_ctx[20] = list[i][0];
-	child_ctx[21] = list[i][1];
+	child_ctx[29] = list[i][0];
+	child_ctx[30] = list[i][1];
 	return child_ctx;
 }
 
 function Activity_svelte_get_each_context_1(ctx, list, i) {
 	const child_ctx = ctx.slice();
-	child_ctx[20] = list[i][0];
-	child_ctx[24] = list[i][1];
+	child_ctx[29] = list[i][0];
+	child_ctx[33] = list[i][1];
 	return child_ctx;
 }
 
-// (137:20) {#if doc.occurredAt && (doc.complete || doc.recur)}
+// (164:20) {#if doc.occurredAt && (doc.complete || doc.recur)}
 function create_if_block_2(ctx) {
 	let t;
 
 	return {
 		c() {
-			t = dom_text(/*agoStr*/ ctx[2]);
+			t = dom_text(/*agoStr*/ ctx[3]);
 		},
 		m(target, anchor) {
 			dom_insert(target, t, anchor);
 		},
 		p(ctx, dirty) {
-			if (dirty & /*agoStr*/ 4) set_data(t, /*agoStr*/ ctx[2]);
+			if (dirty[0] & /*agoStr*/ 8) set_data(t, /*agoStr*/ ctx[3]);
 		},
 		d(detaching) {
 			if (detaching) {
@@ -35821,10 +37836,40 @@ function create_if_block_2(ctx) {
 	};
 }
 
-// (159:16) {#each Object.entries(TypesEnum) as [_, type]}
+// (169:20) 
+function create_icon_slot(ctx) {
+	let tagicon;
+	let current;
+	tagicon = new tagIcon_svelte({ props: { size: 20, slot: "icon" } });
+
+	return {
+		c() {
+			create_component(tagicon.$$.fragment);
+		},
+		m(target, anchor) {
+			mount_component(tagicon, target, anchor);
+			current = true;
+		},
+		p: utils_noop,
+		i(local) {
+			if (current) return;
+			transitions_transition_in(tagicon.$$.fragment, local);
+			current = true;
+		},
+		o(local) {
+			transitions_transition_out(tagicon.$$.fragment, local);
+			current = false;
+		},
+		d(detaching) {
+			destroy_component(tagicon, detaching);
+		}
+	};
+}
+
+// (189:16) {#each Object.entries($settings.activityTypes) as [_, type]}
 function Activity_svelte_create_each_block_1(ctx) {
 	let option;
-	let t_value = /*type*/ ctx[24].name + "";
+	let t_value = /*type*/ ctx[33].name + "";
 	let t;
 	let option_value_value;
 
@@ -35832,133 +37877,65 @@ function Activity_svelte_create_each_block_1(ctx) {
 		c() {
 			option = dom_element("option");
 			t = dom_text(t_value);
-			option.__value = option_value_value = /*type*/ ctx[24].type;
+			option.__value = option_value_value = /*type*/ ctx[33].type;
 			set_input_value(option, option.__value);
 		},
 		m(target, anchor) {
 			dom_insert(target, option, anchor);
 			dom_append(option, t);
-		},
-		p: utils_noop,
-		d(detaching) {
-			if (detaching) {
-				dom_detach(option);
-			}
-		}
-	};
-}
-
-// (167:16) {#each Object.entries(DurationEnum) as [_, duration]}
-function Activity_svelte_create_each_block(ctx) {
-	let option;
-	let t_value = /*duration*/ ctx[21].name + "";
-	let t;
-	let option_value_value;
-
-	return {
-		c() {
-			option = dom_element("option");
-			t = dom_text(t_value);
-			option.__value = option_value_value = /*duration*/ ctx[21].key;
-			set_input_value(option, option.__value);
-		},
-		m(target, anchor) {
-			dom_insert(target, option, anchor);
-			dom_append(option, t);
-		},
-		p: utils_noop,
-		d(detaching) {
-			if (detaching) {
-				dom_detach(option);
-			}
-		}
-	};
-}
-
-// (174:8) {#if doc.occurredAt && (doc.complete || doc.recur)}
-function Activity_svelte_create_if_block_1(ctx) {
-	let div0;
-	let label0;
-	let t1;
-	let p;
-	let t2;
-	let t3;
-	let div1;
-	let label1;
-	let t5;
-	let input;
-	let mounted;
-	let dispose;
-
-	return {
-		c() {
-			div0 = dom_element("div");
-			label0 = dom_element("label");
-			label0.textContent = "Occurred :";
-			t1 = space();
-			p = dom_element("p");
-			t2 = dom_text(/*agoStr*/ ctx[2]);
-			t3 = space();
-			div1 = dom_element("div");
-			label1 = dom_element("label");
-			label1.textContent = "At :";
-			t5 = space();
-			input = dom_element("input");
-			dom_attr(label0, "for", "activity-occurred-at");
-			dom_attr(div0, "class", "input-group");
-			dom_attr(label1, "for", "activity-occurred-at");
-			dom_attr(input, "name", "activity-occurred-at");
-			dom_attr(input, "type", "datetime-local");
-			dom_attr(input, "class", "svelte-nmazvh");
-			dom_attr(div1, "class", "input-group");
-		},
-		m(target, anchor) {
-			dom_insert(target, div0, anchor);
-			dom_append(div0, label0);
-			dom_append(div0, t1);
-			dom_append(div0, p);
-			dom_append(p, t2);
-			dom_insert(target, t3, anchor);
-			dom_insert(target, div1, anchor);
-			dom_append(div1, label1);
-			dom_append(div1, t5);
-			dom_append(div1, input);
-			set_input_value(input, /*doc*/ ctx[0].occurredAt);
-
-			if (!mounted) {
-				dispose = dom_listen(input, "input", /*input_input_handler_1*/ ctx[14]);
-				mounted = true;
-			}
 		},
 		p(ctx, dirty) {
-			if (dirty & /*agoStr*/ 4) set_data(t2, /*agoStr*/ ctx[2]);
+			if (dirty[0] & /*$settings*/ 32 && t_value !== (t_value = /*type*/ ctx[33].name + "")) set_data(t, t_value);
 
-			if (dirty & /*doc, Object*/ 1) {
-				set_input_value(input, /*doc*/ ctx[0].occurredAt);
+			if (dirty[0] & /*$settings*/ 32 && option_value_value !== (option_value_value = /*type*/ ctx[33].type)) {
+				option.__value = option_value_value;
+				set_input_value(option, option.__value);
 			}
 		},
 		d(detaching) {
 			if (detaching) {
-				dom_detach(div0);
-				dom_detach(t3);
-				dom_detach(div1);
+				dom_detach(option);
 			}
-
-			mounted = false;
-			dispose();
 		}
 	};
 }
 
-// (185:8) {#if doc.recur}
-function Activity_svelte_create_if_block(ctx) {
+// (217:20) {#each Object.entries(DurationEnum) as [_, duration]}
+function Activity_svelte_create_each_block(ctx) {
+	let option;
+	let t_value = /*duration*/ ctx[30].name + "";
+	let t;
+	let option_value_value;
+
+	return {
+		c() {
+			option = dom_element("option");
+			t = dom_text(t_value);
+			option.__value = option_value_value = /*duration*/ ctx[30].key;
+			set_input_value(option, option.__value);
+		},
+		m(target, anchor) {
+			dom_insert(target, option, anchor);
+			dom_append(option, t);
+		},
+		p: utils_noop,
+		d(detaching) {
+			if (detaching) {
+				dom_detach(option);
+			}
+		}
+	};
+}
+
+// (223:12) {#if doc.recur}
+function Activity_svelte_create_if_block_1(ctx) {
 	let div;
 	let numberinput;
 	let updating_val;
 	let current;
 
 	function numberinput_val_binding_1(value) {
-		/*numberinput_val_binding_1*/ ctx[15](value);
+		/*numberinput_val_binding_1*/ ctx[22](value);
 	}
 
 	let numberinput_props = {
@@ -35978,6 +37955,7 @@ function Activity_svelte_create_if_block(ctx) {
 			div = dom_element("div");
 			create_component(numberinput.$$.fragment);
 			dom_attr(div, "class", "input-group");
+			dom_attr(div, "data-group", "occurrence");
 		},
 		m(target, anchor) {
 			dom_insert(target, div, anchor);
@@ -35987,7 +37965,7 @@ function Activity_svelte_create_if_block(ctx) {
 		p(ctx, dirty) {
 			const numberinput_changes = {};
 
-			if (!updating_val && dirty & /*doc*/ 1) {
+			if (!updating_val && dirty[0] & /*doc*/ 1) {
 				updating_val = true;
 				numberinput_changes.val = /*doc*/ ctx[0].occurrences;
 				add_flush_callback(() => updating_val = false);
@@ -36014,6 +37992,82 @@ function Activity_svelte_create_if_block(ctx) {
 	};
 }
 
+// (228:12) {#if doc.occurredAt}
+function Activity_svelte_create_if_block(ctx) {
+	let div2;
+	let div0;
+	let label0;
+	let t1;
+	let p;
+	let t2;
+	let t3;
+	let div1;
+	let label1;
+	let t5;
+	let input;
+	let mounted;
+	let dispose;
+
+	return {
+		c() {
+			div2 = dom_element("div");
+			div0 = dom_element("div");
+			label0 = dom_element("label");
+			label0.textContent = "Occurred :";
+			t1 = space();
+			p = dom_element("p");
+			t2 = dom_text(/*agoStr*/ ctx[3]);
+			t3 = space();
+			div1 = dom_element("div");
+			label1 = dom_element("label");
+			label1.textContent = "At :";
+			t5 = space();
+			input = dom_element("input");
+			dom_attr(label0, "for", "activity-occurred-at");
+			dom_attr(label1, "for", "activity-occurred-at");
+			dom_attr(input, "name", "activity-occurred-at");
+			dom_attr(input, "type", "datetime-local");
+			dom_attr(input, "class", "svelte-1860lrq");
+			dom_attr(div2, "class", "input-group");
+			dom_attr(div2, "data-group", "occurrence");
+		},
+		m(target, anchor) {
+			dom_insert(target, div2, anchor);
+			dom_append(div2, div0);
+			dom_append(div0, label0);
+			dom_append(div0, t1);
+			dom_append(div0, p);
+			dom_append(p, t2);
+			dom_append(div2, t3);
+			dom_append(div2, div1);
+			dom_append(div1, label1);
+			dom_append(div1, t5);
+			dom_append(div1, input);
+			set_input_value(input, /*doc*/ ctx[0].occurredAt);
+
+			if (!mounted) {
+				dispose = dom_listen(input, "input", /*input_input_handler_1*/ ctx[23]);
+				mounted = true;
+			}
+		},
+		p(ctx, dirty) {
+			if (dirty[0] & /*agoStr*/ 8) set_data(t2, /*agoStr*/ ctx[3]);
+
+			if (dirty[0] & /*doc, $settings*/ 33) {
+				set_input_value(input, /*doc*/ ctx[0].occurredAt);
+			}
+		},
+		d(detaching) {
+			if (detaching) {
+				dom_detach(div2);
+			}
+
+			mounted = false;
+			dispose();
+		}
+	};
+}
+
 function Activity_svelte_create_fragment(ctx) {
 	let article;
 	let header;
@@ -36035,38 +38089,64 @@ function Activity_svelte_create_fragment(ctx) {
 	let div2;
 	let p0;
 	let t4;
-	let p1;
+	let modalbtn;
+	let updating_source;
 	let t5;
+	let p1;
 	let t6;
+	let t7;
 	let button3;
 	let saveicon1;
-	let t7;
+	let t8;
 	let button4;
 	let binicon;
-	let t8;
+	let t9;
 	let section;
 	let div4;
 	let label0;
-	let t10;
-	let input;
 	let t11;
+	let input;
+	let t12;
 	let div5;
 	let label1;
-	let t13;
-	let select0;
 	let t14;
+	let select0;
+	let t15;
 	let div6;
-	let label2;
 	let t16;
-	let select1;
+	let div7;
+	let button5;
+	let tagicon;
 	let t17;
+	let button6;
+	let timeicon;
+	let t18;
+	let button7;
+	let logicon;
+	let t19;
+	let div8;
+	let h30;
+	let t21;
+	let tagmanager;
+	let updating_source_1;
+	let t22;
+	let div10;
+	let h31;
+	let t24;
+	let div9;
+	let label2;
+	let t26;
+	let select1;
+	let t27;
 	let numberinput;
 	let updating_val;
-	let t18;
-	let t19;
-	let t20;
+	let t28;
+	let t29;
+	let t30;
 	let recurrence;
 	let updating_doc;
+	let t31;
+	let div11;
 	let article_transition;
 	let current;
 	let mounted;
@@ -36074,15 +38154,50 @@ function Activity_svelte_create_fragment(ctx) {
 	targeticon = new target_svelte({});
 	saveicon0 = new save_svelte({});
 	let if_block0 = /*doc*/ ctx[0].occurredAt && (/*doc*/ ctx[0].complete || /*doc*/ ctx[0].recur) && create_if_block_2(ctx);
+
+	function modalbtn_source_binding(value) {
+		/*modalbtn_source_binding*/ ctx[13](value);
+	}
+
+	let modalbtn_props = {
+		classes: 'small',
+		modalName: 'tageditor',
+		$$slots: { icon: [create_icon_slot] },
+		$$scope: { ctx }
+	};
+
+	if (/*doc*/ ctx[0] !== void 0) {
+		modalbtn_props.source = /*doc*/ ctx[0];
+	}
+
+	modalbtn = new ModalBtn_svelte({ props: modalbtn_props });
+	binding_callbacks.push(() => bind(modalbtn, 'source', modalbtn_source_binding));
+	modalbtn.$on("save", /*debouncedSave*/ ctx[7]);
 	saveicon1 = new save_svelte({});
 	binicon = new bin_svelte({});
-	let each_value_1 = each_ensure_array_like(Object.entries(TypesEnum));
+	let each_value_1 = each_ensure_array_like(Object.entries(/*$settings*/ ctx[5].activityTypes));
 	let each_blocks_1 = [];
 
 	for (let i = 0; i < each_value_1.length; i += 1) {
 		each_blocks_1[i] = Activity_svelte_create_each_block_1(Activity_svelte_get_each_context_1(ctx, each_value_1, i));
 	}
 
+	tagicon = new tagIcon_svelte({});
+	timeicon = new timeForward_svelte({});
+	logicon = new notes_svelte({});
+
+	function tagmanager_source_binding(value) {
+		/*tagmanager_source_binding*/ ctx[19](value);
+	}
+
+	let tagmanager_props = {};
+
+	if (/*doc*/ ctx[0] !== void 0) {
+		tagmanager_props.source = /*doc*/ ctx[0];
+	}
+
+	tagmanager = new TagManager_svelte({ props: tagmanager_props });
+	binding_callbacks.push(() => bind(tagmanager, 'source', tagmanager_source_binding));
 	let each_value = each_ensure_array_like(Object.entries(DurationEnum));
 	let each_blocks = [];
 
@@ -36091,7 +38206,7 @@ function Activity_svelte_create_fragment(ctx) {
 	}
 
 	function numberinput_val_binding(value) {
-		/*numberinput_val_binding*/ ctx[13](value);
+		/*numberinput_val_binding*/ ctx[21](value);
 	}
 
 	let numberinput_props = { name: "activity-duration-inc" };
@@ -36102,11 +38217,11 @@ function Activity_svelte_create_fragment(ctx) {
 
 	numberinput = new Number_svelte({ props: numberinput_props });
 	binding_callbacks.push(() => bind(numberinput, 'val', numberinput_val_binding));
-	let if_block1 = /*doc*/ ctx[0].occurredAt && (/*doc*/ ctx[0].complete || /*doc*/ ctx[0].recur) && Activity_svelte_create_if_block_1(ctx);
-	let if_block2 = /*doc*/ ctx[0].recur && Activity_svelte_create_if_block(ctx);
+	let if_block1 = /*doc*/ ctx[0].recur && Activity_svelte_create_if_block_1(ctx);
+	let if_block2 = /*doc*/ ctx[0].occurredAt && Activity_svelte_create_if_block(ctx);
 
 	function recurrence_doc_binding(value) {
-		/*recurrence_doc_binding*/ ctx[16](value);
+		/*recurrence_doc_binding*/ ctx[24](value);
 	}
 
 	let recurrence_props = {};
@@ -36139,77 +38254,119 @@ function Activity_svelte_create_fragment(ctx) {
 			p0 = dom_element("p");
 			if (if_block0) if_block0.c();
 			t4 = space();
+			create_component(modalbtn.$$.fragment);
+			t5 = space();
 			p1 = dom_element("p");
-			t5 = dom_text(/*durationStr*/ ctx[3]);
-			t6 = space();
+			t6 = dom_text(/*durationStr*/ ctx[4]);
+			t7 = space();
 			button3 = dom_element("button");
 			create_component(saveicon1.$$.fragment);
-			t7 = space();
+			t8 = space();
 			button4 = dom_element("button");
 			create_component(binicon.$$.fragment);
-			t8 = space();
+			t9 = space();
 			section = dom_element("section");
 			div4 = dom_element("div");
 			label0 = dom_element("label");
 			label0.textContent = "Name :";
-			t10 = space();
-			input = dom_element("input");
 			t11 = space();
+			input = dom_element("input");
+			t12 = space();
 			div5 = dom_element("div");
 			label1 = dom_element("label");
 			label1.textContent = "Type :";
-			t13 = space();
+			t14 = space();
 			select0 = dom_element("select");
 
 			for (let i = 0; i < each_blocks_1.length; i += 1) {
 				each_blocks_1[i].c();
 			}
 
-			t14 = space();
+			t15 = space();
 			div6 = dom_element("div");
+			div6.innerHTML = ``;
+			t16 = space();
+			div7 = dom_element("div");
+			button5 = dom_element("button");
+			create_component(tagicon.$$.fragment);
+			t17 = space();
+			button6 = dom_element("button");
+			create_component(timeicon.$$.fragment);
+			t18 = space();
+			button7 = dom_element("button");
+			create_component(logicon.$$.fragment);
+			t19 = space();
+			div8 = dom_element("div");
+			h30 = dom_element("h3");
+			h30.textContent = "Tags";
+			t21 = space();
+			create_component(tagmanager.$$.fragment);
+			t22 = space();
+			div10 = dom_element("div");
+			h31 = dom_element("h3");
+			h31.textContent = "Time";
+			t24 = space();
+			div9 = dom_element("div");
 			label2 = dom_element("label");
 			label2.textContent = "Duration :";
-			t16 = space();
+			t26 = space();
 			select1 = dom_element("select");
 
 			for (let i = 0; i < each_blocks.length; i += 1) {
 				each_blocks[i].c();
 			}
 
-			t17 = space();
+			t27 = space();
 			create_component(numberinput.$$.fragment);
-			t18 = space();
+			t28 = space();
 			if (if_block1) if_block1.c();
-			t19 = space();
+			t29 = space();
 			if (if_block2) if_block2.c();
-			t20 = space();
+			t30 = space();
 			create_component(recurrence.$$.fragment);
-			dom_attr(button0, "class", "icon list-btn svelte-nmazvh");
-			dom_attr(div0, "class", "svelte-nmazvh");
-			dom_attr(strong, "class", "svelte-nmazvh");
-			dom_attr(button1, "class", button1_class_value = "" + (null_to_empty(/*doc*/ ctx[0].complete ? 'is-complete title' : 'title') + " svelte-nmazvh"));
-			dom_attr(button2, "class", "icon add-btn svelte-nmazvh");
-			dom_attr(div1, "class", "svelte-nmazvh");
-			dom_attr(p0, "class", "svelte-nmazvh");
-			dom_attr(p1, "class", "svelte-nmazvh");
-			dom_attr(div2, "class", "since svelte-nmazvh");
-			dom_attr(button3, "class", "icon edit-btn svelte-nmazvh");
-			dom_attr(button4, "class", "icon edit-btn svelte-nmazvh");
-			dom_attr(div3, "class", "svelte-nmazvh");
-			dom_attr(header, "class", "svelte-nmazvh");
+			t31 = space();
+			div11 = dom_element("div");
+			div11.innerHTML = `<h3>Logs</h3>`;
+			dom_attr(button0, "class", "icon list-btn svelte-1860lrq");
+			dom_attr(div0, "class", "svelte-1860lrq");
+			dom_attr(strong, "class", "svelte-1860lrq");
+			dom_attr(button1, "class", button1_class_value = "" + (null_to_empty(/*doc*/ ctx[0].complete ? 'is-complete title' : 'title') + " svelte-1860lrq"));
+			dom_attr(button2, "class", "icon add-btn svelte-1860lrq");
+			dom_attr(div1, "class", "svelte-1860lrq");
+			dom_attr(p0, "class", "svelte-1860lrq");
+			dom_attr(p1, "class", "svelte-1860lrq");
+			dom_attr(div2, "class", "since svelte-1860lrq");
+			dom_attr(button3, "class", "icon edit-btn svelte-1860lrq");
+			dom_attr(button4, "class", "icon edit-btn svelte-1860lrq");
+			dom_attr(div3, "class", "svelte-1860lrq");
+			dom_attr(header, "class", "svelte-1860lrq");
 			dom_attr(label0, "for", "activity-name");
 			dom_attr(input, "name", "activity-name");
 			dom_attr(input, "type", "text");
 			dom_attr(div4, "class", "input-group");
+			dom_attr(div4, "data-group", "name");
 			dom_attr(label1, "for", "activity-type");
 			dom_attr(select0, "name", "activity-type");
-			if (/*doc*/ ctx[0].type === void 0) scheduler_add_render_callback(() => /*select0_change_handler*/ ctx[11].call(select0));
+			if (/*doc*/ ctx[0].type === void 0) scheduler_add_render_callback(() => /*select0_change_handler*/ ctx[15].call(select0));
 			dom_attr(div5, "class", "input-group");
+			dom_attr(div5, "data-group", "activity-type");
+			dom_attr(button5, "class", "medium icon svelte-1860lrq");
+			dom_attr(button6, "class", "medium icon svelte-1860lrq");
+			dom_attr(button7, "class", "medium icon svelte-1860lrq");
+			dom_attr(div7, "class", "tab-buttons svelte-1860lrq");
+			dom_attr(div8, "class", "tab-group");
+			dom_attr(div8, "data-group", "tags");
 			dom_attr(label2, "for", "activity-duration");
 			dom_attr(select1, "name", "activity-duration");
-			if (/*doc*/ ctx[0].durationType === void 0) scheduler_add_render_callback(() => /*select1_change_handler*/ ctx[12].call(select1));
-			dom_attr(div6, "class", "input-group");
+			if (/*doc*/ ctx[0].durationType === void 0) scheduler_add_render_callback(() => /*select1_change_handler*/ ctx[20].call(select1));
+			dom_attr(div9, "class", "input-group");
+			dom_attr(div9, "data-group", "duration");
+			dom_attr(div10, "class", "tab-group");
+			dom_attr(div10, "data-group", "time");
+			dom_attr(div11, "class", "tab-group");
+			dom_attr(div11, "data-group", "logs");
 			dom_attr(section, "class", "edit");
+			dom_attr(section, "data-tab", /*tab*/ ctx[2]);
 			dom_attr(article, "data-viewmode", /*viewmode*/ ctx[1]);
 		},
 		m(target, anchor) {
@@ -36232,25 +38389,27 @@ function Activity_svelte_create_fragment(ctx) {
 			dom_append(div2, p0);
 			if (if_block0) if_block0.m(p0, null);
 			dom_append(div2, t4);
+			mount_component(modalbtn, div2, null);
+			dom_append(div2, t5);
 			dom_append(div2, p1);
-			dom_append(p1, t5);
-			dom_append(div3, t6);
+			dom_append(p1, t6);
+			dom_append(div3, t7);
 			dom_append(div3, button3);
 			mount_component(saveicon1, button3, null);
-			dom_append(div3, t7);
+			dom_append(div3, t8);
 			dom_append(div3, button4);
 			mount_component(binicon, button4, null);
-			dom_append(article, t8);
+			dom_append(article, t9);
 			dom_append(article, section);
 			dom_append(section, div4);
 			dom_append(div4, label0);
-			dom_append(div4, t10);
+			dom_append(div4, t11);
 			dom_append(div4, input);
 			set_input_value(input, /*doc*/ ctx[0].name);
-			dom_append(section, t11);
+			dom_append(section, t12);
 			dom_append(section, div5);
 			dom_append(div5, label1);
-			dom_append(div5, t13);
+			dom_append(div5, t14);
 			dom_append(div5, select0);
 
 			for (let i = 0; i < each_blocks_1.length; i += 1) {
@@ -36260,11 +38419,31 @@ function Activity_svelte_create_fragment(ctx) {
 			}
 
 			select_option(select0, /*doc*/ ctx[0].type, true);
-			dom_append(section, t14);
+			dom_append(section, t15);
 			dom_append(section, div6);
-			dom_append(div6, label2);
-			dom_append(div6, t16);
-			dom_append(div6, select1);
+			dom_append(section, t16);
+			dom_append(section, div7);
+			dom_append(div7, button5);
+			mount_component(tagicon, button5, null);
+			dom_append(div7, t17);
+			dom_append(div7, button6);
+			mount_component(timeicon, button6, null);
+			dom_append(div7, t18);
+			dom_append(div7, button7);
+			mount_component(logicon, button7, null);
+			dom_append(section, t19);
+			dom_append(section, div8);
+			dom_append(div8, h30);
+			dom_append(div8, t21);
+			mount_component(tagmanager, div8, null);
+			dom_append(section, t22);
+			dom_append(section, div10);
+			dom_append(div10, h31);
+			dom_append(div10, t24);
+			dom_append(div10, div9);
+			dom_append(div9, label2);
+			dom_append(div9, t26);
+			dom_append(div9, select1);
 
 			for (let i = 0; i < each_blocks.length; i += 1) {
 				if (each_blocks[i]) {
@@ -36273,35 +38452,40 @@ function Activity_svelte_create_fragment(ctx) {
 			}
 
 			select_option(select1, /*doc*/ ctx[0].durationType, true);
-			dom_append(div6, t17);
-			mount_component(numberinput, div6, null);
-			dom_append(section, t18);
-			if (if_block1) if_block1.m(section, null);
-			dom_append(section, t19);
-			if (if_block2) if_block2.m(section, null);
-			dom_append(section, t20);
-			mount_component(recurrence, section, null);
+			dom_append(div9, t27);
+			mount_component(numberinput, div9, null);
+			dom_append(div10, t28);
+			if (if_block1) if_block1.m(div10, null);
+			dom_append(div10, t29);
+			if (if_block2) if_block2.m(div10, null);
+			dom_append(div10, t30);
+			mount_component(recurrence, div10, null);
+			dom_append(section, t31);
+			dom_append(section, div11);
 			current = true;
 
 			if (!mounted) {
 				dispose = [
-					dom_listen(button0, "click", /*ocurred*/ ctx[8]),
-					dom_listen(button1, "click", /*click_handler*/ ctx[9]),
-					dom_listen(button2, "click", /*debouncedAdd*/ ctx[6]),
-					dom_listen(button3, "click", /*debouncedSave*/ ctx[5]),
-					dom_listen(button4, "click", /*remove*/ ctx[4]),
-					dom_listen(input, "input", /*input_input_handler*/ ctx[10]),
-					dom_listen(select0, "change", /*select0_change_handler*/ ctx[11]),
-					dom_listen(select1, "change", /*select1_change_handler*/ ctx[12])
+					dom_listen(button0, "click", /*debounceOccur*/ ctx[9]),
+					dom_listen(button1, "click", /*click_handler*/ ctx[12]),
+					dom_listen(button2, "click", /*debouncedAdd*/ ctx[8]),
+					dom_listen(button3, "click", /*debouncedSave*/ ctx[7]),
+					dom_listen(button4, "click", /*remove*/ ctx[6]),
+					dom_listen(input, "input", /*input_input_handler*/ ctx[14]),
+					dom_listen(select0, "change", /*select0_change_handler*/ ctx[15]),
+					dom_listen(button5, "click", /*click_handler_1*/ ctx[16]),
+					dom_listen(button6, "click", /*click_handler_2*/ ctx[17]),
+					dom_listen(button7, "click", /*click_handler_3*/ ctx[18]),
+					dom_listen(select1, "change", /*select1_change_handler*/ ctx[20])
 				];
 
 				mounted = true;
 			}
 		},
-		p(ctx, [dirty]) {
-			if ((!current || dirty & /*doc*/ 1) && t1_value !== (t1_value = /*doc*/ ctx[0].name + "")) set_data(t1, t1_value);
+		p(ctx, dirty) {
+			if ((!current || dirty[0] & /*doc*/ 1) && t1_value !== (t1_value = /*doc*/ ctx[0].name + "")) set_data(t1, t1_value);
 
-			if (!current || dirty & /*doc, Object*/ 1 && button1_class_value !== (button1_class_value = "" + (null_to_empty(/*doc*/ ctx[0].complete ? 'is-complete title' : 'title') + " svelte-nmazvh"))) {
+			if (!current || dirty[0] & /*doc, $settings*/ 33 && button1_class_value !== (button1_class_value = "" + (null_to_empty(/*doc*/ ctx[0].complete ? 'is-complete title' : 'title') + " svelte-1860lrq"))) {
 				dom_attr(button1, "class", button1_class_value);
 			}
 
@@ -36318,14 +38502,27 @@ function Activity_svelte_create_fragment(ctx) {
 				if_block0 = null;
 			}
 
-			if (!current || dirty & /*durationStr*/ 8) set_data(t5, /*durationStr*/ ctx[3]);
+			const modalbtn_changes = {};
 
-			if (dirty & /*doc, Object*/ 1 && input.value !== /*doc*/ ctx[0].name) {
+			if (dirty[1] & /*$$scope*/ 32) {
+				modalbtn_changes.$$scope = { dirty, ctx };
+			}
+
+			if (!updating_source && dirty[0] & /*doc*/ 1) {
+				updating_source = true;
+				modalbtn_changes.source = /*doc*/ ctx[0];
+				add_flush_callback(() => updating_source = false);
+			}
+
+			modalbtn.$set(modalbtn_changes);
+			if (!current || dirty[0] & /*durationStr*/ 16) set_data(t6, /*durationStr*/ ctx[4]);
+
+			if (dirty[0] & /*doc, $settings*/ 33 && input.value !== /*doc*/ ctx[0].name) {
 				set_input_value(input, /*doc*/ ctx[0].name);
 			}
 
-			if (dirty & /*Object*/ 0) {
-				each_value_1 = each_ensure_array_like(Object.entries(TypesEnum));
+			if (dirty[0] & /*$settings*/ 32) {
+				each_value_1 = each_ensure_array_like(Object.entries(/*$settings*/ ctx[5].activityTypes));
 				let i;
 
 				for (i = 0; i < each_value_1.length; i += 1) {
@@ -36347,9 +38544,19 @@ function Activity_svelte_create_fragment(ctx) {
 				each_blocks_1.length = each_value_1.length;
 			}
 
-			if (dirty & /*doc, Object*/ 1) {
+			if (dirty[0] & /*doc, $settings*/ 33) {
 				select_option(select0, /*doc*/ ctx[0].type);
 			}
+
+			const tagmanager_changes = {};
+
+			if (!updating_source_1 && dirty[0] & /*doc*/ 1) {
+				updating_source_1 = true;
+				tagmanager_changes.source = /*doc*/ ctx[0];
+				add_flush_callback(() => updating_source_1 = false);
+			}
+
+			tagmanager.$set(tagmanager_changes);
 
 			if (dirty & /*Object*/ 0) {
 				each_value = each_ensure_array_like(Object.entries(DurationEnum));
@@ -36374,13 +38581,13 @@ function Activity_svelte_create_fragment(ctx) {
 				each_blocks.length = each_value.length;
 			}
 
-			if (dirty & /*doc, Object*/ 1) {
+			if (dirty[0] & /*doc, $settings*/ 33) {
 				select_option(select1, /*doc*/ ctx[0].durationType);
 			}
 
 			const numberinput_changes = {};
 
-			if (!updating_val && dirty & /*doc*/ 1) {
+			if (!updating_val && dirty[0] & /*doc*/ 1) {
 				updating_val = true;
 				numberinput_changes.val = /*doc*/ ctx[0].durationIncrement;
 				add_flush_callback(() => updating_val = false);
@@ -36388,45 +38595,45 @@ function Activity_svelte_create_fragment(ctx) {
 
 			numberinput.$set(numberinput_changes);
 
-			if (/*doc*/ ctx[0].occurredAt && (/*doc*/ ctx[0].complete || /*doc*/ ctx[0].recur)) {
+			if (/*doc*/ ctx[0].recur) {
 				if (if_block1) {
 					if_block1.p(ctx, dirty);
+
+					if (dirty[0] & /*doc*/ 1) {
+						transitions_transition_in(if_block1, 1);
+					}
 				} else {
 					if_block1 = Activity_svelte_create_if_block_1(ctx);
 					if_block1.c();
-					if_block1.m(section, t19);
+					transitions_transition_in(if_block1, 1);
+					if_block1.m(div10, t29);
 				}
 			} else if (if_block1) {
-				if_block1.d(1);
-				if_block1 = null;
-			}
-
-			if (/*doc*/ ctx[0].recur) {
-				if (if_block2) {
-					if_block2.p(ctx, dirty);
-
-					if (dirty & /*doc*/ 1) {
-						transitions_transition_in(if_block2, 1);
-					}
-				} else {
-					if_block2 = Activity_svelte_create_if_block(ctx);
-					if_block2.c();
-					transitions_transition_in(if_block2, 1);
-					if_block2.m(section, t20);
-				}
-			} else if (if_block2) {
 				transitions_group_outros();
 
-				transitions_transition_out(if_block2, 1, 1, () => {
-					if_block2 = null;
+				transitions_transition_out(if_block1, 1, 1, () => {
+					if_block1 = null;
 				});
 
 				transitions_check_outros();
 			}
 
+			if (/*doc*/ ctx[0].occurredAt) {
+				if (if_block2) {
+					if_block2.p(ctx, dirty);
+				} else {
+					if_block2 = Activity_svelte_create_if_block(ctx);
+					if_block2.c();
+					if_block2.m(div10, t30);
+				}
+			} else if (if_block2) {
+				if_block2.d(1);
+				if_block2 = null;
+			}
+
 			const recurrence_changes = {};
 
-			if (!updating_doc && dirty & /*doc*/ 1) {
+			if (!updating_doc && dirty[0] & /*doc*/ 1) {
 				updating_doc = true;
 				recurrence_changes.doc = /*doc*/ ctx[0];
 				add_flush_callback(() => updating_doc = false);
@@ -36434,7 +38641,11 @@ function Activity_svelte_create_fragment(ctx) {
 
 			recurrence.$set(recurrence_changes);
 
-			if (!current || dirty & /*viewmode*/ 2) {
+			if (!current || dirty[0] & /*tab*/ 4) {
+				dom_attr(section, "data-tab", /*tab*/ ctx[2]);
+			}
+
+			if (!current || dirty[0] & /*viewmode*/ 2) {
 				dom_attr(article, "data-viewmode", /*viewmode*/ ctx[1]);
 			}
 		},
@@ -36442,10 +38653,15 @@ function Activity_svelte_create_fragment(ctx) {
 			if (current) return;
 			transitions_transition_in(targeticon.$$.fragment, local);
 			transitions_transition_in(saveicon0.$$.fragment, local);
+			transitions_transition_in(modalbtn.$$.fragment, local);
 			transitions_transition_in(saveicon1.$$.fragment, local);
 			transitions_transition_in(binicon.$$.fragment, local);
+			transitions_transition_in(tagicon.$$.fragment, local);
+			transitions_transition_in(timeicon.$$.fragment, local);
+			transitions_transition_in(logicon.$$.fragment, local);
+			transitions_transition_in(tagmanager.$$.fragment, local);
 			transitions_transition_in(numberinput.$$.fragment, local);
-			transitions_transition_in(if_block2);
+			transitions_transition_in(if_block1);
 			transitions_transition_in(recurrence.$$.fragment, local);
 
 			if (local) {
@@ -36461,10 +38677,15 @@ function Activity_svelte_create_fragment(ctx) {
 		o(local) {
 			transitions_transition_out(targeticon.$$.fragment, local);
 			transitions_transition_out(saveicon0.$$.fragment, local);
+			transitions_transition_out(modalbtn.$$.fragment, local);
 			transitions_transition_out(saveicon1.$$.fragment, local);
 			transitions_transition_out(binicon.$$.fragment, local);
+			transitions_transition_out(tagicon.$$.fragment, local);
+			transitions_transition_out(timeicon.$$.fragment, local);
+			transitions_transition_out(logicon.$$.fragment, local);
+			transitions_transition_out(tagmanager.$$.fragment, local);
 			transitions_transition_out(numberinput.$$.fragment, local);
-			transitions_transition_out(if_block2);
+			transitions_transition_out(if_block1);
 			transitions_transition_out(recurrence.$$.fragment, local);
 
 			if (local) {
@@ -36482,9 +38703,14 @@ function Activity_svelte_create_fragment(ctx) {
 			destroy_component(targeticon);
 			destroy_component(saveicon0);
 			if (if_block0) if_block0.d();
+			destroy_component(modalbtn);
 			destroy_component(saveicon1);
 			destroy_component(binicon);
 			destroy_each(each_blocks_1, detaching);
+			destroy_component(tagicon);
+			destroy_component(timeicon);
+			destroy_component(logicon);
+			destroy_component(tagmanager);
 			destroy_each(each_blocks, detaching);
 			destroy_component(numberinput);
 			if (if_block1) if_block1.d();
@@ -36500,6 +38726,8 @@ function Activity_svelte_create_fragment(ctx) {
 function Activity_svelte_instance($$self, $$props, $$invalidate) {
 	let durationStr;
 	let agoStr;
+	let $settings;
+	component_subscribe($$self, settings, $$value => $$invalidate(5, $settings = $$value));
 	const dispatch = createEventDispatcher();
 
 	function add() {
@@ -36508,7 +38736,7 @@ function Activity_svelte_instance($$self, $$props, $$invalidate) {
 			timeout: 3000
 		});
 
-		dispatch('add', { todo: doc });
+		dispatch('add', { doc });
 	}
 
 	function remove() {
@@ -36517,7 +38745,7 @@ function Activity_svelte_instance($$self, $$props, $$invalidate) {
 			timeout: 3000
 		});
 
-		dispatch('remove', { todo: doc });
+		dispatch('remove', { doc });
 	}
 
 	function save() {
@@ -36527,37 +38755,61 @@ function Activity_svelte_instance($$self, $$props, $$invalidate) {
 		}
 
 		addToast({
-			message: 'Updated "' + doc.name + '" ',
+			message: 'Saved "' + doc.name + '" ',
 			timeout: 3000
 		});
 
-		dispatch('update', { todo: doc });
+		dispatch('update', { doc });
 	}
 
 	// only fire once, debouncing multiple clicks, reducing revisions
 	const debouncedSave = (0,lodash.debounce)(save, 1000);
 
 	const debouncedAdd = (0,lodash.debounce)(add, 1000);
+	const debounceOccur = (0,lodash.debounce)(occurred, 500);
 
 	function toggleMode(mode) {
 		$$invalidate(1, viewmode = viewmode === mode ? 'list' : mode);
 	}
 
-	function ocurred() {
+	function toggleTab(t) {
+		if (t === tab) {
+			$$invalidate(2, tab = 'hidden');
+		} else {
+			$$invalidate(2, tab = t);
+		}
+	}
+
+	function occurred() {
+		let msg = 'Occurred';
+
 		if (!doc.recur) {
 			$$invalidate(0, doc.complete = !doc.complete, doc);
+			msg = doc.complete ? 'Completed' : 'Uncompleted';
 		} else {
 			$$invalidate(0, doc.complete = false, doc);
 			$$invalidate(0, doc.occurrences++, doc);
 		}
 
-		$$invalidate(0, doc.occurredAt = new Date().toISOString().substr(0, 19), doc);
-		save();
+		$$invalidate(0, doc.occurredAt = new Date().toISOString().substring(0, 19), doc);
+
+		addToast({
+			message: '"' + doc.name + '" ' + msg,
+			timeout: 3000
+		});
+
+		dispatch('update', { doc });
 	}
 
 	let { doc } = $$props;
 	let { viewmode = 'list' } = $$props;
+	let tab = 'hidden';
 	const click_handler = () => toggleMode('edit');
+
+	function modalbtn_source_binding(value) {
+		doc = value;
+		$$invalidate(0, doc);
+	}
 
 	function input_input_handler() {
 		doc.name = this.value;
@@ -36566,6 +38818,15 @@ function Activity_svelte_instance($$self, $$props, $$invalidate) {
 
 	function select0_change_handler() {
 		doc.type = select_value(this);
+		$$invalidate(0, doc);
+	}
+
+	const click_handler_1 = () => toggleTab('tags');
+	const click_handler_2 = () => toggleTab('time');
+	const click_handler_3 = () => toggleTab('logs');
+
+	function tagmanager_source_binding(value) {
+		doc = value;
 		$$invalidate(0, doc);
 	}
 
@@ -36581,16 +38842,16 @@ function Activity_svelte_instance($$self, $$props, $$invalidate) {
 		}
 	}
 
-	function input_input_handler_1() {
-		doc.occurredAt = this.value;
-		$$invalidate(0, doc);
-	}
-
 	function numberinput_val_binding_1(value) {
 		if ($$self.$$.not_equal(doc.occurrences, value)) {
 			doc.occurrences = value;
 			$$invalidate(0, doc);
 		}
+	}
+
+	function input_input_handler_1() {
+		doc.occurredAt = this.value;
+		$$invalidate(0, doc);
 	}
 
 	function recurrence_doc_binding(value) {
@@ -36604,32 +38865,40 @@ function Activity_svelte_instance($$self, $$props, $$invalidate) {
 	};
 
 	$$self.$$.update = () => {
-		if ($$self.$$.dirty & /*doc*/ 1) {
-			$: $$invalidate(3, durationStr = doc.durationIncrement + doc.durationType);
+		if ($$self.$$.dirty[0] & /*doc*/ 1) {
+			$: $$invalidate(4, durationStr = doc.durationIncrement + doc.durationType);
 		}
 
-		if ($$self.$$.dirty & /*doc*/ 1) {
-			$: $$invalidate(2, agoStr = ago(doc.occurredAt));
+		if ($$self.$$.dirty[0] & /*doc*/ 1) {
+			$: $$invalidate(3, agoStr = ago(doc.occurredAt));
 		}
 	};
 
 	return [
 		doc,
 		viewmode,
+		tab,
 		agoStr,
 		durationStr,
+		$settings,
 		remove,
 		debouncedSave,
 		debouncedAdd,
+		debounceOccur,
 		toggleMode,
-		ocurred,
+		toggleTab,
 		click_handler,
+		modalbtn_source_binding,
 		input_input_handler,
 		select0_change_handler,
+		click_handler_1,
+		click_handler_2,
+		click_handler_3,
+		tagmanager_source_binding,
 		select1_change_handler,
 		numberinput_val_binding,
-		input_input_handler_1,
 		numberinput_val_binding_1,
+		input_input_handler_1,
 		recurrence_doc_binding
 	];
 }
@@ -36637,7 +38906,7 @@ function Activity_svelte_instance($$self, $$props, $$invalidate) {
 class Activity extends SvelteComponent {
 	constructor(options) {
 		super();
-		init(this, options, Activity_svelte_instance, Activity_svelte_create_fragment, safe_not_equal, { doc: 0, viewmode: 1 });
+		init(this, options, Activity_svelte_instance, Activity_svelte_create_fragment, safe_not_equal, { doc: 0, viewmode: 1 }, null, [-1, -1]);
 	}
 }
 
@@ -36694,404 +38963,6 @@ class Plus extends SvelteComponent {
 }
 
 /* harmony default export */ const plus_svelte = (Plus);
-;// ./src/lib/input/Tag.svelte
-/* src/lib/input/Tag.svelte generated by Svelte v4.2.19 */
-
-
-
-
-
-
-function Tag_svelte_create_fragment(ctx) {
-	let label;
-	let input;
-	let t0;
-	let span;
-	let t1;
-	let mounted;
-	let dispose;
-
-	return {
-		c() {
-			label = dom_element("label");
-			input = dom_element("input");
-			t0 = space();
-			span = dom_element("span");
-			t1 = dom_text(/*tagName*/ ctx[1]);
-			dom_attr(input, "name", /*tagName*/ ctx[1]);
-			dom_attr(input, "type", "checkbox");
-			input.disabled = /*disabled*/ ctx[2];
-			dom_attr(input, "class", "svelte-qb3s0q");
-			dom_attr(label, "class", "tag svelte-qb3s0q");
-			dom_attr(label, "data-checked", /*checked*/ ctx[0]);
-			set_style(label, "background-color", /*tag*/ ctx[3] ? /*tag*/ ctx[3].hex : 'transparent');
-		},
-		m(target, anchor) {
-			dom_insert(target, label, anchor);
-			dom_append(label, input);
-			input.checked = /*checked*/ ctx[0];
-			set_input_value(input, /*tagName*/ ctx[1]);
-			dom_append(label, t0);
-			dom_append(label, span);
-			dom_append(span, t1);
-
-			if (!mounted) {
-				dispose = dom_listen(input, "change", /*input_change_handler*/ ctx[6]);
-				mounted = true;
-			}
-		},
-		p(ctx, [dirty]) {
-			if (dirty & /*tagName*/ 2) {
-				dom_attr(input, "name", /*tagName*/ ctx[1]);
-			}
-
-			if (dirty & /*disabled*/ 4) {
-				input.disabled = /*disabled*/ ctx[2];
-			}
-
-			if (dirty & /*checked*/ 1) {
-				input.checked = /*checked*/ ctx[0];
-			}
-
-			if (dirty & /*tagName*/ 2) {
-				set_input_value(input, /*tagName*/ ctx[1]);
-			}
-
-			if (dirty & /*tagName*/ 2) set_data(t1, /*tagName*/ ctx[1]);
-
-			if (dirty & /*checked*/ 1) {
-				dom_attr(label, "data-checked", /*checked*/ ctx[0]);
-			}
-
-			if (dirty & /*tag*/ 8) {
-				set_style(label, "background-color", /*tag*/ ctx[3] ? /*tag*/ ctx[3].hex : 'transparent');
-			}
-		},
-		i: utils_noop,
-		o: utils_noop,
-		d(detaching) {
-			if (detaching) {
-				dom_detach(label);
-			}
-
-			mounted = false;
-			dispose();
-		}
-	};
-}
-
-function Tag_svelte_instance($$self, $$props, $$invalidate) {
-	let $settings;
-	component_subscribe($$self, settings, $$value => $$invalidate(7, $settings = $$value));
-	let tag;
-	let { tagName } = $$props;
-	let { checked } = $$props;
-	let { group } = $$props;
-	let { disabled = false } = $$props;
-	let { selectMax = 0 } = $$props;
-
-	// get tag object if available
-	onMount(() => {
-		if (tagName) {
-			if (Object.hasOwn($settings.tags, tagName)) {
-				$$invalidate(3, tag = $settings.tags[tagName]);
-			}
-
-			if (Object.hasOwn($settings.activityTypes, tagName)) {
-				$$invalidate(3, tag = $settings.activityTypes[tagName]);
-			}
-		}
-	});
-
-	function updateCheckbox(group) {
-		$$invalidate(0, checked = group.indexOf(tagName) >= 0);
-	}
-
-	function updateGroup(checked) {
-		const intSelectMax = parseInt(selectMax);
-		const index = group.indexOf(tagName);
-
-		if (checked) {
-			if (index < 0) {
-				if (intSelectMax > 0) {
-					if (intSelectMax === 1) {
-						$$invalidate(4, group = [tagName]);
-					} else if (group.length <= intSelectMax) {
-						group.push(tagName);
-					}
-				} else {
-					group.push(tagName);
-				}
-
-				$$invalidate(4, group);
-			}
-		} else {
-			if (index >= 0) {
-				group.splice(index, 1);
-				$$invalidate(4, group);
-			}
-		}
-	}
-
-	function input_change_handler() {
-		checked = this.checked;
-		tagName = this.value;
-		$$invalidate(0, checked);
-		$$invalidate(1, tagName);
-	}
-
-	$$self.$$set = $$props => {
-		if ('tagName' in $$props) $$invalidate(1, tagName = $$props.tagName);
-		if ('checked' in $$props) $$invalidate(0, checked = $$props.checked);
-		if ('group' in $$props) $$invalidate(4, group = $$props.group);
-		if ('disabled' in $$props) $$invalidate(2, disabled = $$props.disabled);
-		if ('selectMax' in $$props) $$invalidate(5, selectMax = $$props.selectMax);
-	};
-
-	$$self.$$.update = () => {
-		if ($$self.$$.dirty & /*group*/ 16) {
-			$: updateCheckbox(group);
-		}
-
-		if ($$self.$$.dirty & /*checked*/ 1) {
-			$: updateGroup(checked);
-		}
-	};
-
-	return [checked, tagName, disabled, tag, group, selectMax, input_change_handler];
-}
-
-class Tag_svelte_Tag extends SvelteComponent {
-	constructor(options) {
-		super();
-
-		init(this, options, Tag_svelte_instance, Tag_svelte_create_fragment, safe_not_equal, {
-			tagName: 1,
-			checked: 0,
-			group: 4,
-			disabled: 2,
-			selectMax: 5
-		});
-	}
-}
-
-/* harmony default export */ const Tag_svelte = (Tag_svelte_Tag);
-
-;// ./src/lib/Tags.svelte
-/* src/lib/Tags.svelte generated by Svelte v4.2.19 */
-
-
-
-
-
-function Tags_svelte_get_each_context(ctx, list, i) {
-	const child_ctx = ctx.slice();
-	child_ctx[7] = list[i];
-	return child_ctx;
-}
-
-// (17:4) {#each tags as tag}
-function Tags_svelte_create_each_block(ctx) {
-	let tag_1;
-	let updating_group;
-	let current;
-
-	function tag_1_group_binding(value) {
-		/*tag_1_group_binding*/ ctx[6](value);
-	}
-
-	let tag_1_props = {
-		tagName: /*tag*/ ctx[7],
-		selectMax: /*selectMax*/ ctx[5],
-		disabled: /*disabled*/ ctx[4]
-	};
-
-	if (/*selected*/ ctx[0] !== void 0) {
-		tag_1_props.group = /*selected*/ ctx[0];
-	}
-
-	tag_1 = new Tag_svelte({ props: tag_1_props });
-	binding_callbacks.push(() => bind(tag_1, 'group', tag_1_group_binding));
-
-	return {
-		c() {
-			create_component(tag_1.$$.fragment);
-		},
-		m(target, anchor) {
-			mount_component(tag_1, target, anchor);
-			current = true;
-		},
-		p(ctx, dirty) {
-			const tag_1_changes = {};
-			if (dirty & /*tags*/ 8) tag_1_changes.tagName = /*tag*/ ctx[7];
-			if (dirty & /*selectMax*/ 32) tag_1_changes.selectMax = /*selectMax*/ ctx[5];
-			if (dirty & /*disabled*/ 16) tag_1_changes.disabled = /*disabled*/ ctx[4];
-
-			if (!updating_group && dirty & /*selected*/ 1) {
-				updating_group = true;
-				tag_1_changes.group = /*selected*/ ctx[0];
-				add_flush_callback(() => updating_group = false);
-			}
-
-			tag_1.$set(tag_1_changes);
-		},
-		i(local) {
-			if (current) return;
-			transitions_transition_in(tag_1.$$.fragment, local);
-			current = true;
-		},
-		o(local) {
-			transitions_transition_out(tag_1.$$.fragment, local);
-			current = false;
-		},
-		d(detaching) {
-			destroy_component(tag_1, detaching);
-		}
-	};
-}
-
-function Tags_svelte_create_fragment(ctx) {
-	let section;
-	let section_class_value;
-	let current;
-	let each_value = each_ensure_array_like(/*tags*/ ctx[3]);
-	let each_blocks = [];
-
-	for (let i = 0; i < each_value.length; i += 1) {
-		each_blocks[i] = Tags_svelte_create_each_block(Tags_svelte_get_each_context(ctx, each_value, i));
-	}
-
-	const out = i => transitions_transition_out(each_blocks[i], 1, 1, () => {
-		each_blocks[i] = null;
-	});
-
-	return {
-		c() {
-			section = dom_element("section");
-
-			for (let i = 0; i < each_blocks.length; i += 1) {
-				each_blocks[i].c();
-			}
-
-			dom_attr(section, "class", section_class_value = ['tags'].concat(/*classes*/ ctx[2]).join(' '));
-			dom_attr(section, "name", /*name*/ ctx[1]);
-		},
-		m(target, anchor) {
-			dom_insert(target, section, anchor);
-
-			for (let i = 0; i < each_blocks.length; i += 1) {
-				if (each_blocks[i]) {
-					each_blocks[i].m(section, null);
-				}
-			}
-
-			current = true;
-		},
-		p(ctx, [dirty]) {
-			if (dirty & /*tags, selectMax, disabled, selected*/ 57) {
-				each_value = each_ensure_array_like(/*tags*/ ctx[3]);
-				let i;
-
-				for (i = 0; i < each_value.length; i += 1) {
-					const child_ctx = Tags_svelte_get_each_context(ctx, each_value, i);
-
-					if (each_blocks[i]) {
-						each_blocks[i].p(child_ctx, dirty);
-						transitions_transition_in(each_blocks[i], 1);
-					} else {
-						each_blocks[i] = Tags_svelte_create_each_block(child_ctx);
-						each_blocks[i].c();
-						transitions_transition_in(each_blocks[i], 1);
-						each_blocks[i].m(section, null);
-					}
-				}
-
-				transitions_group_outros();
-
-				for (i = each_value.length; i < each_blocks.length; i += 1) {
-					out(i);
-				}
-
-				transitions_check_outros();
-			}
-
-			if (!current || dirty & /*classes*/ 4 && section_class_value !== (section_class_value = ['tags'].concat(/*classes*/ ctx[2]).join(' '))) {
-				dom_attr(section, "class", section_class_value);
-			}
-
-			if (!current || dirty & /*name*/ 2) {
-				dom_attr(section, "name", /*name*/ ctx[1]);
-			}
-		},
-		i(local) {
-			if (current) return;
-
-			for (let i = 0; i < each_value.length; i += 1) {
-				transitions_transition_in(each_blocks[i]);
-			}
-
-			current = true;
-		},
-		o(local) {
-			each_blocks = each_blocks.filter(Boolean);
-
-			for (let i = 0; i < each_blocks.length; i += 1) {
-				transitions_transition_out(each_blocks[i]);
-			}
-
-			current = false;
-		},
-		d(detaching) {
-			if (detaching) {
-				dom_detach(section);
-			}
-
-			destroy_each(each_blocks, detaching);
-		}
-	};
-}
-
-function Tags_svelte_instance($$self, $$props, $$invalidate) {
-	let { name } = $$props;
-	let { classes = ['tags'] } = $$props;
-	let { tags } = $$props;
-	let { selected = [] } = $$props;
-	let { disabled = false } = $$props;
-	let { selectMax = 0 } = $$props;
-
-	function tag_1_group_binding(value) {
-		selected = value;
-		$$invalidate(0, selected);
-	}
-
-	$$self.$$set = $$props => {
-		if ('name' in $$props) $$invalidate(1, name = $$props.name);
-		if ('classes' in $$props) $$invalidate(2, classes = $$props.classes);
-		if ('tags' in $$props) $$invalidate(3, tags = $$props.tags);
-		if ('selected' in $$props) $$invalidate(0, selected = $$props.selected);
-		if ('disabled' in $$props) $$invalidate(4, disabled = $$props.disabled);
-		if ('selectMax' in $$props) $$invalidate(5, selectMax = $$props.selectMax);
-	};
-
-	return [selected, name, classes, tags, disabled, selectMax, tag_1_group_binding];
-}
-
-class Tags extends SvelteComponent {
-	constructor(options) {
-		super();
-
-		init(this, options, Tags_svelte_instance, Tags_svelte_create_fragment, safe_not_equal, {
-			name: 1,
-			classes: 2,
-			tags: 3,
-			selected: 0,
-			disabled: 4,
-			selectMax: 5
-		});
-	}
-}
-
-/* harmony default export */ const Tags_svelte = (Tags);
 ;// ./src/DocBrowser.svelte
 /* src/DocBrowser.svelte generated by Svelte v4.2.19 */
 
@@ -37113,7 +38984,7 @@ function DocBrowser_svelte_get_each_context(ctx, list, i) {
 	return child_ctx;
 }
 
-// (123:0) {:else}
+// (122:0) {:else}
 function DocBrowser_svelte_create_else_block(ctx) {
 	let h1;
 	let t0_value = /*sortedAndFilteredItems*/ ctx[10].length + "";
@@ -37150,14 +39021,14 @@ function DocBrowser_svelte_create_else_block(ctx) {
 	};
 }
 
-// (119:0) {#if isLoading}
+// (118:0) {#if isLoading}
 function DocBrowser_svelte_create_if_block_1(ctx) {
 	let h1;
 
 	return {
 		c() {
 			h1 = dom_element("h1");
-			h1.textContent = "Loading your todos…";
+			h1.textContent = "Loading…";
 		},
 		m(target, anchor) {
 			dom_insert(target, h1, anchor);
@@ -37171,7 +39042,7 @@ function DocBrowser_svelte_create_if_block_1(ctx) {
 	};
 }
 
-// (141:0) {#if items.length > 0}
+// (140:0) {#if items.length > 0}
 function DocBrowser_svelte_create_if_block(ctx) {
 	let section0;
 	let div0;
@@ -37349,7 +39220,7 @@ function DocBrowser_svelte_create_if_block(ctx) {
 	};
 }
 
-// (162:12) {#each sortedAndFilteredItems as todo (todo._id)}
+// (161:12) {#each sortedAndFilteredItems as todo (todo._id)}
 function DocBrowser_svelte_create_each_block(key_1, ctx) {
 	let li;
 	let activity;
@@ -37407,11 +39278,11 @@ function DocBrowser_svelte_create_fragment(ctx) {
 	let section;
 	let activity;
 	let t2;
-	let tags0;
+	let tagcheckboxbar0;
 	let updating_tags;
 	let updating_selected;
 	let t3;
-	let tags1;
+	let tagcheckboxbar1;
 	let updating_tags_1;
 	let updating_selected_1;
 	let t4;
@@ -37438,53 +39309,53 @@ function DocBrowser_svelte_create_fragment(ctx) {
 
 	activity.$on("add", /*addDoc*/ ctx[11]);
 
-	function tags0_tags_binding(value) {
-		/*tags0_tags_binding*/ ctx[15](value);
+	function tagcheckboxbar0_tags_binding(value) {
+		/*tagcheckboxbar0_tags_binding*/ ctx[15](value);
 	}
 
-	function tags0_selected_binding(value) {
-		/*tags0_selected_binding*/ ctx[16](value);
+	function tagcheckboxbar0_selected_binding(value) {
+		/*tagcheckboxbar0_selected_binding*/ ctx[16](value);
 	}
 
-	let tags0_props = {
+	let tagcheckboxbar0_props = {
 		name: "activityTypes",
 		classes: ['tagBar'],
 		selectMax: "1"
 	};
 
 	if (/*activityTypes*/ ctx[9] !== void 0) {
-		tags0_props.tags = /*activityTypes*/ ctx[9];
+		tagcheckboxbar0_props.tags = /*activityTypes*/ ctx[9];
 	}
 
 	if (/*selectedActivityTypes*/ ctx[4] !== void 0) {
-		tags0_props.selected = /*selectedActivityTypes*/ ctx[4];
+		tagcheckboxbar0_props.selected = /*selectedActivityTypes*/ ctx[4];
 	}
 
-	tags0 = new Tags_svelte({ props: tags0_props });
-	binding_callbacks.push(() => bind(tags0, 'tags', tags0_tags_binding));
-	binding_callbacks.push(() => bind(tags0, 'selected', tags0_selected_binding));
+	tagcheckboxbar0 = new TagCheckboxBar_svelte({ props: tagcheckboxbar0_props });
+	binding_callbacks.push(() => bind(tagcheckboxbar0, 'tags', tagcheckboxbar0_tags_binding));
+	binding_callbacks.push(() => bind(tagcheckboxbar0, 'selected', tagcheckboxbar0_selected_binding));
 
-	function tags1_tags_binding(value) {
-		/*tags1_tags_binding*/ ctx[17](value);
+	function tagcheckboxbar1_tags_binding(value) {
+		/*tagcheckboxbar1_tags_binding*/ ctx[17](value);
 	}
 
-	function tags1_selected_binding(value) {
-		/*tags1_selected_binding*/ ctx[18](value);
+	function tagcheckboxbar1_selected_binding(value) {
+		/*tagcheckboxbar1_selected_binding*/ ctx[18](value);
 	}
 
-	let tags1_props = { name: "tags", classes: ['tagBar'] };
+	let tagcheckboxbar1_props = { name: "tags", classes: ['tagBar'] };
 
 	if (/*tags*/ ctx[8] !== void 0) {
-		tags1_props.tags = /*tags*/ ctx[8];
+		tagcheckboxbar1_props.tags = /*tags*/ ctx[8];
 	}
 
 	if (/*selectedTags*/ ctx[3] !== void 0) {
-		tags1_props.selected = /*selectedTags*/ ctx[3];
+		tagcheckboxbar1_props.selected = /*selectedTags*/ ctx[3];
 	}
 
-	tags1 = new Tags_svelte({ props: tags1_props });
-	binding_callbacks.push(() => bind(tags1, 'tags', tags1_tags_binding));
-	binding_callbacks.push(() => bind(tags1, 'selected', tags1_selected_binding));
+	tagcheckboxbar1 = new TagCheckboxBar_svelte({ props: tagcheckboxbar1_props });
+	binding_callbacks.push(() => bind(tagcheckboxbar1, 'tags', tagcheckboxbar1_tags_binding));
+	binding_callbacks.push(() => bind(tagcheckboxbar1, 'selected', tagcheckboxbar1_selected_binding));
 	let if_block1 = /*items*/ ctx[0].length > 0 && DocBrowser_svelte_create_if_block(ctx);
 
 	return {
@@ -37497,9 +39368,9 @@ function DocBrowser_svelte_create_fragment(ctx) {
 			section = dom_element("section");
 			create_component(activity.$$.fragment);
 			t2 = space();
-			create_component(tags0.$$.fragment);
+			create_component(tagcheckboxbar0.$$.fragment);
 			t3 = space();
-			create_component(tags1.$$.fragment);
+			create_component(tagcheckboxbar1.$$.fragment);
 			t4 = space();
 			if (if_block1) if_block1.c();
 			if_block1_anchor = empty();
@@ -37514,9 +39385,9 @@ function DocBrowser_svelte_create_fragment(ctx) {
 			dom_insert(target, section, anchor);
 			mount_component(activity, section, null);
 			dom_insert(target, t2, anchor);
-			mount_component(tags0, target, anchor);
+			mount_component(tagcheckboxbar0, target, anchor);
 			dom_insert(target, t3, anchor);
-			mount_component(tags1, target, anchor);
+			mount_component(tagcheckboxbar1, target, anchor);
 			dom_insert(target, t4, anchor);
 			if (if_block1) if_block1.m(target, anchor);
 			dom_insert(target, if_block1_anchor, anchor);
@@ -37544,36 +39415,36 @@ function DocBrowser_svelte_create_fragment(ctx) {
 			if (dirty & /*newDoc*/ 32) activity_changes.doc = /*newDoc*/ ctx[5];
 			if (dirty & /*addNewItem*/ 128) activity_changes.viewmode = /*addNewItem*/ ctx[7] ? 'add' : 'hidden';
 			activity.$set(activity_changes);
-			const tags0_changes = {};
+			const tagcheckboxbar0_changes = {};
 
 			if (!updating_tags && dirty & /*activityTypes*/ 512) {
 				updating_tags = true;
-				tags0_changes.tags = /*activityTypes*/ ctx[9];
+				tagcheckboxbar0_changes.tags = /*activityTypes*/ ctx[9];
 				add_flush_callback(() => updating_tags = false);
 			}
 
 			if (!updating_selected && dirty & /*selectedActivityTypes*/ 16) {
 				updating_selected = true;
-				tags0_changes.selected = /*selectedActivityTypes*/ ctx[4];
+				tagcheckboxbar0_changes.selected = /*selectedActivityTypes*/ ctx[4];
 				add_flush_callback(() => updating_selected = false);
 			}
 
-			tags0.$set(tags0_changes);
-			const tags1_changes = {};
+			tagcheckboxbar0.$set(tagcheckboxbar0_changes);
+			const tagcheckboxbar1_changes = {};
 
 			if (!updating_tags_1 && dirty & /*tags*/ 256) {
 				updating_tags_1 = true;
-				tags1_changes.tags = /*tags*/ ctx[8];
+				tagcheckboxbar1_changes.tags = /*tags*/ ctx[8];
 				add_flush_callback(() => updating_tags_1 = false);
 			}
 
 			if (!updating_selected_1 && dirty & /*selectedTags*/ 8) {
 				updating_selected_1 = true;
-				tags1_changes.selected = /*selectedTags*/ ctx[3];
+				tagcheckboxbar1_changes.selected = /*selectedTags*/ ctx[3];
 				add_flush_callback(() => updating_selected_1 = false);
 			}
 
-			tags1.$set(tags1_changes);
+			tagcheckboxbar1.$set(tagcheckboxbar1_changes);
 
 			if (/*items*/ ctx[0].length > 0) {
 				if (if_block1) {
@@ -37602,16 +39473,16 @@ function DocBrowser_svelte_create_fragment(ctx) {
 			if (current) return;
 			transitions_transition_in(addicon.$$.fragment, local);
 			transitions_transition_in(activity.$$.fragment, local);
-			transitions_transition_in(tags0.$$.fragment, local);
-			transitions_transition_in(tags1.$$.fragment, local);
+			transitions_transition_in(tagcheckboxbar0.$$.fragment, local);
+			transitions_transition_in(tagcheckboxbar1.$$.fragment, local);
 			transitions_transition_in(if_block1);
 			current = true;
 		},
 		o(local) {
 			transitions_transition_out(addicon.$$.fragment, local);
 			transitions_transition_out(activity.$$.fragment, local);
-			transitions_transition_out(tags0.$$.fragment, local);
-			transitions_transition_out(tags1.$$.fragment, local);
+			transitions_transition_out(tagcheckboxbar0.$$.fragment, local);
+			transitions_transition_out(tagcheckboxbar1.$$.fragment, local);
 			transitions_transition_out(if_block1);
 			current = false;
 		},
@@ -37630,8 +39501,8 @@ function DocBrowser_svelte_create_fragment(ctx) {
 			if_block0.d(detaching);
 			destroy_component(addicon);
 			destroy_component(activity);
-			destroy_component(tags0, detaching);
-			destroy_component(tags1, detaching);
+			destroy_component(tagcheckboxbar0, detaching);
+			destroy_component(tagcheckboxbar1, detaching);
 			if (if_block1) if_block1.d(detaching);
 			mounted = false;
 			dispose();
@@ -37683,10 +39554,10 @@ function DocBrowser_svelte_instance($$self, $$props, $$invalidate) {
 
 	// Event handlers for adding, updating and removing todos
 	async function addDoc(event) {
-		const { todo: activity } = event.detail;
-		activity.complete = false;
-		activity.createdAt = new Date().toISOString();
-		const addition = await db.post(activity);
+		const { doc } = event.detail;
+		doc.complete = false;
+		doc.createdAt = new Date().toISOString();
+		const addition = await db.post(doc);
 
 		if (addition.ok) {
 			await updateItems();
@@ -37697,8 +39568,8 @@ function DocBrowser_svelte_instance($$self, $$props, $$invalidate) {
 	}
 
 	async function updateDoc(event) {
-		const { todo } = event.detail;
-		const update = await db.put(todo);
+		const { doc } = event.detail;
+		const update = await db.put(doc);
 
 		if (update.ok) {
 			await updateItems();
@@ -37706,14 +39577,14 @@ function DocBrowser_svelte_instance($$self, $$props, $$invalidate) {
 	}
 
 	async function removeDoc(event) {
-		const { todo: todoToRemove } = event.detail;
-		const removal = await db.remove(todoToRemove);
+		const { doc } = event.detail;
+		const removal = await db.remove(doc);
 
 		if (removal.ok) {
 			// For removal, we can just update the local state instead of reloading everything from PouchDB,
 			// since we no longer care about the doc’s revision.
-			$$invalidate(0, items = items.filter(todo => {
-				return todo._id !== todoToRemove._id;
+			$$invalidate(0, items = items.filter(activityDoc => {
+				return activityDoc._id !== doc._id;
 			}));
 		}
 	}
@@ -37728,22 +39599,22 @@ function DocBrowser_svelte_instance($$self, $$props, $$invalidate) {
 		$$invalidate(7, addNewItem = !addNewItem);
 	}
 
-	function tags0_tags_binding(value) {
+	function tagcheckboxbar0_tags_binding(value) {
 		activityTypes = value;
 		$$invalidate(9, activityTypes);
 	}
 
-	function tags0_selected_binding(value) {
+	function tagcheckboxbar0_selected_binding(value) {
 		selectedActivityTypes = value;
 		$$invalidate(4, selectedActivityTypes);
 	}
 
-	function tags1_tags_binding(value) {
+	function tagcheckboxbar1_tags_binding(value) {
 		tags = value;
 		$$invalidate(8, tags);
 	}
 
-	function tags1_selected_binding(value) {
+	function tagcheckboxbar1_selected_binding(value) {
 		selectedTags = value;
 		$$invalidate(3, selectedTags);
 	}
@@ -37792,10 +39663,10 @@ function DocBrowser_svelte_instance($$self, $$props, $$invalidate) {
 		updateDoc,
 		removeDoc,
 		toggleNewItem,
-		tags0_tags_binding,
-		tags0_selected_binding,
-		tags1_tags_binding,
-		tags1_selected_binding,
+		tagcheckboxbar0_tags_binding,
+		tagcheckboxbar0_selected_binding,
+		tagcheckboxbar1_tags_binding,
+		tagcheckboxbar1_selected_binding,
 		select0_change_handler,
 		select1_change_handler
 	];
@@ -37976,8 +39847,8 @@ class Cog extends SvelteComponent {
 
 const get_items_slot_changes = dirty => ({});
 const get_items_slot_context = ctx => ({});
-const get_icon_slot_changes = dirty => ({});
-const get_icon_slot_context = ctx => ({});
+const Menu_svelte_get_icon_slot_changes = dirty => ({});
+const Menu_svelte_get_icon_slot_context = ctx => ({});
 
 function Menu_svelte_create_fragment(ctx) {
 	let button;
@@ -37988,7 +39859,7 @@ function Menu_svelte_create_fragment(ctx) {
 	let mounted;
 	let dispose;
 	const icon_slot_template = /*#slots*/ ctx[4].icon;
-	const icon_slot = create_slot(icon_slot_template, ctx, /*$$scope*/ ctx[3], get_icon_slot_context);
+	const icon_slot = create_slot(icon_slot_template, ctx, /*$$scope*/ ctx[3], Menu_svelte_get_icon_slot_context);
 	const items_slot_template = /*#slots*/ ctx[4].items;
 	const items_slot = create_slot(items_slot_template, ctx, /*$$scope*/ ctx[3], get_items_slot_context);
 
@@ -38034,8 +39905,8 @@ function Menu_svelte_create_fragment(ctx) {
 						/*$$scope*/ ctx[3],
 						!current
 						? get_all_dirty_from_scope(/*$$scope*/ ctx[3])
-						: get_slot_changes(icon_slot_template, /*$$scope*/ ctx[3], dirty, get_icon_slot_changes),
-						get_icon_slot_context
+						: get_slot_changes(icon_slot_template, /*$$scope*/ ctx[3], dirty, Menu_svelte_get_icon_slot_changes),
+						Menu_svelte_get_icon_slot_context
 					);
 				}
 			}
@@ -38350,14 +40221,14 @@ class Dark_light extends SvelteComponent {
 }
 
 /* harmony default export */ const dark_light_svelte = (Dark_light);
-;// ./src/LightMode.svelte
-/* src/LightMode.svelte generated by Svelte v4.2.19 */
+;// ./src/lib/input/LightModeBtn.svelte
+/* src/lib/input/LightModeBtn.svelte generated by Svelte v4.2.19 */
 
 
 
 
 
-function LightMode_svelte_create_fragment(ctx) {
+function LightModeBtn_svelte_create_fragment(ctx) {
 	let button;
 	let darklighticon;
 	let current;
@@ -38404,7 +40275,7 @@ function LightMode_svelte_create_fragment(ctx) {
 	};
 }
 
-function LightMode_svelte_instance($$self, $$props, $$invalidate) {
+function LightModeBtn_svelte_instance($$self, $$props, $$invalidate) {
 	let { value = 0 } = $$props;
 
 	function toggle() {
@@ -38418,14 +40289,14 @@ function LightMode_svelte_instance($$self, $$props, $$invalidate) {
 	return [toggle, value];
 }
 
-class LightMode extends SvelteComponent {
+class LightModeBtn extends SvelteComponent {
 	constructor(options) {
 		super();
-		init(this, options, LightMode_svelte_instance, LightMode_svelte_create_fragment, safe_not_equal, { value: 1 });
+		init(this, options, LightModeBtn_svelte_instance, LightModeBtn_svelte_create_fragment, safe_not_equal, { value: 1 });
 	}
 }
 
-/* harmony default export */ const LightMode_svelte = (LightMode);
+/* harmony default export */ const LightModeBtn_svelte = (LightModeBtn);
 
 ;// ./src/Settings.svelte
 /* src/Settings.svelte generated by Svelte v4.2.19 */
@@ -38439,22 +40310,22 @@ function Settings_svelte_create_fragment(ctx) {
 	let section;
 	let h2;
 	let t1;
-	let lightmode;
+	let lightmodebtn;
 	let updating_value;
 	let current;
 
-	function lightmode_value_binding(value) {
-		/*lightmode_value_binding*/ ctx[1](value);
+	function lightmodebtn_value_binding(value) {
+		/*lightmodebtn_value_binding*/ ctx[1](value);
 	}
 
-	let lightmode_props = {};
+	let lightmodebtn_props = {};
 
 	if (/*$settings*/ ctx[0].lightMode !== void 0) {
-		lightmode_props.value = /*$settings*/ ctx[0].lightMode;
+		lightmodebtn_props.value = /*$settings*/ ctx[0].lightMode;
 	}
 
-	lightmode = new LightMode_svelte({ props: lightmode_props });
-	binding_callbacks.push(() => bind(lightmode, 'value', lightmode_value_binding));
+	lightmodebtn = new LightModeBtn_svelte({ props: lightmodebtn_props });
+	binding_callbacks.push(() => bind(lightmodebtn, 'value', lightmodebtn_value_binding));
 
 	return {
 		c() {
@@ -38462,34 +40333,34 @@ function Settings_svelte_create_fragment(ctx) {
 			h2 = dom_element("h2");
 			h2.textContent = "Settings";
 			t1 = space();
-			create_component(lightmode.$$.fragment);
+			create_component(lightmodebtn.$$.fragment);
 			dom_attr(h2, "class", "svelte-mjouae");
 		},
 		m(target, anchor) {
 			dom_insert(target, section, anchor);
 			dom_append(section, h2);
 			dom_append(section, t1);
-			mount_component(lightmode, section, null);
+			mount_component(lightmodebtn, section, null);
 			current = true;
 		},
 		p(ctx, [dirty]) {
-			const lightmode_changes = {};
+			const lightmodebtn_changes = {};
 
 			if (!updating_value && dirty & /*$settings*/ 1) {
 				updating_value = true;
-				lightmode_changes.value = /*$settings*/ ctx[0].lightMode;
+				lightmodebtn_changes.value = /*$settings*/ ctx[0].lightMode;
 				add_flush_callback(() => updating_value = false);
 			}
 
-			lightmode.$set(lightmode_changes);
+			lightmodebtn.$set(lightmodebtn_changes);
 		},
 		i(local) {
 			if (current) return;
-			transitions_transition_in(lightmode.$$.fragment, local);
+			transitions_transition_in(lightmodebtn.$$.fragment, local);
 			current = true;
 		},
 		o(local) {
-			transitions_transition_out(lightmode.$$.fragment, local);
+			transitions_transition_out(lightmodebtn.$$.fragment, local);
 			current = false;
 		},
 		d(detaching) {
@@ -38497,7 +40368,7 @@ function Settings_svelte_create_fragment(ctx) {
 				dom_detach(section);
 			}
 
-			destroy_component(lightmode);
+			destroy_component(lightmodebtn);
 		}
 	};
 }
@@ -38506,14 +40377,14 @@ function Settings_svelte_instance($$self, $$props, $$invalidate) {
 	let $settings;
 	component_subscribe($$self, settings, $$value => $$invalidate(0, $settings = $$value));
 
-	function lightmode_value_binding(value) {
+	function lightmodebtn_value_binding(value) {
 		if ($$self.$$.not_equal($settings.lightMode, value)) {
 			$settings.lightMode = value;
 			settings.set($settings);
 		}
 	}
 
-	return [$settings, lightmode_value_binding];
+	return [$settings, lightmodebtn_value_binding];
 }
 
 class Settings extends SvelteComponent {
@@ -38650,7 +40521,7 @@ function create_items_slot_1(ctx) {
 }
 
 // (28:8) 
-function create_icon_slot(ctx) {
+function Navigation_svelte_create_icon_slot(ctx) {
 	let cogicon;
 	let current;
 	cogicon = new cog_svelte({ props: { slot: "icon" } });
@@ -38736,7 +40607,7 @@ function Navigation_svelte_create_fragment(ctx) {
 				align: "right",
 				$$slots: {
 					items: [create_items_slot],
-					icon: [create_icon_slot]
+					icon: [Navigation_svelte_create_icon_slot]
 				},
 				$$scope: { ctx }
 			}
@@ -39010,7 +40881,8 @@ function close_svelte_create_fragment(ctx) {
 		c() {
 			svg = svg_element("svg");
 			path = svg_element("path");
-			dom_attr(path, "fill", "currentColor");
+			dom_attr(path, "class", "fill");
+			dom_attr(path, "fill", "#333");
 			dom_attr(path, "d", "M242.72 256l100.07-100.07c12.28-12.28 12.28-32.19 0-44.48l-22.24-22.24c-12.28-12.28-32.19-12.28-44.48 0L176 189.28 75.93 89.21c-12.28-12.28-32.19-12.28-44.48 0L9.21 111.45c-12.28 12.28-12.28 32.19 0 44.48L109.28 256 9.21 356.07c-12.28 12.28-12.28 32.19 0 44.48l22.24 22.24c12.28 12.28 32.2 12.28 44.48 0L176 322.72l100.07 100.07c12.28 12.28 32.2 12.28 44.48 0l22.24-22.24c12.28-12.28 12.28-32.19 0-44.48L242.72 256z");
 			dom_attr(svg, "width", /*width*/ ctx[0]);
 			set_style(svg, "text-align", "center");
@@ -39637,8 +41509,717 @@ class Toasts extends SvelteComponent {
 
 /* harmony default export */ const Toasts_svelte = (Toasts);
 
+;// ./src/Modal.svelte
+/* src/Modal.svelte generated by Svelte v4.2.19 */
+
+
+
+
+
+
+function Modal_svelte_create_else_block(ctx) {
+	let section;
+	let p;
+	let t1;
+	let button;
+	let closeicon;
+	let current;
+	let mounted;
+	let dispose;
+	closeicon = new close_svelte({ props: { width: "1.5em" } });
+
+	return {
+		c() {
+			section = dom_element("section");
+			p = dom_element("p");
+			p.textContent = "This is not the modal you're looking for....";
+			t1 = space();
+			button = dom_element("button");
+			create_component(closeicon.$$.fragment);
+			dom_attr(button, "class", "close");
+		},
+		m(target, anchor) {
+			dom_insert(target, section, anchor);
+			dom_append(section, p);
+			dom_append(section, t1);
+			dom_append(section, button);
+			mount_component(closeicon, button, null);
+			current = true;
+
+			if (!mounted) {
+				dispose = dom_listen(button, "click", /*dismissModal*/ ctx[2]);
+				mounted = true;
+			}
+		},
+		p: utils_noop,
+		i(local) {
+			if (current) return;
+			transitions_transition_in(closeicon.$$.fragment, local);
+			current = true;
+		},
+		o(local) {
+			transitions_transition_out(closeicon.$$.fragment, local);
+			current = false;
+		},
+		d(detaching) {
+			if (detaching) {
+				dom_detach(section);
+			}
+
+			destroy_component(closeicon);
+			mounted = false;
+			dispose();
+		}
+	};
+}
+
+// (16:0) {#if modal }
+function Modal_svelte_create_if_block(ctx) {
+	let section;
+	let div;
+	let t0;
+	let t1;
+	let t2;
+	let button;
+	let closeicon;
+	let section_name_value;
+	let current;
+	let mounted;
+	let dispose;
+	let if_block0 = /*modal*/ ctx[1].title && create_if_block_3(ctx);
+	let if_block1 = /*modal*/ ctx[1].message && Modal_svelte_create_if_block_2(ctx);
+	let if_block2 = /*modal*/ ctx[1].component && Modal_svelte_create_if_block_1(ctx);
+	closeicon = new close_svelte({ props: { width: "1.5em" } });
+
+	return {
+		c() {
+			section = dom_element("section");
+			div = dom_element("div");
+			if (if_block0) if_block0.c();
+			t0 = space();
+			if (if_block1) if_block1.c();
+			t1 = space();
+			if (if_block2) if_block2.c();
+			t2 = space();
+			button = dom_element("button");
+			create_component(closeicon.$$.fragment);
+			dom_attr(button, "class", "icon close");
+			dom_attr(div, "class", "content");
+			dom_attr(section, "name", section_name_value = /*modal*/ ctx[1].title);
+		},
+		m(target, anchor) {
+			dom_insert(target, section, anchor);
+			dom_append(section, div);
+			if (if_block0) if_block0.m(div, null);
+			dom_append(div, t0);
+			if (if_block1) if_block1.m(div, null);
+			dom_append(div, t1);
+			if (if_block2) if_block2.m(div, null);
+			dom_append(div, t2);
+			dom_append(div, button);
+			mount_component(closeicon, button, null);
+			current = true;
+
+			if (!mounted) {
+				dispose = dom_listen(button, "click", /*dismissModal*/ ctx[2]);
+				mounted = true;
+			}
+		},
+		p(ctx, dirty) {
+			if (/*modal*/ ctx[1].title) {
+				if (if_block0) {
+					if_block0.p(ctx, dirty);
+				} else {
+					if_block0 = create_if_block_3(ctx);
+					if_block0.c();
+					if_block0.m(div, t0);
+				}
+			} else if (if_block0) {
+				if_block0.d(1);
+				if_block0 = null;
+			}
+
+			if (/*modal*/ ctx[1].message) {
+				if (if_block1) {
+					if_block1.p(ctx, dirty);
+				} else {
+					if_block1 = Modal_svelte_create_if_block_2(ctx);
+					if_block1.c();
+					if_block1.m(div, t1);
+				}
+			} else if (if_block1) {
+				if_block1.d(1);
+				if_block1 = null;
+			}
+
+			if (/*modal*/ ctx[1].component) {
+				if (if_block2) {
+					if_block2.p(ctx, dirty);
+
+					if (dirty & /*modal*/ 2) {
+						transitions_transition_in(if_block2, 1);
+					}
+				} else {
+					if_block2 = Modal_svelte_create_if_block_1(ctx);
+					if_block2.c();
+					transitions_transition_in(if_block2, 1);
+					if_block2.m(div, t2);
+				}
+			} else if (if_block2) {
+				transitions_group_outros();
+
+				transitions_transition_out(if_block2, 1, 1, () => {
+					if_block2 = null;
+				});
+
+				transitions_check_outros();
+			}
+
+			if (!current || dirty & /*modal*/ 2 && section_name_value !== (section_name_value = /*modal*/ ctx[1].title)) {
+				dom_attr(section, "name", section_name_value);
+			}
+		},
+		i(local) {
+			if (current) return;
+			transitions_transition_in(if_block2);
+			transitions_transition_in(closeicon.$$.fragment, local);
+			current = true;
+		},
+		o(local) {
+			transitions_transition_out(if_block2);
+			transitions_transition_out(closeicon.$$.fragment, local);
+			current = false;
+		},
+		d(detaching) {
+			if (detaching) {
+				dom_detach(section);
+			}
+
+			if (if_block0) if_block0.d();
+			if (if_block1) if_block1.d();
+			if (if_block2) if_block2.d();
+			destroy_component(closeicon);
+			mounted = false;
+			dispose();
+		}
+	};
+}
+
+// (20:2) {#if modal.title }
+function create_if_block_3(ctx) {
+	let h2;
+	let t_value = /*modal*/ ctx[1].title + "";
+	let t;
+
+	return {
+		c() {
+			h2 = dom_element("h2");
+			t = dom_text(t_value);
+		},
+		m(target, anchor) {
+			dom_insert(target, h2, anchor);
+			dom_append(h2, t);
+		},
+		p(ctx, dirty) {
+			if (dirty & /*modal*/ 2 && t_value !== (t_value = /*modal*/ ctx[1].title + "")) set_data(t, t_value);
+		},
+		d(detaching) {
+			if (detaching) {
+				dom_detach(h2);
+			}
+		}
+	};
+}
+
+// (24:2) {#if modal.message }
+function Modal_svelte_create_if_block_2(ctx) {
+	let p;
+	let t_value = /*modal*/ ctx[1].message + "";
+	let t;
+
+	return {
+		c() {
+			p = dom_element("p");
+			t = dom_text(t_value);
+		},
+		m(target, anchor) {
+			dom_insert(target, p, anchor);
+			dom_append(p, t);
+		},
+		p(ctx, dirty) {
+			if (dirty & /*modal*/ 2 && t_value !== (t_value = /*modal*/ ctx[1].message + "")) set_data(t, t_value);
+		},
+		d(detaching) {
+			if (detaching) {
+				dom_detach(p);
+			}
+		}
+	};
+}
+
+// (28:2) {#if modal.component }
+function Modal_svelte_create_if_block_1(ctx) {
+	let switch_instance;
+	let updating_source;
+	let switch_instance_anchor;
+	let current;
+	const switch_instance_spread_levels = [/*modal*/ ctx[1].data];
+
+	function switch_instance_source_binding(value) {
+		/*switch_instance_source_binding*/ ctx[3](value);
+	}
+
+	var switch_value = /*modal*/ ctx[1].component;
+
+	function switch_props(ctx, dirty) {
+		let switch_instance_props = {};
+
+		for (let i = 0; i < switch_instance_spread_levels.length; i += 1) {
+			switch_instance_props = utils_assign(switch_instance_props, switch_instance_spread_levels[i]);
+		}
+
+		if (dirty !== undefined && dirty & /*modal*/ 2) {
+			switch_instance_props = utils_assign(switch_instance_props, get_spread_update(switch_instance_spread_levels, [get_spread_object(/*modal*/ ctx[1].data)]));
+		}
+
+		if (/*source*/ ctx[0] !== void 0) {
+			switch_instance_props.source = /*source*/ ctx[0];
+		}
+
+		return { props: switch_instance_props };
+	}
+
+	if (switch_value) {
+		switch_instance = construct_svelte_component(switch_value, switch_props(ctx));
+		binding_callbacks.push(() => bind(switch_instance, 'source', switch_instance_source_binding));
+	}
+
+	return {
+		c() {
+			if (switch_instance) create_component(switch_instance.$$.fragment);
+			switch_instance_anchor = empty();
+		},
+		m(target, anchor) {
+			if (switch_instance) mount_component(switch_instance, target, anchor);
+			dom_insert(target, switch_instance_anchor, anchor);
+			current = true;
+		},
+		p(ctx, dirty) {
+			if (dirty & /*modal*/ 2 && switch_value !== (switch_value = /*modal*/ ctx[1].component)) {
+				if (switch_instance) {
+					transitions_group_outros();
+					const old_component = switch_instance;
+
+					transitions_transition_out(old_component.$$.fragment, 1, 0, () => {
+						destroy_component(old_component, 1);
+					});
+
+					transitions_check_outros();
+				}
+
+				if (switch_value) {
+					switch_instance = construct_svelte_component(switch_value, switch_props(ctx, dirty));
+					binding_callbacks.push(() => bind(switch_instance, 'source', switch_instance_source_binding));
+					create_component(switch_instance.$$.fragment);
+					transitions_transition_in(switch_instance.$$.fragment, 1);
+					mount_component(switch_instance, switch_instance_anchor.parentNode, switch_instance_anchor);
+				} else {
+					switch_instance = null;
+				}
+			} else if (switch_value) {
+				const switch_instance_changes = (dirty & /*modal*/ 2)
+				? get_spread_update(switch_instance_spread_levels, [get_spread_object(/*modal*/ ctx[1].data)])
+				: {};
+
+				if (!updating_source && dirty & /*source*/ 1) {
+					updating_source = true;
+					switch_instance_changes.source = /*source*/ ctx[0];
+					add_flush_callback(() => updating_source = false);
+				}
+
+				switch_instance.$set(switch_instance_changes);
+			}
+		},
+		i(local) {
+			if (current) return;
+			if (switch_instance) transitions_transition_in(switch_instance.$$.fragment, local);
+			current = true;
+		},
+		o(local) {
+			if (switch_instance) transitions_transition_out(switch_instance.$$.fragment, local);
+			current = false;
+		},
+		d(detaching) {
+			if (detaching) {
+				dom_detach(switch_instance_anchor);
+			}
+
+			if (switch_instance) destroy_component(switch_instance, detaching);
+		}
+	};
+}
+
+function Modal_svelte_create_fragment(ctx) {
+	let current_block_type_index;
+	let if_block;
+	let if_block_anchor;
+	let current;
+	const if_block_creators = [Modal_svelte_create_if_block, Modal_svelte_create_else_block];
+	const if_blocks = [];
+
+	function select_block_type(ctx, dirty) {
+		if (/*modal*/ ctx[1]) return 0;
+		return 1;
+	}
+
+	current_block_type_index = select_block_type(ctx, -1);
+	if_block = if_blocks[current_block_type_index] = if_block_creators[current_block_type_index](ctx);
+
+	return {
+		c() {
+			if_block.c();
+			if_block_anchor = empty();
+		},
+		m(target, anchor) {
+			if_blocks[current_block_type_index].m(target, anchor);
+			dom_insert(target, if_block_anchor, anchor);
+			current = true;
+		},
+		p(ctx, [dirty]) {
+			let previous_block_index = current_block_type_index;
+			current_block_type_index = select_block_type(ctx, dirty);
+
+			if (current_block_type_index === previous_block_index) {
+				if_blocks[current_block_type_index].p(ctx, dirty);
+			} else {
+				transitions_group_outros();
+
+				transitions_transition_out(if_blocks[previous_block_index], 1, 1, () => {
+					if_blocks[previous_block_index] = null;
+				});
+
+				transitions_check_outros();
+				if_block = if_blocks[current_block_type_index];
+
+				if (!if_block) {
+					if_block = if_blocks[current_block_type_index] = if_block_creators[current_block_type_index](ctx);
+					if_block.c();
+				} else {
+					if_block.p(ctx, dirty);
+				}
+
+				transitions_transition_in(if_block, 1);
+				if_block.m(if_block_anchor.parentNode, if_block_anchor);
+			}
+		},
+		i(local) {
+			if (current) return;
+			transitions_transition_in(if_block);
+			current = true;
+		},
+		o(local) {
+			transitions_transition_out(if_block);
+			current = false;
+		},
+		d(detaching) {
+			if (detaching) {
+				dom_detach(if_block_anchor);
+			}
+
+			if_blocks[current_block_type_index].d(detaching);
+		}
+	};
+}
+
+function Modal_svelte_instance($$self, $$props, $$invalidate) {
+	const dispatch = createEventDispatcher();
+	let { source } = $$props;
+	let { modal } = $$props;
+
+	function dismissModal() {
+		dispatch("dismiss");
+	}
+
+	function switch_instance_source_binding(value) {
+		source = value;
+		$$invalidate(0, source);
+	}
+
+	$$self.$$set = $$props => {
+		if ('source' in $$props) $$invalidate(0, source = $$props.source);
+		if ('modal' in $$props) $$invalidate(1, modal = $$props.modal);
+	};
+
+	return [source, modal, dismissModal, switch_instance_source_binding];
+}
+
+class Modal_svelte_Modal extends SvelteComponent {
+	constructor(options) {
+		super();
+		init(this, options, Modal_svelte_instance, Modal_svelte_create_fragment, safe_not_equal, { source: 0, modal: 1 });
+	}
+}
+
+/* harmony default export */ const Modal_svelte = (Modal_svelte_Modal);
+;// ./src/Modals.svelte
+/* src/Modals.svelte generated by Svelte v4.2.19 */
+
+
+
+
+
+
+
+function Modals_svelte_get_each_context(ctx, list, i) {
+	const child_ctx = ctx.slice();
+	child_ctx[3] = list[i];
+	child_ctx[4] = list;
+	child_ctx[5] = i;
+	return child_ctx;
+}
+
+// (7:0) {#if $modals}
+function Modals_svelte_create_if_block(ctx) {
+	let section;
+	let each_blocks = [];
+	let each_1_lookup = new Map();
+	let section_transition;
+	let current;
+	let each_value = each_ensure_array_like(/*$modals*/ ctx[0]);
+	const get_key = ctx => /*modal*/ ctx[3].id;
+
+	for (let i = 0; i < each_value.length; i += 1) {
+		let child_ctx = Modals_svelte_get_each_context(ctx, each_value, i);
+		let key = get_key(child_ctx);
+		each_1_lookup.set(key, each_blocks[i] = Modals_svelte_create_each_block(key, child_ctx));
+	}
+
+	return {
+		c() {
+			section = dom_element("section");
+
+			for (let i = 0; i < each_blocks.length; i += 1) {
+				each_blocks[i].c();
+			}
+
+			dom_attr(section, "name", "modals");
+		},
+		m(target, anchor) {
+			dom_insert(target, section, anchor);
+
+			for (let i = 0; i < each_blocks.length; i += 1) {
+				if (each_blocks[i]) {
+					each_blocks[i].m(section, null);
+				}
+			}
+
+			current = true;
+		},
+		p(ctx, dirty) {
+			if (dirty & /*$modals*/ 1) {
+				each_value = each_ensure_array_like(/*$modals*/ ctx[0]);
+				transitions_group_outros();
+				each_blocks = update_keyed_each(each_blocks, dirty, get_key, 1, ctx, each_value, each_1_lookup, section, outro_and_destroy_block, Modals_svelte_create_each_block, null, Modals_svelte_get_each_context);
+				transitions_check_outros();
+			}
+		},
+		i(local) {
+			if (current) return;
+
+			for (let i = 0; i < each_value.length; i += 1) {
+				transitions_transition_in(each_blocks[i]);
+			}
+
+			if (local) {
+				scheduler_add_render_callback(() => {
+					if (!current) return;
+					if (!section_transition) section_transition = create_bidirectional_transition(section, fade, {}, true);
+					section_transition.run(1);
+				});
+			}
+
+			current = true;
+		},
+		o(local) {
+			for (let i = 0; i < each_blocks.length; i += 1) {
+				transitions_transition_out(each_blocks[i]);
+			}
+
+			if (local) {
+				if (!section_transition) section_transition = create_bidirectional_transition(section, fade, {}, false);
+				section_transition.run(0);
+			}
+
+			current = false;
+		},
+		d(detaching) {
+			if (detaching) {
+				dom_detach(section);
+			}
+
+			for (let i = 0; i < each_blocks.length; i += 1) {
+				each_blocks[i].d();
+			}
+
+			if (detaching && section_transition) section_transition.end();
+		}
+	};
+}
+
+// (9:4) {#each $modals as modal (modal.id)}
+function Modals_svelte_create_each_block(key_1, ctx) {
+	let first;
+	let modal_1;
+	let updating_source;
+	let current;
+
+	function modal_1_source_binding(value) {
+		/*modal_1_source_binding*/ ctx[1](value, /*modal*/ ctx[3]);
+	}
+
+	function dismiss_handler() {
+		return /*dismiss_handler*/ ctx[2](/*modal*/ ctx[3]);
+	}
+
+	let modal_1_props = { modal: /*modal*/ ctx[3] };
+
+	if (/*modal*/ ctx[3].source !== void 0) {
+		modal_1_props.source = /*modal*/ ctx[3].source;
+	}
+
+	modal_1 = new Modal_svelte({ props: modal_1_props });
+	binding_callbacks.push(() => bind(modal_1, 'source', modal_1_source_binding));
+	modal_1.$on("dismiss", dismiss_handler);
+
+	return {
+		key: key_1,
+		first: null,
+		c() {
+			first = empty();
+			create_component(modal_1.$$.fragment);
+			this.first = first;
+		},
+		m(target, anchor) {
+			dom_insert(target, first, anchor);
+			mount_component(modal_1, target, anchor);
+			current = true;
+		},
+		p(new_ctx, dirty) {
+			ctx = new_ctx;
+			const modal_1_changes = {};
+			if (dirty & /*$modals*/ 1) modal_1_changes.modal = /*modal*/ ctx[3];
+
+			if (!updating_source && dirty & /*$modals*/ 1) {
+				updating_source = true;
+				modal_1_changes.source = /*modal*/ ctx[3].source;
+				add_flush_callback(() => updating_source = false);
+			}
+
+			modal_1.$set(modal_1_changes);
+		},
+		i(local) {
+			if (current) return;
+			transitions_transition_in(modal_1.$$.fragment, local);
+			current = true;
+		},
+		o(local) {
+			transitions_transition_out(modal_1.$$.fragment, local);
+			current = false;
+		},
+		d(detaching) {
+			if (detaching) {
+				dom_detach(first);
+			}
+
+			destroy_component(modal_1, detaching);
+		}
+	};
+}
+
+function Modals_svelte_create_fragment(ctx) {
+	let if_block_anchor;
+	let current;
+	let if_block = /*$modals*/ ctx[0] && Modals_svelte_create_if_block(ctx);
+
+	return {
+		c() {
+			if (if_block) if_block.c();
+			if_block_anchor = empty();
+		},
+		m(target, anchor) {
+			if (if_block) if_block.m(target, anchor);
+			dom_insert(target, if_block_anchor, anchor);
+			current = true;
+		},
+		p(ctx, [dirty]) {
+			if (/*$modals*/ ctx[0]) {
+				if (if_block) {
+					if_block.p(ctx, dirty);
+
+					if (dirty & /*$modals*/ 1) {
+						transitions_transition_in(if_block, 1);
+					}
+				} else {
+					if_block = Modals_svelte_create_if_block(ctx);
+					if_block.c();
+					transitions_transition_in(if_block, 1);
+					if_block.m(if_block_anchor.parentNode, if_block_anchor);
+				}
+			} else if (if_block) {
+				transitions_group_outros();
+
+				transitions_transition_out(if_block, 1, 1, () => {
+					if_block = null;
+				});
+
+				transitions_check_outros();
+			}
+		},
+		i(local) {
+			if (current) return;
+			transitions_transition_in(if_block);
+			current = true;
+		},
+		o(local) {
+			transitions_transition_out(if_block);
+			current = false;
+		},
+		d(detaching) {
+			if (detaching) {
+				dom_detach(if_block_anchor);
+			}
+
+			if (if_block) if_block.d(detaching);
+		}
+	};
+}
+
+function Modals_svelte_instance($$self, $$props, $$invalidate) {
+	let $modals;
+	component_subscribe($$self, modals, $$value => $$invalidate(0, $modals = $$value));
+
+	function modal_1_source_binding(value, modal) {
+		if ($$self.$$.not_equal(modal.source, value)) {
+			modal.source = value;
+			modals.set($modals);
+		}
+	}
+
+	const dismiss_handler = modal => dismissModal(modal.id);
+	return [$modals, modal_1_source_binding, dismiss_handler];
+}
+
+class Modals extends SvelteComponent {
+	constructor(options) {
+		super();
+		init(this, options, Modals_svelte_instance, Modals_svelte_create_fragment, safe_not_equal, {});
+	}
+}
+
+/* harmony default export */ const Modals_svelte = (Modals);
 ;// ./src/App.svelte
 /* src/App.svelte generated by Svelte v4.2.19 */
+
 
 
 
@@ -39655,11 +42236,14 @@ function App_svelte_create_fragment(ctx) {
 	let t1;
 	let main;
 	let docbrowser;
+	let t2;
+	let modals;
 	let div_data_light_mode_value;
 	let current;
 	toasts = new Toasts_svelte({});
 	navigation = new Navigation_svelte({});
 	docbrowser = new DocBrowser_svelte({});
+	modals = new Modals_svelte({});
 
 	return {
 		c() {
@@ -39670,6 +42254,8 @@ function App_svelte_create_fragment(ctx) {
 			t1 = space();
 			main = dom_element("main");
 			create_component(docbrowser.$$.fragment);
+			t2 = space();
+			create_component(modals.$$.fragment);
 			dom_attr(div, "data-light-mode", div_data_light_mode_value = /*$settings*/ ctx[0].lightMode);
 		},
 		m(target, anchor) {
@@ -39680,6 +42266,8 @@ function App_svelte_create_fragment(ctx) {
 			dom_append(div, t1);
 			dom_append(div, main);
 			mount_component(docbrowser, main, null);
+			dom_append(div, t2);
+			mount_component(modals, div, null);
 			current = true;
 		},
 		p(ctx, [dirty]) {
@@ -39692,12 +42280,14 @@ function App_svelte_create_fragment(ctx) {
 			transitions_transition_in(toasts.$$.fragment, local);
 			transitions_transition_in(navigation.$$.fragment, local);
 			transitions_transition_in(docbrowser.$$.fragment, local);
+			transitions_transition_in(modals.$$.fragment, local);
 			current = true;
 		},
 		o(local) {
 			transitions_transition_out(toasts.$$.fragment, local);
 			transitions_transition_out(navigation.$$.fragment, local);
 			transitions_transition_out(docbrowser.$$.fragment, local);
+			transitions_transition_out(modals.$$.fragment, local);
 			current = false;
 		},
 		d(detaching) {
@@ -39709,6 +42299,7 @@ function App_svelte_create_fragment(ctx) {
 			destroy_component(toasts, detaching);
 			destroy_component(navigation);
 			destroy_component(docbrowser);
+			destroy_component(modals);
 		}
 	};
 }
