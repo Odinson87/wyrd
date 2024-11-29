@@ -8,7 +8,7 @@
     import ActivityDoc from './lib/ActivityDoc'
     import Activity from './Activity.svelte'
     import AddIcon from './lib/icons/plus.svelte'
-    import Tags from './lib/input/Tags.svelte'
+    import TagCheckboxBar from './lib/input/TagCheckboxBar.svelte'
 
     let notifications = getContext('app');
     // Set up local PouchDB and continuous replication to remote CouchDB
@@ -133,9 +133,9 @@
     <Activity doc={newDoc} viewmode={addNewItem ? 'add' : 'hidden'} on:add={addDoc}/>
 </section>
 
-<Tags name='activityTypes' classes={['tagBar']} selectMax=1 bind:tags={activityTypes} bind:selected={selectedActivityTypes}></Tags>
+<TagCheckboxBar name='activityTypes' classes={['tagBar']} selectMax=1 bind:tags={activityTypes} bind:selected={selectedActivityTypes} />
 
-<Tags name='tags' classes={['tagBar']} bind:tags={tags} bind:selected={selectedTags}></Tags>
+<TagCheckboxBar name='tags' classes={['tagBar']} bind:tags={tags} bind:selected={selectedTags}/>
 
 {#if items.length > 0}    
     <section>  

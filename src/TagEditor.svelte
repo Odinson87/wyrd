@@ -1,6 +1,6 @@
 <script>
     import { settings } from './lib/stores';
-    import Tags from './lib/input/Tags.svelte';
+    import TagCheckboxBar from './lib/input/TagCheckboxBar.svelte';
     
     let availableTags = Object.keys($settings.tags);
     export let source = {};
@@ -17,11 +17,11 @@
 
 {#if sourceHasTags}
     <h3>Selected</h3>
-    <Tags tags={source.tags} disabled={true}/>
+    <TagCheckboxBar tags={source.tags} disabled={true}/>
 
 
     <h3>Choose Tags</h3>
-    <Tags name='edit-tags' tags={availableTags} bind:selected={source.tags}/>
+    <TagCheckboxBar name='edit-tags' tags={availableTags} bind:selected={source.tags}/>
 {:else}
     <p>This provided source has no tags</p>
 {/if}
