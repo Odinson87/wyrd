@@ -1,5 +1,5 @@
 <script>
-    import Tag from "./Tag.svelte";
+    import TagCheckbox from "./TagCheckbox.svelte";
 
     export let name;
     export let classes = [];
@@ -15,6 +15,6 @@
 
 <section class='{['tags'].concat(classes).join(' ')}' name={name}>
     {#each tags as tag}
-		<Tag tagName={tag} selectMax={selectMax} bind:selectedVal={value} bind:group={selected} disabled={disabled}></Tag>
+		<TagCheckbox tagName={tag} selectMax={selectMax} bind:selectedVal={value} bind:group={selected} disabled={disabled} />
 	{/each}
 </section>
