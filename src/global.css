@@ -171,20 +171,46 @@ label.tag {
 	padding: 2px 10px;
 	border-radius: 4px;
 }
+button.tag {
+	padding: 2px 10px;
+	border-radius: 4px;
+	display: inline-block;
+	margin: 5px 3px auto;
+	text-transform: uppercase;
+	font-size: 0.75rem;
+	font-weight: bold;
+}
 
-section[name="edit-tags"] label[data-checked="false"] span::after {
+/* 
+extra characters for tags
+- when checked in TagEditor
+- when adding remove in TagManager
+ */
+
+ div.addTags button.tag span::after,
+ section[name="edit-tags"] label[data-checked="false"] span::after {
 	content: '+';
-	font-size: 1.2em;
+	font-size: 1.3em;
 	line-height: 0em;
-	margin-left: 5px;
+	margin-left: 6px;
 }
 
 section[name="edit-tags"] label[data-checked="true"] span::after {
 	content: '-';
-	font-size: 1.2em;
+	font-size: 1.3em;
 	line-height: 0em;
-	margin-left: 5px;
+	margin-left: 6px;
 }
+
+div.removeTags button.tag span::after {
+	content: '+';
+	display:inline-block;
+	font-size: 1.4em;
+	line-height: 0em;
+	margin-left: 6px;
+	transform: rotate(45deg);
+}
+
 
 [data-light-mode='1'] label.tag[data-checked="true"] {
 	box-shadow: 0px 3px #666 inset;

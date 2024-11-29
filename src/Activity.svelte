@@ -15,7 +15,7 @@
     import NumberInput from './lib/input/Number.svelte';
     import Recurrence from './lib/input/Recurrence.svelte';
     import ModalBtn from './lib/input/ModalBtn.svelte';
-    import TagEditor from './TagEditor.svelte';
+    import TagManager from './TagManager.svelte';
 
     const dispatch = createEventDispatcher();
 
@@ -207,7 +207,7 @@
         </div>
         <div class="tab-group" data-group="tags">
             <h3>Tags</h3>
-            <TagEditor bind:source={doc}/>
+            <TagManager bind:source={doc}/>
         </div>
         <div class="tab-group" data-group="time">
             <h3>Time</h3>
