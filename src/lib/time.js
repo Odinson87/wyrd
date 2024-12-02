@@ -1,6 +1,17 @@
 import { DurationEnum } from "./enums";
 
+export function getDateTimeStr(date = null) {
+    if (date) {
+        return (new Date(date).toISOString().substring(0,19));
+    } else {
+        return new Date().toISOString().substring(0,19);
+    }
+}
+
 export function ago(isoString) {
+    if (isoString === null || isoString === '') {
+        return 'never';
+    }
     let nowS = (new Date()).getTime()/1000;
     let dS = new Date(isoString).getTime()/1000;
     let diffS = Math.round(nowS - dS);

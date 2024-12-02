@@ -11,7 +11,6 @@
         modal = getNewModal(modalName);
         modal.source = source;
         modal = addModal(modal);
-        
         const unsubscribe = modals.subscribe((value) => {
             // trigger reactivity on source
             source = source;

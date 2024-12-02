@@ -5,6 +5,7 @@
     export let val;
     export let name;
     export let label;
+    export let disabled = false;
 
 
     function increment() {
@@ -53,5 +54,5 @@
 <label for={name}>{label}:</label>
 {/if}
 <button class="leftArrow" on:click={ () => decrement() }> - </button>
-<input min={min} name={name} type='number' bind:value={val}>
+<input disabled={disabled} min={min} name={name} type='number' bind:value={val}>
 <button class="rightArrow" on:click={ () => increment() }> + </button>

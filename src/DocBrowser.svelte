@@ -1,5 +1,5 @@
 <script>
-    import { onMount, getContext } from 'svelte'
+    import { onMount } from 'svelte'
     import { sortBy } from 'lodash'
     import { settings } from './lib/stores'
     import Filters from './lib/filters'
@@ -10,7 +10,6 @@
     import AddIcon from './lib/icons/plus.svelte'
     import TagCheckboxBar from './lib/input/TagCheckboxBar.svelte'
 
-    let notifications = getContext('app');
     // Set up local PouchDB and continuous replication to remote CouchDB
     let db = new PouchDB('db', {revs_limit: 1, auto_compaction: true})
   

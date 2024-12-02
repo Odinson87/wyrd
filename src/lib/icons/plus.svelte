@@ -1,5 +1,9 @@
+<script>
+	export let size = 26;
+</script>
+
 <svg fill="#000000" version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" 
-	 width="26px" height="26px" viewBox="0 0 349.03 349.031"
+	 width="{size}px" height="{size}px" viewBox="0 0 349.03 349.031"
 	 xml:space="preserve">
 <g>
 	<path d="M349.03,141.226v66.579c0,5.012-4.061,9.079-9.079,9.079H216.884v123.067c0,5.019-4.067,9.079-9.079,9.079h-66.579

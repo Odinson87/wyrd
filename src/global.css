@@ -8,6 +8,9 @@ img, picture, video, canvas, svg {
 	max-width: 100%;
 }
 
+/* Spacing Helpers */
+.m-5 {margin: 5px;}
+
 /* Typography */
 h1 { line-height:2em; }
 

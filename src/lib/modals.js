@@ -1,5 +1,6 @@
 import Modal from './Modal.js';
 import TagEditor from '../TagEditor.svelte';
+import LogManager from '../LogManager.svelte';
 
 export const modalConfig = {
     tageditor: new Modal({
@@ -8,6 +9,13 @@ export const modalConfig = {
         message: 'Add tags to help group and organise things',
         source: null,
         component: TagEditor
+    }),
+    logmanager: new Modal({
+        name: 'logmanager',
+        title: 'Logs',
+        message: 'Add and edit logs',
+        source: null,
+        component: LogManager
     })
 }
 

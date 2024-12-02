@@ -2,9 +2,8 @@
     import { createEventDispatcher } from 'svelte';
     import { fade } from 'svelte/transition';
     import { debounce } from 'lodash';
-    import { ago } from './lib/time.js';
-
-    import { DurationEnum } from './lib/enums';
+    
+    import { getDateTimeStr } from './lib/time.js';
     import { settings, addToast } from "./lib/stores.js";
     import SaveIcon from './lib/icons/save.svelte';
     import BinIcon from './lib/icons/bin.svelte';
@@ -16,6 +15,8 @@
     import Recurrence from './lib/input/Recurrence.svelte';
     import ModalBtn from './lib/input/ModalBtn.svelte';
     import TagManager from './TagManager.svelte';
+    import Duration from './lib/input/Duration.svelte';
+    import OccurredAt from './lib/input/OccurredAt.svelte';
 
     const dispatch = createEventDispatcher();
 
@@ -73,7 +74,7 @@
             doc.complete = false
             doc.occurrences++;
         }
-        doc.occurredAt = (new Date()).toISOString().substring(0, 19);
+        doc.occurredAt = getDateTimeStr();
         
         addToast({
             message: '"' + doc.name + '" ' + msg,
@@ -81,11 +82,9 @@
         });
         dispatch('update', {doc: doc})
     }
-
-
-    $: durationStr = doc.durationIncrement + doc.durationType;
-    $: agoStr = ago(doc.occurredAt);
-
+    
+    let agoStr
+    let durationStr;
     export let doc;
     export let viewmode = 'list';
     let tab = 'hidden';
@@ -126,9 +125,6 @@
     }
 
     .since p:last-child { bottom: -3px;}
-    [name="activity-occurred-at"] {
-        font-size: 15px;
-    }
 
     .tab-buttons {
         display: flex;
@@ -201,9 +197,14 @@
             <button class="medium icon" on:click={() => toggleTab('time')}>
                 <TimeIcon/>
             </button>
-            <button class="medium icon" on:click={() => toggleTab('logs')}>
-                <LogIcon/>
-            </button>
+            <ModalBtn  
+                classes={'medium m-5'}
+                modalName={'logmanager'}
+                bind:source={doc}
+                on:save={debouncedSave}
+                on:click={() => toggleTab('logs')}>
+                <LogIcon slot='icon'/>
+            </ModalBtn>
         </div>
         <div class="tab-group" data-group="tags">
             <h3>Tags</h3>
@@ -212,29 +213,21 @@
         <div class="tab-group" data-group="time">
             <h3>Time</h3>
             <div class="input-group" data-group="duration">
-                <label for="activity-duration">Duration :</label>
-                <select bind:value={doc.durationType} name="activity-duration">
-                    {#each Object.entries(DurationEnum) as [_, duration]}
-                        <option value={duration.key}>{duration.name}</option>
-                    {/each}
-                </select>
-                <NumberInput bind:val={doc.durationIncrement} name="activity-duration-inc"/>
+                <Duration
+                    label='duration'
+                    name="activity-duration"
+                    bind:durationType={doc.durationType}
+                    bind:durationIncrement={doc.durationIncrement}
+                    bind:value={durationStr}/>
             </div>
             {#if doc.recur}
             <div class="input-group" data-group="occurrence">
                 <NumberInput bind:val={doc.occurrences} label="Ocurrences" name="activity-ocurrences"/>
             </div>
             {/if}
-            {#if doc.occurredAt}
+            {#if doc.occurredAt !== null}
             <div class="input-group" data-group="occurrence">
-                <div>
-                    <label for=activity-occurred-at>Occurred :</label>
-                    <p>{agoStr}</p>
-                </div>
-                <div>
-                    <label for=activity-occurred-at>At :</label>
-                    <input name="activity-occurred-at" type='datetime-local' bind:value={doc.occurredAt}>
-                </div>
+                <OccurredAt name='activity-occurred-at' bind:agoStr={agoStr} bind:occurredAt={doc.occurredAt}/>
             </div>
             {/if}
 

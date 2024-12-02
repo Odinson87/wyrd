@@ -12,7 +12,7 @@ class ActivityDoc {
         this.tags = [];
         this.ignore = true;
         this.suggestedIds = [];
-        this.logs = [];
+        this.logItemId;
     }
 }
 
