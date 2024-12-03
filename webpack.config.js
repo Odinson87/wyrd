@@ -10,7 +10,10 @@ const outputDir = 'docs';
 
 module.exports = {
 	entry: {
-		bundle: ['./src/global.css', './src/main.js']
+		bundle: [
+			'./src/global.css',
+			'./src/main.js'
+		]
 	},
 	resolve: {
 		alias: {
@@ -61,6 +64,9 @@ module.exports = {
 		    // `...`,
 		    new CssMinimizerPlugin(),
 		],
+		splitChunks: {
+			chunks: 'all',
+		},
 	},
 	mode,
 	plugins: [
