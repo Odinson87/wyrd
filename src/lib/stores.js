@@ -1,6 +1,18 @@
-import { writable } from "svelte/store";
-import {v4 as uuidv4} from "uuid"
-import Conf from './Conf.js'
+import { writable, get as getStore } from 'svelte/store';
+import { v4 as uuidv4 } from 'uuid';
+import Conf from './Conf.js';
+
+// Settings Store in Local Storage
+// Get the value out of storage on load
+// Update & set defaults using Conf
+const stored = new Conf(JSON.parse(localStorage.getItem('settings') ?? '{}'));
+
+// Set the stored value
+export const settings = writable(stored)
+
+// Anytime the store changes, update the local storage value.
+settings.subscribe((value) => localStorage.settings = JSON.stringify(value))
+
 
 //  Modals Store
 export const modals = writable([]); 
@@ -20,6 +32,7 @@ export const dismissModal = (id) => {
   modals.update((all) => all.filter((t) => t.id !== id));
 };
 
+
 // Toasts Store
 export const toasts = writable([]);
 
@@ -27,6 +40,10 @@ export const addToast = (toast) => {
   // Create a unique ID so we can easily find/remove it
   // if it is dismissible/has a timeout.
   const id = uuidv4();
+
+  if (getStore(settings).toastArt) {
+    toast.timeout = null;
+  }
 
   // Setup some sensible defaults for a toast.
   const defaults = {
@@ -46,16 +63,3 @@ export const addToast = (toast) => {
 export const dismissToast = (id) => {
   toasts.update((all) => all.filter((t) => t.id !== id));
 };
-
-
-
-// Settings Store in Local Storage
-// Get the value out of storage on load
-// Update & set defaults using Conf
-const stored = new Conf(JSON.parse(localStorage.getItem('settings') ?? '{}'));
-
-// Set the stored value
-export const settings = writable(stored)
-
-// Anytime the store changes, update the local storage value.
-settings.subscribe((value) => localStorage.settings = JSON.stringify(value))

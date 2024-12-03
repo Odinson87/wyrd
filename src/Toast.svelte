@@ -1,6 +1,10 @@
 <script>
-  import { createEventDispatcher } from "svelte";
-  import { fade } from "svelte/transition";
+  import { createEventDispatcher, onMount } from 'svelte';
+  import { fade } from 'svelte/transition';
+  import { SVG } from './lib/vendor/svg.js';
+  import { v4 as uuidv4} from 'uuid';
+
+  import { settings } from './lib/stores.js';
   import SuccessIcon from "./lib/icons/success.svelte";
   import ErrorIcon from "./lib/icons/error.svelte";
   import InfoIcon from "./lib/icons/info.svelte";
@@ -8,11 +12,24 @@
 
   const dispatch = createEventDispatcher();
 
+  let svgId = uuidv4();
   export let type = "error";
   export let dismissible = true;
+
+  onMount(() => {
+    if ($settings.toastArt) {
+      console.log('toast Art');
+      let draw = SVG().addTo('#svg' + svgId).size(320, 320);
+      let rect = draw.rect(100, 100).attr({ fill: '#f06' })
+    }
+  });
+
 </script>
 
 <article class={type} role="alert" transition:fade>
+  {#if $settings.toastArt }
+    <svg id={'svg' + svgId}></svg>
+  {/if}
   {#if type === "success"}
     <SuccessIcon width="1.1em" />
   {:else if type === "error"}

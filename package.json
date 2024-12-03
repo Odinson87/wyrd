@@ -20,7 +20,6 @@
     "dev": "webpack-dev-server"
   },
   "dependencies": {
-    "@svgdotjs/svg.js": "^3.2.4",
     "lodash": "^4.17.11",
     "pouchdb-browser": "^9.0.0",
     "pouchdb-find": "^9.0.0",
