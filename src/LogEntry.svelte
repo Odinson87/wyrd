@@ -38,6 +38,4 @@
     <label for='log-entry-text'>Note:</label>
     <textarea name='log-entry-text' type='textarea' rows='2' bind:value={log.text}></textarea>
 </article>
-{:else}
- Logs maaate! You're Joking!
 {/if}
