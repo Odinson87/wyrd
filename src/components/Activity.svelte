@@ -3,20 +3,20 @@
     import { fade } from 'svelte/transition';
     import { debounce } from 'lodash';
     
-    import { getDateTimeStr } from './lib/time.js';
-    import { settings, addToast } from "./lib/stores.js";
-    import SaveIcon from './lib/icons/save.svelte';
-    import BinIcon from './lib/icons/bin.svelte';
-    import TargetIcon from './lib/icons/target.svelte';
-    import TagIcon from './lib/icons/tagIcon.svelte';
-    import TimeIcon from './lib/icons/timeForward.svelte';
-    import LogIcon from './lib/icons/notes.svelte';
-    import NumberInput from './lib/input/Number.svelte';
-    import Recurrence from './lib/input/Recurrence.svelte';
-    import ModalBtn from './lib/input/ModalBtn.svelte';
+    import { getDateTimeStr } from '../lib/time.js';
+    import { settings, addToast } from "../lib/stores.js";
+    import SaveIcon from '../lib/icons/save.svelte';
+    import BinIcon from '../lib/icons/bin.svelte';
+    import TargetIcon from '../lib/icons/target.svelte';
+    import TagIcon from '../lib/icons/tagIcon.svelte';
+    import TimeIcon from '../lib/icons/timeForward.svelte';
+    import LogIcon from '../lib/icons/notes.svelte';
+    import NumberInput from '../lib/input/Number.svelte';
+    import Recurrence from '../lib/input/Recurrence.svelte';
+    import ModalBtn from '../lib/input/ModalBtn.svelte';
     import TagManager from './TagManager.svelte';
-    import Duration from './lib/input/Duration.svelte';
-    import OccurredAt from './lib/input/OccurredAt.svelte';
+    import Duration from '../lib/input/Duration.svelte';
+    import OccurredAt from '../lib/input/OccurredAt.svelte';
 
     const dispatch = createEventDispatcher();
 

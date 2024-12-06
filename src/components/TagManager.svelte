@@ -1,7 +1,7 @@
 <script>
-    import { settings } from './lib/stores';
-    import TagButton from './lib/input/TagButton.svelte';
-    import SearchArray from './lib/input/SearchArray.svelte';
+    import { settings } from '../lib/stores';
+    import TagButton from '../lib/input/TagButton.svelte';
+    import SearchArray from '../lib/input/SearchArray.svelte';
     
     let availableTags = Object.keys($settings.tags);
     let searchResults = availableTags;

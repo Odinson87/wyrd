@@ -1,6 +1,6 @@
 <script>
-    import { settings } from './lib/stores.js';
-    import LightModeBtn from "./lib/input/LightModeBtn.svelte";
+    import { settings } from '../lib/stores.js';
+    import LightModeBtn from "../lib/input/LightModeBtn.svelte";
 </script>
 
 <style>

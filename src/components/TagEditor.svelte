@@ -1,6 +1,6 @@
 <script>
-    import { settings } from './lib/stores';
-    import TagCheckboxBar from './lib/input/TagCheckboxBar.svelte';
+    import { settings } from '../lib/stores';
+    import TagCheckboxBar from '../lib/input/TagCheckboxBar.svelte';
     
     let availableTags = Object.keys($settings.tags);
     export let source = {};

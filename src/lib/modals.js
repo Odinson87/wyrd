@@ -1,6 +1,6 @@
 import Modal from './Modal.js';
-import TagEditor from '../TagEditor.svelte';
-import LogManager from '../LogManager.svelte';
+import TagEditor from '../components/TagEditor.svelte';
+import LogManager from '../components/LogManager.svelte';
 
 export const modalConfig = {
     tageditor: new Modal({

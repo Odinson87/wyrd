@@ -1,14 +1,14 @@
 <script>
     import { onMount } from 'svelte'
     import { sortBy } from 'lodash'
-    import { settings } from './lib/stores'
-    import Filters from './lib/filters'
     import PouchDB from 'pouchdb-browser'
     
-    import ActivityDoc from './lib/ActivityDoc'
+    import { settings } from '../lib/stores'
+    import Filters from '../lib/filters'
+    import ActivityDoc from '../lib/ActivityDoc'
     import Activity from './Activity.svelte'
-    import AddIcon from './lib/icons/plus.svelte'
-    import TagCheckboxBar from './lib/input/TagCheckboxBar.svelte'
+    import AddIcon from '../lib/icons/plus.svelte'
+    import TagCheckboxBar from '../lib/input/TagCheckboxBar.svelte'
 
     // Set up local PouchDB and continuous replication to remote CouchDB
     let db = new PouchDB('db', {revs_limit: 1, auto_compaction: true})

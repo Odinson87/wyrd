@@ -1,10 +1,10 @@
 <script>
-    import ActiveIcon from "./lib/icons/active.svelte";
-    import BurgerIcon from "./lib/icons/burger.svelte";
-    import CogIcon from "./lib/icons/cog.svelte";
-    import Menu from "./lib/Menu.svelte";
-    import MenuItem from './lib/MenuItem.svelte';
-    import Settings from "./Settings.svelte"
+    import ActiveIcon from "../lib/icons/active.svelte";
+    import BurgerIcon from "../lib/icons/burger.svelte";
+    import CogIcon from "../lib/icons/cog.svelte";
+    import Menu from "../lib/components/Menu.svelte";
+    import MenuItem from '../lib/components/MenuItem.svelte';
+    import Settings from "../components/Settings.svelte"
 </script>
 
 <style>

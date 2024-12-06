@@ -1,14 +1,14 @@
 <script>
   import { createEventDispatcher, onMount } from 'svelte';
   import { fade } from 'svelte/transition';
-  import { SVG } from './lib/vendor/svg.js';
+  import { SVG } from '../lib/vendor/svg.js';
   import { v4 as uuidv4} from 'uuid';
 
-  import { settings } from './lib/stores.js';
-  import SuccessIcon from "./lib/icons/success.svelte";
-  import ErrorIcon from "./lib/icons/error.svelte";
-  import InfoIcon from "./lib/icons/info.svelte";
-  import CloseIcon from "./lib/icons/close.svelte";
+  import { settings } from '../lib/stores.js';
+  import SuccessIcon from "../lib/icons/success.svelte";
+  import ErrorIcon from "../lib/icons/error.svelte";
+  import InfoIcon from "../lib/icons/info.svelte";
+  import CloseIcon from "../lib/icons/close.svelte";
 
   const dispatch = createEventDispatcher();
 

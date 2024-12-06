@@ -1,7 +1,7 @@
 <script>
   import { fade } from "svelte/transition";
   import Modal from "./Modal.svelte";
-  import { dismissModal, modals} from "./lib/stores.js";
+  import { dismissModal, modals} from "../lib/stores.js";
 </script>
 
 {#if $modals}

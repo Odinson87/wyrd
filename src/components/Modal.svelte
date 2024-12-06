@@ -1,6 +1,6 @@
 <script>
     import { createEventDispatcher, onMount } from "svelte";
-    import CloseIcon from "./lib/icons/close.svelte";
+    import CloseIcon from "../lib/icons/close.svelte";
     const dispatch = createEventDispatcher();
 
     export let source;

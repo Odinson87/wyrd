@@ -1,8 +1,8 @@
 <script>
-    import DocBrowser from './DocBrowser.svelte';
-    import Navigation from './Navigation.svelte';
-    import Toasts from './Toasts.svelte';
-    import Modals from './Modals.svelte';
+    import DocBrowser from './components/DocBrowser.svelte';
+    import Navigation from './components/Navigation.svelte';
+    import Toasts from './components/Toasts.svelte';
+    import Modals from './components/Modals.svelte';
     import { settings } from './lib/stores.js';
 
 </script>

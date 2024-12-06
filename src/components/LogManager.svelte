@@ -5,10 +5,10 @@
     //import Filters from './lib/filters'
     import PouchDB from 'pouchdb-browser';
     
-    import Log from './lib/Log.js';
-    import AddIcon from './lib/icons/plus.svelte';
+    import Log from '../lib/Log.js';
+    import AddIcon from '../lib/icons/plus.svelte';
     import LogEntry from './LogEntry.svelte';
-    import { addToast } from './lib/stores.js';
+    import { addToast } from '../lib/stores.js';
 
     // Set up local PouchDB and continuous replication to remote CouchDB
     let db = new PouchDB('logs', {revs_limit: 1, auto_compaction: true});

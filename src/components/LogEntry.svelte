@@ -1,10 +1,10 @@
 <script>
     import { createEventDispatcher } from "svelte";
 
-    import DeleteIcon from "./lib/icons/bin.svelte";
-    import SaveIcon from "./lib/icons/save.svelte";
-    import Duration from "./lib/input/Duration.svelte";
-    import OccurredAt from "./lib/input/OccurredAt.svelte";
+    import DeleteIcon from "../lib/icons/bin.svelte";
+    import SaveIcon from "../lib/icons/save.svelte";
+    import Duration from "../lib/input/Duration.svelte";
+    import OccurredAt from "../lib/input/OccurredAt.svelte";
 
     const dispatch = createEventDispatcher();
 
