@@ -1,7 +1,7 @@
 <script>
   import { createEventDispatcher, onMount } from 'svelte';
   import { fade } from 'svelte/transition';
-  import { SVG } from '../lib/vendor/svg.js';
+  //import { SVG } from '../lib/vendor/svg.js';
   import { v4 as uuidv4} from 'uuid';
 
   import { settings } from '../lib/stores.js';
@@ -9,6 +9,7 @@
   import ErrorIcon from "../lib/icons/error.svelte";
   import InfoIcon from "../lib/icons/info.svelte";
   import CloseIcon from "../lib/icons/close.svelte";
+  import Art from './Art.svelte';
 
   const dispatch = createEventDispatcher();
 
@@ -21,11 +22,13 @@
     if ($settings.toastArt) {
       hasArt = true;
       console.log('toast Art');
+      /*
       let draw = SVG().addTo('#svg' + svgId).size(270, 270);
       let symbol = draw.symbol();  
       symbol.rect(100, 100).attr({ fill: '#f06' });
       draw.use(symbol).move(100, 100);
       draw.use(symbol).move(10, 20).rotate(45).fill({ color: '#000', opacity: 0.6 });
+      */
     }
   });
 
@@ -52,7 +55,9 @@
     {/if}
   </div>
   {#if $settings.toastArt }
-    <div class='art' id={'svg' + svgId}></div>
+    <div class='art' id={'svg' + svgId}>
+      <Art/>
+    </div>
   {/if}
 </article>
 
