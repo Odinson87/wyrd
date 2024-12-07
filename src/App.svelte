@@ -7,8 +7,8 @@
 
 </script>
 
-<Toasts/>
 <div data-light-mode={$settings.lightMode}>
+    <Toasts/>
     <Navigation/>
 
     <main>

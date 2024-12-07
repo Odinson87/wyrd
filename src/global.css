@@ -112,6 +112,7 @@ button.menu-item:hover {
 
 [data-light-mode='0'] section[name="modals"] button svg,
 [data-light-mode='0'] main button svg,
+[data-light-mode='0'] article[role="alert"] button svg .fill,
 [data-light-mode='0'] section[name="modals"] button svg .fill,
 [data-light-mode='0'] main button svg .fill{
 	fill: #eee;

@@ -64,8 +64,8 @@
 <style lang="postcss">
   article {
     color: white;
-    padding: 0.75rem 1.5rem;
-    border-radius: 0.2rem;
+    border-radius: 0.4rem;
+    border: none;
     margin: 0 auto 0.5rem auto;
     width: 20rem;
   }
@@ -76,24 +76,24 @@
   }
 
   .error {
-    background: IndianRed;
+    background: rgb(122, 53, 53);
   }
   .success {
-    background: MediumSeaGreen;
+    background: rgb(29, 80, 52);
   }
   .info {
-    background: SkyBlue;
-  }
-  .text {
-    margin: 0 1rem;
+    background: #222
   }
   button {
     color: white;
     background: transparent;
     border: 0 none;
     padding: 0;
-    margin: 0 0 0 auto;
     line-height: 1;
     font-size: 1rem;
+  }
+
+  .content {
+    margin: 0.3em 0.5em;
   }
 </style>

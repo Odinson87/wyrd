@@ -1,7 +1,7 @@
 <script>
-    export let viewBoxSize = 270;
-    export let width = 270;
-    export let height = 270;
+    export let viewBoxSize = 308;
+    export let width = 308;
+    export let height = 308;
     export let layerCount = 1;
 
     $: rv = referenceValues(viewBoxSize, layerCount);
@@ -84,8 +84,8 @@
 <svg width={width} height={height} viewBox={viewBoxCoords(viewBoxSize, true)} xmlns="http://www.w3.org/2000/svg">
     <defs>
         <linearGradient id="Gradient1">
-          <stop offset="0%" stop-color="green" />
-          <stop offset="100%" stop-color="white" />
+          <stop offset="0%" stop-color="#888" />
+          <stop offset="100%" stop-color="#eee" />
         </linearGradient>
         
         <symbol 
@@ -94,7 +94,7 @@
             width={rv.s80}
             height={rv.s80}
             >
-            <circle cx={rv.s80/2} cy={rv.s80/2} r={rv.r80 - rv.m} />
+            <circle cx={rv.s80/2} cy={rv.s80/2} r={rv.r80 - rv.m} fill='none'/>
         </symbol>
     
         <symbol
@@ -112,11 +112,12 @@
             width={rv.s80}
             height={rv.s80}>
 
-            <polyline points={getVertexCoordsStr(rv.s80/2, rv.s80/2, rv.r80 - rv.m, rv.points, 1)} />
+            <polyline points={getVertexCoordsStr(rv.s80/2, rv.s80/2, rv.r80 - rv.m, rv.points, 1)} fill='none'/>
         </symbol>
     </defs>
     {#each layers as layer}
-        <use 
+        <g>
+            <use 
             href='#circle'
             x={0 - (rv.s80/2)}
             y={0 - (rv.s80/2)}
@@ -124,8 +125,8 @@
             stroke='url(#Gradient1)' 
             stroke-width='3'
             />
-
-        <use 
+            
+            <use 
             href='#rect'
             x={0 - (rv.s80/2)}
             y={0 - (rv.s80/2)}
@@ -134,8 +135,8 @@
             stroke-width='3'
             transform='rotate(45)'
             />
-
-        <use
+            
+            <use
             href='#polyline'
             x={0 - (rv.s80/2)}
             y={0 - (rv.s80/2)}
@@ -144,6 +145,7 @@
             stroke-width='3'
             transform='rotate({ 360/4/rv.points })'
             />
-
+            
+        </g>
     {/each}    
 </svg>
