@@ -296,6 +296,8 @@ button.title {
 	right: -2px;
 }
 
+
+
 [data-viewmode="hidden"],
 [data-viewmode="list"] section.edit,
 [data-viewmode="list"] header button.add-btn,
