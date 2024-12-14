@@ -194,7 +194,7 @@
     </h1>
 {:else}
     <h1>
-        {sortedAndFilteredItems.length} Activities ({items.length})
+        {sortedAndFilteredItems.length} Items ({items.length})
     </h1>
 {/if}
 
