@@ -9,9 +9,9 @@
 <style>
     .tag-indicator {
         position:absolute;
-        top: -5px;
-        left: -2px;
-        width: 101%;
+        top: -2px;
+        left: -1px;
+        width: 100.75%;
         border-radius: 4px 4px 0 0;
         overflow: hidden;
         display:flex;

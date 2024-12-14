@@ -145,7 +145,7 @@ article {
 	margin: 5px 0;
 	border: 1px solid #ccc;
 	border-radius: 4px;
-	max-width: 320px;
+	width: 320px;
 }
 
 a {
