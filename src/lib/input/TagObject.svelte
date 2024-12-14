@@ -50,9 +50,9 @@
         margin-bottom: 0;
         padding: 0px;
         background-color: #333;
-        border-radius: 52%;
+        border-radius: 50%;
         border: 2px solid #eee;
-        width: 35px;
+        width: 32px;
         vertical-align: middle;
     }
 

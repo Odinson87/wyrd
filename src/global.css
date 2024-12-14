@@ -331,7 +331,7 @@ button.title {
 	background-color: rgba(50,50,50,0.97);
 }
 [data-light-mode="1"] section[name='modals'] > section {
-	background-color: rgba(255,255,255,0.92);
+	background-color: rgba(255,255,255,0.97);
 }
 
 
