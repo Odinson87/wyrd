@@ -5,13 +5,19 @@
     export let label;
     export let name;
 
+    $: { sourceChanged(source) }
+    function sourceChanged(s) {
+        console.log('search source changed');
+        search();
+    }
+
     function search() {
         if(term === ''){
             results = source;
         } else {
 
             if (typeof(term) !== 'undefined' && term !== null && term !== '') {
-                console.log(term);
+                //console.log(term);
                 if (source) {
                     results = results;
                 }
@@ -29,6 +35,8 @@
                     });
                     return found === 0 ? false : true
                 }).sort();
+            } else {
+                results = source;
             }
         }
     }

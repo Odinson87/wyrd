@@ -25,27 +25,38 @@
   */
   
     // Set up
+    let isLoading = true
     let newDoc = new ActivityDoc
     let sortByWhat = 'createdAt'
     let completedFilter = ''
-    let isLoading = true
     let addNewItem = false
-    let tags = Object.keys($settings.tags)
+    let activityTypes = [];
+    let tags = [];
     let selectedTags = [];
-    let activityTypes = Object.keys($settings.activityTypes);
     let selectedActivityTypes = [];
 
-    // All the todos directly from the PouchDB. Sorting and filtering comes later
+    // All the todos directly from the PouchDB
     export let items = []
-    $: sortedAndFilteredItems = sortBy(items, [sortByWhat]).filter((todo) => {
+    $: sortedAndFilteredItems = sortBy(items, [sortByWhat]).filter((item) => {
       let filters = new Filters(completedFilter, selectedActivityTypes, selectedTags); 
       
       if (filters.hasActiveFilters()) {
-        return filters.matches(todo);
+        return filters.matches(item);
       }
 
       return true;
     })
+
+    $: { settingsUpdated($settings) }
+    // reset settings when configuration change
+    function settingsUpdated(s) {
+        activityTypes = Object.keys(s.activityTypes);
+        tags = Object.keys(s.tags);
+        // if tags/types no longer exist, remove from selected
+        selectedActivityTypes = selectedActivityTypes.filter( t => !activityTypes.includes(t) );
+        selectedTags = selectedTags.filter( t => !tags.includes(t) );
+        updateItems();
+    }
 
     // Helper for reloading all todos from the local PouchDB. It’s on-device and has basically zero latency,
     // so we can use it quite liberally instead of keeping our local state up to date like you’d do
@@ -157,9 +168,9 @@
     </section>
     <section>
         <ul>
-            {#each sortedAndFilteredItems as todo (todo._id)}
+            {#each sortedAndFilteredItems as item (item._id)}
             <li>
-                <Activity doc={todo} on:remove={removeDoc} on:update={updateDoc}/>
+                <Activity doc={item} on:remove={removeDoc} on:update={updateDoc}/>
             </li>
             {/each}
         </ul>
