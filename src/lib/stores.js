@@ -13,7 +13,6 @@ export const settings = writable(stored)
 // Anytime the store changes, update the local storage value.
 settings.subscribe((value) => localStorage.settings = JSON.stringify(value))
 
-
 //  Modals Store
 export const modals = writable([]); 
 

@@ -14,11 +14,27 @@
 <style>
     .modal {
         z-index:500;
+        overflow: scroll;
+    }
+
+    button.close {
+        position: fixed;
+        top: 10px;
+        right: 20px;
+        color: white;
+        background: transparent;
+        border: 0 none;
+        padding: 0;
+        line-height: 1;
+        font-size: 1rem;
     }
 </style>
 
 {#if modal}
 <section class='modal' name={modal.title}>
+    <button class="close" on:click={dismissModal}>
+        <CloseIcon />
+    </button>
     <div class="content">
         {#if modal.title}
             <h2>{modal.title}</h2>
@@ -31,10 +47,6 @@
         {#if modal.component}
             <svelte:component this={modal.component} bind:source {...modal.data} />
         {/if}
-
-        <button class="icon close" on:click={dismissModal}>
-            <CloseIcon width="1.5em" />
-        </button>
     </div>
 </section>
 {:else}

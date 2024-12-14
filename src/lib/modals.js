@@ -5,7 +5,7 @@ import LogManager from '../components/LogManager.svelte';
 export const modalConfig = {
     tageditor: new Modal({
         name: 'tageditor',
-        title: 'Edit Tags',
+        title: 'Configure Tags',
         message: 'Add tags to help group and organise things',
         source: null,
         component: TagEditor

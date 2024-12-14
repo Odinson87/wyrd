@@ -1,5 +1,5 @@
 <script>
-    let term;
+    export let term;
     export let source = [];
     export let results = [];
     export let label;

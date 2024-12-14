@@ -161,7 +161,7 @@
                         {agoStr}
                     {/if}
                 </p>
-                <ModalBtn classes={'small'} modalName={'tageditor'} bind:source={doc} on:save={debouncedSave} >
+                <ModalBtn classes={'small'} modalName={'tageditor'}>
                     <TagIcon size={20} slot="icon"/>
                 </ModalBtn>
                 <p>{durationStr}</p>

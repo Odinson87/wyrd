@@ -1,12 +1,36 @@
 <script>
     import { settings } from '../lib/stores';
-    import TagCheckboxBar from '../lib/input/TagCheckboxBar.svelte';
-    
+    import TagObject from '../lib/input/TagObject.svelte'
+    import SearchArray from '../lib/input/SearchArray.svelte';
+    import AddIcon from '../lib/icons/plus.svelte';
+
     let availableTags = Object.keys($settings.tags);
-    export let source = {};
+    let searchResults = availableTags;
+    let filteredTags = availableTags;
+    let searchTerm;
 
-    $: sourceHasTags = Object.hasOwn(source, 'tags');
+    $: { updateTags(searchResults) }
 
+    function updateTags(resultTags) {
+        filteredTags = availableTags.filter((t) => {
+            // include if tag is in tag search results
+            if (resultTags.indexOf(t) > -1) {
+                return true;
+            } else {
+                return false;
+            }
+        }).sort();
+    }
+    
+    function save(event) {
+        const { tag: tag } = event.detail;
+        $settings.tags[tag.tagName] = tag;
+    }
+
+    function deleteTag(event) {
+        const { tagName: tagName } = event.detail;
+        delete $settings.tags[tagName]
+    }
 </script>
 
 <style>
@@ -15,13 +39,15 @@
     }
 </style>
 
-{#if sourceHasTags}
-    <h3>Selected</h3>
-    <TagCheckboxBar tags={source.tags} disabled={true}/>
+<h3>Search or Add Tags</h3>
 
+<SearchArray name='search-tags' bind:term={searchTerm} bind:results={searchResults} source={availableTags}/>
+<button class='icon'>
+    <AddIcon/>
+</button>
 
-    <h3>Choose Tags</h3>
-    <TagCheckboxBar name='edit-tags' tags={availableTags} bind:selected={source.tags}/>
-{:else}
-    <p>This provided source has no tags</p>
-{/if}
+<section>
+    {#each filteredTags as tagName}
+        <TagObject on:save={save} on:remove={deleteTag} tag={$settings.tags[tagName]}/>
+    {/each}
+</section>

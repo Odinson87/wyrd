@@ -2,8 +2,7 @@ import Tag from './Tag';
 
 export const TypesEnum = {
     Todo: new Tag("Todo", "Todo", "#B18FDD"),
-    Activity: new Tag("Activity", "Activity", "#44BBFF"),
-    Trigger:  new Tag("Trigger", "Trigger", "#FF6000")
+    Activity: new Tag("Activity", "Activity", "#44BBFF")
 }
 
 export const TagsEnum = {
@@ -13,7 +12,8 @@ export const TagsEnum = {
     Chore: new Tag("Chore", "Activity", "#D999B9"),
     Shopping: new Tag("Shopping", "Activity", "#C57B57"),
     Health: new Tag("Health", "Activity", "#179889"),
-    Distraction: new Tag("Distraction", "Activity", "#FFCA3A")
+    Trigger:  new Tag("Trigger", "Activity", "#EE6000"),
+    Distraction: new Tag("Distraction", "Activity", "#EECA3A")
 }
 
 export const DurationEnum = Object.freeze({
