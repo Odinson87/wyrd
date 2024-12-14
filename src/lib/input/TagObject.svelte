@@ -53,6 +53,7 @@
         border-radius: 52%;
         border: 2px solid #eee;
         width: 35px;
+        vertical-align: middle;
     }
 
     .input-group {margin: 10px 0px;}
