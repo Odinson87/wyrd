@@ -3,7 +3,7 @@
     import { sortBy } from 'lodash'
     import PouchDB from 'pouchdb-browser'
     
-    import { settings } from '../lib/stores'
+    import { addToast, settings } from '../lib/stores'
     import Filters from '../lib/filters'
     import ActivityDoc from '../lib/ActivityDoc'
     import Activity from './Activity.svelte'
@@ -35,27 +35,73 @@
     let selectedTags = [];
     let selectedActivityTypes = [];
 
-    // All the todos directly from the PouchDB
+    // All the docs directly from the PouchDB
     export let items = []
     $: sortedAndFilteredItems = sortBy(items, [sortByWhat]).filter((item) => {
-      let filters = new Filters(completedFilter, selectedActivityTypes, selectedTags); 
+        let filters = new Filters(completedFilter, selectedActivityTypes, selectedTags); 
       
-      if (filters.hasActiveFilters()) {
-        return filters.matches(item);
-      }
+        if (filters.hasActiveFilters()) {
+            return filters.matches(item);
+        }
 
-      return true;
+        return true;
     })
 
     $: { settingsUpdated($settings) }
     // reset settings when configuration change
     function settingsUpdated(s) {
-        activityTypes = Object.keys(s.activityTypes);
-        tags = Object.keys(s.tags);
-        // if tags/types no longer exist, remove from selected
-        selectedActivityTypes = selectedActivityTypes.filter( t => !activityTypes.includes(t) );
-        selectedTags = selectedTags.filter( t => !tags.includes(t) );
-        updateItems();
+
+        // track changes and update docs if required        
+        let freshTypes = Object.keys(s.activityTypes);
+        let freshTags = Object.keys(s.tags);
+
+        // if any tags/types selected no longer exist, filter out 
+        if (selectedActivityTypes.length > 0) {
+            selectedActivityTypes = selectedActivityTypes.filter( t => freshTypes.includes(t) );
+        }
+        if (selectedTags.length > 0) {
+            selectedTags = selectedTags.filter( t => freshTags.includes(t) );
+        }
+
+        // when there are missing tags update db removing them from each required doc
+        let missingTags = tags.filter( t => !freshTags.includes(t) );     
+        if (missingTags.length > 0) {  
+            removeDocTags(missingTags);
+        }
+
+        // reset values from settings
+        activityTypes = freshTypes;
+        tags = freshTags;
+    }
+
+    async function removeDocTags(missingTags) {
+
+        let itemsToUpdate = items.filter( d => {
+            let update = false;
+            missingTags.forEach( tagName => {
+                update = d.tags.includes(tagName);
+            });
+            return update;
+        });
+        
+        itemsToUpdate = itemsToUpdate.map( d => {
+            missingTags.forEach( tagName => {
+                d.tags = d.tags.filter( t => t !== tagName);
+            })
+            return d;
+        });
+
+        const updated = await updateDocs(itemsToUpdate);
+        if (updated.ok) {
+            addToast({
+                message: 'Removed Tags: ' + missingTags.join(', ')
+            });
+        } else {
+            addToast({
+                type: 'error',
+                message: JSON.stringify(updated)
+            });
+        }
     }
 
     // Helper for reloading all todos from the local PouchDB. It’s on-device and has basically zero latency,
@@ -63,11 +109,11 @@
     // in a Redux reducer. It also saves us from having to rebuild the local state todos from the data we sent
     // to the database and the `_id` and `_rev` values that were sent back.
     async function updateItems() {
-      const allDocs = await db.allDocs({
-        include_docs: true
-      })
-      items = allDocs.rows.map(row => row.doc)
-      isLoading = false
+        const allDocs = await db.allDocs({
+            include_docs: true
+        })
+        items = allDocs.rows.map(row => row.doc)
+        isLoading = false
     }
   
     // Event handlers for adding, updating and removing todos
@@ -83,30 +129,47 @@
         newDoc = new ActivityDoc;
         addNewItem = false;
     }
+
+    async function updateDocs(docs) {
+        const updated = await db.bulkDocs(docs);
+        let success = true;
+        if (updated.forEach( u => { 
+            if (!u.ok) {
+                success = false;
+            }
+        }))
+
+        await updateItems();
+
+        return { 
+            ok: success,
+            results: updated
+        };
+    }
   
     async function updateDoc(event) {
-      const { doc: doc } = event.detail
-      const update = await db.put(doc)
-      if (update.ok) {
-        await updateItems()
-      }
+        const { doc: doc } = event.detail
+        const update = await db.put(doc)
+        if (update.ok) {
+            await updateItems()
+        }
     }
   
     async function removeDoc(event) {
-      const { doc: doc } = event.detail
-      const removal = await db.remove(doc)
-      if (removal.ok) {
-        // For removal, we can just update the local state instead of reloading everything from PouchDB,
-        // since we no longer care about the doc’s revision.
-        items = items.filter((activityDoc) => {
-          return activityDoc._id !== doc._id
-          })
-      }
+        const { doc: doc } = event.detail
+        const removal = await db.remove(doc)
+        if (removal.ok) {
+            // For removal, we can just update the local state instead of reloading everything from PouchDB,
+            // since we no longer care about the doc’s revision.
+            items = items.filter((activityDoc) => {
+                return activityDoc._id !== doc._id
+            })
+        }
     }
   
     // Load todos on first run
     onMount(async () => {
-      await updateItems()
+        await updateItems()
     })
 
     // New Item
@@ -117,11 +180,11 @@
   
 <style>
     ul {
-      display: flex;
-      flex-flow: column nowrap;
-      margin: 10px 0;
-      padding: 0;
-      list-style: none;
+        display: flex;
+        flex-flow: column nowrap;
+        margin: 10px 0;
+        padding: 0;
+        list-style: none;
     }
 </style>
 

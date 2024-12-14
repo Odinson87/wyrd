@@ -7,7 +7,6 @@
 
     $: { sourceChanged(source) }
     function sourceChanged(s) {
-        console.log('search source changed');
         search();
     }
 

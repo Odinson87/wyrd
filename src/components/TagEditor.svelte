@@ -19,16 +19,6 @@
 
     function settingsUpdated(s) {
         availableTags = Object.keys(s.tags);
-        console.log('tageditor', 'settings updated');
-
-        /*
-        // remove missing tags from results
-        let missingTags = filteredTags.filter( t => !availableTags.includes(t) );
-        missingTags.forEach( tagName => {
-            console.log(tagName);
-            filteredTags = filteredTags.splice(filteredTags.indexOf(tagName), 1);
-        });
-        */
     }
 
     $: { updateTags(searchResults) }
@@ -45,10 +35,8 @@
     }
 
     function add(){
-        console.log(searchTerm);
         if (searchTerm !== '' && !Object.hasOwn($settings.tags, searchTerm)) {
             let t = new Tag(searchTerm, TypesEnum.Activity.name, '#777777');
-            console.log(t);
             $settings.tags[t.name] = t;
 
             // trigger updates;
@@ -58,7 +46,6 @@
     
     function save(event) {
         const { tag: tag } = event.detail;
-        console.log(tag);
         if (tag.tagName !== '') {
             $settings.tags[tag.tagName] = tag;
         } 
@@ -66,8 +53,6 @@
         
     function deleteTag(event) {
         const { tag: tag } = event.detail;
-        console.log('Delete');
-        console.log(tag);
         delete $settings.tags[tag.name];
 
         // trigger updates;
