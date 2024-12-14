@@ -40,9 +40,11 @@
         text-align: center;
     }
 
+    /*
     input[type="text"] {
         max-width: 210px;
     }
+    */
     input[type="color"] {
         display: inline-block;
         margin-bottom: 0;
@@ -69,12 +71,8 @@
                 <DeleteIcon/>
             </button>
         </div>
-    </header>
-    <div class="input-group">
-        <label for='tagName'>Name :</label>
-        <input type='text' name='tagName' bind:value={ tag.name } />
-    </div>
-    
+    </header> 
+   
     <div class="input-group">
         <label for='type'>Type :</label>
         <select name='type' bind:value={tag.type}>

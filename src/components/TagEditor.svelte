@@ -46,9 +46,9 @@
     
     function save(event) {
         const { tag: tag } = event.detail;
-        if (tag.tagName !== '') {
-            $settings.tags[tag.tagName] = tag;
-        } 
+        if (tag.name !== '') {
+            $settings.tags[tag.name] = tag;
+        }
     }
         
     function deleteTag(event) {
