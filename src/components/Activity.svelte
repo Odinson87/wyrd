@@ -85,9 +85,9 @@
     
     let agoStr
     let durationStr;
+    let tab = 'hidden';
     export let doc;
     export let viewmode = 'list';
-    let tab = 'hidden';
 </script>
 
 <style>

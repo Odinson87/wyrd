@@ -61,7 +61,7 @@
                 if (next >= n) {
                     next = next - n;
                 }
-                console.log(i, next)
+                //console.log(i, next)
                 i = next;
                 added++;
             }
@@ -75,7 +75,7 @@
 
     function getVertexCoordsStr(x = 0, y = 0, r = 1, n = 7, shift = 0){
         let coords = getVertexCoords(x, y, r, n, shift);
-        console.log(coords);
+        //console.log(coords);
         return coords.map((v) => {return v.join(', ')}).join(' ');
     }
 

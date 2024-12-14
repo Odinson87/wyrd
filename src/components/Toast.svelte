@@ -21,7 +21,7 @@
   onMount(() => {
     if ($settings.toastArt) {
       hasArt = true;
-      console.log('toast Art');
+      //console.log('toast Art');
       /*
       let draw = SVG().addTo('#svg' + svgId).size(270, 270);
       let symbol = draw.symbol();  

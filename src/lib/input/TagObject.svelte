@@ -14,15 +14,15 @@
     export let tag;
 
     function remove() {
-        dispatch('remove', {tag});
+        dispatch('remove', { tag });
     }
 
     function save() {
-        dispatch('save', {tag})
+        dispatch('save', { tag })
     }
 
     onMount(() => {
-        console.log($settings.activityTypes)
+        //console.log($settings.activityTypes)
     });
 </script>
 
