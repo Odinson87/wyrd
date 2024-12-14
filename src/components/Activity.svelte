@@ -17,6 +17,7 @@
     import TagManager from './TagManager.svelte';
     import Duration from '../lib/input/Duration.svelte';
     import OccurredAt from '../lib/input/OccurredAt.svelte';
+    import TagIndicator from '../lib/components/TagIndicator.svelte';
 
     const dispatch = createEventDispatcher();
 
@@ -140,6 +141,7 @@
     transition:fade
     data-viewmode={viewmode}
 >
+    <TagIndicator bind:tags={doc.tags}/>
     <header>
         <div>
             <button class="icon list-btn" on:click={debounceOccur}>

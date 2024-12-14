@@ -140,6 +140,7 @@ section.tagBar[name='activityTypes'] {
 }
 
 article { 
+	position: relative;
 	padding: 6px;
 	margin: 5px 0;
 	border: 1px solid #ccc;
