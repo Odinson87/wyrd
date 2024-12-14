@@ -69,7 +69,7 @@
             removeDocTags(missingTags);
         }
 
-        // reset values from settings
+        // set values from new settings
         activityTypes = freshTypes;
         tags = freshTags;
     }
@@ -94,7 +94,8 @@
         const updated = await updateDocs(itemsToUpdate);
         if (updated.ok) {
             addToast({
-                message: 'Removed Tags: ' + missingTags.join(', ')
+                message: 'Removed Tag(s): ' + missingTags.join(', '),
+                timeout: 3000
             });
         } else {
             addToast({
