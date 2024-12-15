@@ -35,6 +35,15 @@ export const RecurrenceDisplayEnums = Object.freeze({
     bymonth : ['YEARLY'],
 });
 
+export const RecurrenceNthEnums = Object.freeze({
+    First : 1,
+    Second : 2,
+    Third : 3,
+    Fourth : 4,
+    Last : -1
+});
+
+
 export const SentimentEnum = Object.freeze({
     sad: 0,
     worried: 1,

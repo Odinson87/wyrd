@@ -2,9 +2,10 @@
     import { capitalize } from 'lodash';
     import { RRule } from 'rrule';
 
-    import { RecurrenceDisplayEnums, RecurrenceEnums } from "../enums";
+    import { RecurrenceDisplayEnums, RecurrenceEnums, RecurrenceNthEnums } from "../enums";
     import { convertToRRule, rruleText } from '../time';
     import RecurrencePattern from '../RecurrencePattern';
+    import TagCheckboxBar from './TagCheckboxBar.svelte';
     import CheckboxInput from './Checkbox.svelte';
     import TextButtonCheckboxInput from './TextButtonCheckbox.svelte';
     import NumberInput from './Number.svelte';
@@ -32,6 +33,9 @@
             if (!RecurrenceDisplayEnums[p].includes(doc.recurrence.freq)) {
                 //console.log('reset ' + p);
                 doc.recurrence[p] = [];
+                if (doc.recurrence.freq !== 'MONTHLY') {
+                    doc.recurrence.nths = [];
+                }
             } 
         });
     }
@@ -97,6 +101,12 @@
         {/if}
 
         {#if RecurrenceDisplayEnums['bymonthday'].includes(doc.recurrence.freq)}
+            {#if doc.recurrence.freq === 'MONTHLY' }
+                <div class='nth'>
+                    <TagCheckboxBar bind:selected={doc.recurrence.nth} tags={Object.keys(RecurrenceNthEnums)} />
+                </div>
+            {/if}
+            
             <label for='activity-recurrence-bymonthday'>Month days:</label>
             <div class="monthdays text-check-buttons">
                 {#each Array(31).keys() as i}

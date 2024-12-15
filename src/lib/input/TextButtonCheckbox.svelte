@@ -58,7 +58,6 @@
         line-height: 2.5em;
     }
 
- 
     label input:checked ~ .checkmark { background-color: #52aa17; }
 
 </style>

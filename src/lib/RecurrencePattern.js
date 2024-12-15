@@ -14,6 +14,7 @@ class RecurrencePattern {
         this.byweekday = [];
         this.bymonthday = [];
         this.bymonth = [];
+        this.nth = [];
     }
 }
 

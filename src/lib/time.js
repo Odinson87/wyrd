@@ -1,6 +1,6 @@
 import { datetime, RRule } from "rrule";
 
-import { DurationEnum } from "./enums";
+import { DurationEnum, RecurrenceNthEnums } from "./enums";
 
 export function datetimeFromDate(date) {
     return datetime(
@@ -29,8 +29,17 @@ export function convertToRRule(recurrencePattern) {
                 switch(n) {
                     case 'byweekday' : 
                         if (recurrencePattern[n].length > 0) {
-                            // convert weekday to RRule constant
-                            rule[n] = recurrencePattern[n].map( v => RRule[v] );
+                            if (Object.hasOwn(recurrencePattern,'nth') && recurrencePattern['nth'].length > 0) {
+                                rule[n] = [];
+                                recurrencePattern['nth'].forEach( nthStr => {
+                                    recurrencePattern[n].forEach( d => {
+                                        rule[n].push(RRule.FR.nth(RecurrenceNthEnums[nthStr]));
+                                    });
+                                });
+                            } else {
+                                // convert weekday to RRule constant
+                                rule[n] = recurrencePattern[n].map( d => RRule[d] );
+                            }
                         }
                         break;
                     case 'bymonth' :

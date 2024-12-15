@@ -82,7 +82,7 @@
     }
 </style>
     
-<label class='tag' data-checked={checked} style='background-color:{tag ? tag.hex : 'transparent'}'>
+<label class='tag' data-checked={checked} style='background-color:{tag ? tag.hex : '#60b6de'}'>
     <input name={tagName} type='checkbox' disabled={disabled} bind:checked={checked} bind:value={tagName}>
     <span>{tagName}</span>
 </label>
