@@ -1,4 +1,60 @@
+import { datetime, RRule } from "rrule";
+
 import { DurationEnum } from "./enums";
+
+export function datetimeFromDate(date) {
+    return datetime(
+        date.getFullYear(),
+        date.getMonth(),
+        date.getDate(),
+        date.getHours(),
+        date.getMinutes()
+    );
+}
+
+const optionalRRuleProps = ['interval', 'byweekday', 'bymonth', 'bymonthday'];
+
+export function convertToRRule(recurrencePattern) {
+    //console.log(recurrencePattern);
+    let rule = {
+        freq: RRule[recurrencePattern.freq],
+        dtstart: datetimeFromDate(new Date(recurrencePattern.dtstart))
+    };
+    optionalRRuleProps.forEach(n => {
+        if (Object.hasOwn(recurrencePattern, n)) {
+            
+            let type = typeof(recurrencePattern[n]);
+
+            if ( type !== undefined && type !== null ) {
+                switch(n) {
+                    case 'byweekday' : 
+                        if (recurrencePattern[n].length > 0) {
+                            // convert weekday to RRule constant
+                            rule[n] = recurrencePattern[n].map( v => RRule[v] );
+                        }
+                        break;
+                    case 'bymonth' :
+                    case 'bymonthday' :
+                        if (recurrencePattern[n].length > 0) {
+                            rule[n] = recurrencePattern[n];
+                        }
+                        break;
+                    default :
+                        rule[n] = recurrencePattern[n];
+                }
+            }
+        }
+    });
+    //console.log(rule);
+
+    return new RRule(rule);
+}
+//export function dateFromDatetime();
+
+export function rruleText(rrule) {
+    let str = rrule.toText();
+    return str.charAt(0).toUpperCase() + str.substring(1) ;
+}
 
 export function getDateTimeStr(date = null) {
     if (date) {

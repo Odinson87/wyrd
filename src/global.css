@@ -270,8 +270,14 @@ button.icon.small {
 	height: 1.7em;
 }
 
-[data-light-mode="0"]button.icon:hover {filter: brightness(120%);}
-[data-light-mode="1"]button.icon:hover {filter: brightness(70%);}
+[data-light-mode="0"] button.icon:hover { filter: brightness(120%); }
+[data-light-mode="1"] button.icon:hover { filter: brightness(70%); }
+
+label:hover input ~ .checkmark { background-color: #ccc; }
+[data-light-mode="0"] .text-check-buttons .checkmark { background-color: #222; }
+[data-light-mode="0"] .text-check-buttons .checkmark:hover { filter: brightness(120%); }
+[data-light-mode="1"] .text-check-buttons .checkmark { background-color: #eee; }
+[data-light-mode="1"] .text-check-buttons .checkmark:hover { filter: brightness(70%); }
 
 button.addItem {
 	display: block;

@@ -54,12 +54,11 @@
         height: 30px;
         width: 30px;
         border-radius: 50%;
-        background-color: #eee;
         text-align: center;
         line-height: 2.5em;
     }
 
-    label:hover input ~ .checkmark { background-color: #ccc; }
+ 
     label input:checked ~ .checkmark { background-color: #52aa17; }
 
 </style>

@@ -24,8 +24,15 @@ export const DurationEnum = Object.freeze({
 });
 
 export const RecurrenceEnums = Object.freeze({
-  freq: ['Days', 'Weeks', 'Months', 'Years'],
-  byday: ['SU','MO','TU','WE','TH','FR','SA'],
+  freq: ['DAILY', 'WEEKLY', 'MONTHLY', 'YEARLY'],
+  byweekday: ['SU','MO','TU','WE','TH','FR','SA'],
+  bymonth: ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC']
+});
+
+export const RecurrenceDisplayEnums = Object.freeze({
+    byweekday : ['WEEKLY', 'MONTHLY', 'YEARLY'],
+    bymonthday : ['MONTHLY', 'YEARLY'],
+    bymonth : ['YEARLY'],
 });
 
 export const SentimentEnum = Object.freeze({
