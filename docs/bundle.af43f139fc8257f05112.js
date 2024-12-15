@@ -10,7 +10,7 @@
 
 /***/ }),
 
-/***/ 292:
+/***/ 928:
 /***/ ((__unused_webpack_module, __unused_webpack___webpack_exports__, __webpack_require__) => {
 
 
@@ -67,9 +67,25 @@ const DurationEnum = Object.freeze({
 });
 
 const RecurrenceEnums = Object.freeze({
-  freq: ['Days', 'Weeks', 'Months', 'Years'],
-  byday: ['SU','MO','TU','WE','TH','FR','SA'],
+  freq: ['DAILY', 'WEEKLY', 'MONTHLY', 'YEARLY'],
+  byweekday: ['SU','MO','TU','WE','TH','FR','SA'],
+  bymonth: ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC']
 });
+
+const RecurrenceDisplayEnums = Object.freeze({
+    byweekday : ['WEEKLY', 'MONTHLY', 'YEARLY'],
+    bymonthday : ['MONTHLY', 'YEARLY'],
+    bymonth : ['YEARLY'],
+});
+
+const RecurrenceNthEnums = Object.freeze({
+    First : 1,
+    Second : 2,
+    Third : 3,
+    Fourth : 4,
+    Last : -1
+});
+
 
 const SentimentEnum = Object.freeze({
     sad: 0,
@@ -258,8 +274,75 @@ class ActivityDoc {
 /* harmony default export */ const lib_ActivityDoc = (ActivityDoc);
 // EXTERNAL MODULE: ./node_modules/svelte/src/runtime/transition/index.js + 1 modules
 var transition = __webpack_require__(942);
+// EXTERNAL MODULE: ./node_modules/rrule/dist/esm/index.js + 27 modules
+var esm = __webpack_require__(211);
 ;// ./src/lib/time.js
 
+
+
+
+function datetimeFromDate(date) {
+    return (0,esm/* datetime */.w$)(
+        date.getFullYear(),
+        date.getMonth(),
+        date.getDate(),
+        date.getHours(),
+        date.getMinutes()
+    );
+}
+
+const optionalRRuleProps = ['interval', 'byweekday', 'bymonth', 'bymonthday'];
+
+function convertToRRule(recurrencePattern) {
+    //console.log(recurrencePattern);
+    let rule = {
+        freq: esm/* RRule */.p3[recurrencePattern.freq],
+        dtstart: datetimeFromDate(new Date(recurrencePattern.dtstart))
+    };
+    optionalRRuleProps.forEach(n => {
+        if (Object.hasOwn(recurrencePattern, n)) {
+            
+            let type = typeof(recurrencePattern[n]);
+
+            if ( type !== undefined && type !== null ) {
+                switch(n) {
+                    case 'byweekday' : 
+                        if (recurrencePattern[n].length > 0) {
+                            if (Object.hasOwn(recurrencePattern,'nth') && recurrencePattern['nth'].length > 0) {
+                                rule[n] = [];
+                                recurrencePattern['nth'].forEach( nthStr => {
+                                    recurrencePattern[n].forEach( d => {
+                                        rule[n].push(esm/* RRule */.p3.FR.nth(RecurrenceNthEnums[nthStr]));
+                                    });
+                                });
+                            } else {
+                                // convert weekday to RRule constant
+                                rule[n] = recurrencePattern[n].map( d => esm/* RRule */.p3[d] );
+                            }
+                        }
+                        break;
+                    case 'bymonth' :
+                    case 'bymonthday' :
+                        if (recurrencePattern[n].length > 0) {
+                            rule[n] = recurrencePattern[n];
+                        }
+                        break;
+                    default :
+                        rule[n] = recurrencePattern[n];
+                }
+            }
+        }
+    });
+    //console.log(rule);
+
+    return new esm/* RRule */.p3(rule);
+}
+//export function dateFromDatetime();
+
+function rruleText(rrule) {
+    let str = rrule.toText();
+    return str.charAt(0).toUpperCase() + str.substring(1) ;
+}
 
 function getDateTimeStr(date = null) {
     if (date) {
@@ -983,22 +1066,475 @@ class Number_svelte_Number extends internal/* SvelteComponent */.r7T {
 
 ;// ./src/lib/RecurrencePattern.js
 
+
 // iCalendar influenced : https://icalendar.org/iCalendar-RFC-5545/3-8-5-3-recurrence-rule.html
 // to stop recurrence the recur flag is set to false, rather than using 'count' or 'until'
 // dtstart and dtend is used to denote the dates between which the actvity can occur, rather than dtend being used to work out duration. 
 // this "simplified" reccurence model should be sufficient
-// if freq is yearly, bydays is set and theres a dtend then for a range, then the matching week day is calcluated rather than 1-31   
+// if freq is yearly, byweekday is set and theres a dtend then for a range, then the matching week day is calcluated rather than 1-31   
 class RecurrencePattern {
     constructor(){
-        this.dtstart = (new Date()).toISOString();
+        this.dtstart = getDateTimeStr();
         this.dtend = null;
         this.freq = RecurrenceEnums.freq[0];
-        this.interval;
-        this.byday = [];
+        this.interval = 1;
+        this.byweekday = [];
+        this.bymonthday = [];
+        this.bymonth = [];
+        this.nth = [];
     }
 }
 
 /* harmony default export */ const lib_RecurrencePattern = (RecurrencePattern);
+;// ./src/lib/input/TagCheckbox.svelte
+/* src/lib/input/TagCheckbox.svelte generated by Svelte v4.2.19 */
+
+
+
+
+
+
+function TagCheckbox_svelte_create_fragment(ctx) {
+	let label;
+	let input;
+	let t0;
+	let span;
+	let t1;
+	let mounted;
+	let dispose;
+
+	return {
+		c() {
+			label = (0,internal/* element */.ND4)("label");
+			input = (0,internal/* element */.ND4)("input");
+			t0 = (0,internal/* space */.xem)();
+			span = (0,internal/* element */.ND4)("span");
+			t1 = (0,internal/* text */.Qq7)(/*tagName*/ ctx[0]);
+			(0,internal/* attr */.CFu)(input, "name", /*tagName*/ ctx[0]);
+			(0,internal/* attr */.CFu)(input, "type", "checkbox");
+			input.disabled = /*disabled*/ ctx[2];
+			(0,internal/* attr */.CFu)(input, "class", "svelte-yr11cf");
+			(0,internal/* attr */.CFu)(label, "class", "tag svelte-yr11cf");
+			(0,internal/* attr */.CFu)(label, "data-checked", /*checked*/ ctx[1]);
+			(0,internal/* set_style */.hgi)(label, "background-color", /*tag*/ ctx[3] ? /*tag*/ ctx[3].hex : '#60b6de');
+		},
+		m(target, anchor) {
+			(0,internal/* insert */.Yry)(target, label, anchor);
+			(0,internal/* append */.BCw)(label, input);
+			input.checked = /*checked*/ ctx[1];
+			(0,internal/* set_input_value */.Gvd)(input, /*tagName*/ ctx[0]);
+			(0,internal/* append */.BCw)(label, t0);
+			(0,internal/* append */.BCw)(label, span);
+			(0,internal/* append */.BCw)(span, t1);
+
+			if (!mounted) {
+				dispose = (0,internal/* listen */.KTR)(input, "change", /*input_change_handler*/ ctx[7]);
+				mounted = true;
+			}
+		},
+		p(ctx, [dirty]) {
+			if (dirty & /*tagName*/ 1) {
+				(0,internal/* attr */.CFu)(input, "name", /*tagName*/ ctx[0]);
+			}
+
+			if (dirty & /*disabled*/ 4) {
+				input.disabled = /*disabled*/ ctx[2];
+			}
+
+			if (dirty & /*checked*/ 2) {
+				input.checked = /*checked*/ ctx[1];
+			}
+
+			if (dirty & /*tagName*/ 1) {
+				(0,internal/* set_input_value */.Gvd)(input, /*tagName*/ ctx[0]);
+			}
+
+			if (dirty & /*tagName*/ 1) (0,internal/* set_data */.iQh)(t1, /*tagName*/ ctx[0]);
+
+			if (dirty & /*checked*/ 2) {
+				(0,internal/* attr */.CFu)(label, "data-checked", /*checked*/ ctx[1]);
+			}
+
+			if (dirty & /*tag*/ 8) {
+				(0,internal/* set_style */.hgi)(label, "background-color", /*tag*/ ctx[3] ? /*tag*/ ctx[3].hex : '#60b6de');
+			}
+		},
+		i: internal/* noop */.lQ1,
+		o: internal/* noop */.lQ1,
+		d(detaching) {
+			if (detaching) {
+				(0,internal/* detach */.YoD)(label);
+			}
+
+			mounted = false;
+			dispose();
+		}
+	};
+}
+
+function TagCheckbox_svelte_instance($$self, $$props, $$invalidate) {
+	let $settings;
+	(0,internal/* component_subscribe */.j0C)($$self, settings, $$value => $$invalidate(8, $settings = $$value));
+	let tag;
+	let { tagName } = $$props;
+	let { checked } = $$props;
+	let { group } = $$props;
+	let { disabled = false } = $$props;
+	let { selectMax = 0 } = $$props;
+	let { selectedVal } = $$props;
+
+	// get tag object if available
+	function setTag(name) {
+		if (name) {
+			if (Object.hasOwn($settings.tags, name)) {
+				$$invalidate(3, tag = $settings.tags[name]);
+			}
+
+			if (Object.hasOwn($settings.activityTypes, name)) {
+				$$invalidate(3, tag = $settings.activityTypes[name]);
+			}
+		}
+	}
+
+	function updateCheckbox(group) {
+		$$invalidate(1, checked = group.indexOf(tagName) >= 0);
+	}
+
+	function updateGroup(checked) {
+		const intSelectMax = parseInt(selectMax);
+		const index = group.indexOf(tagName);
+
+		if (checked) {
+			if (index < 0) {
+				if (intSelectMax > 0) {
+					if (intSelectMax === 1) {
+						$$invalidate(4, group = [tagName]);
+						$$invalidate(5, selectedVal = tagName);
+					} else if (group.length <= intSelectMax) {
+						group.push(tagName);
+					}
+				} else {
+					group.push(tagName);
+				}
+
+				$$invalidate(4, group);
+			}
+		} else {
+			if (index >= 0) {
+				group.splice(index, 1);
+				$$invalidate(4, group);
+			}
+		}
+	} //        console.log(group);
+
+	function input_change_handler() {
+		checked = this.checked;
+		tagName = this.value;
+		$$invalidate(1, checked);
+		$$invalidate(0, tagName);
+	}
+
+	$$self.$$set = $$props => {
+		if ('tagName' in $$props) $$invalidate(0, tagName = $$props.tagName);
+		if ('checked' in $$props) $$invalidate(1, checked = $$props.checked);
+		if ('group' in $$props) $$invalidate(4, group = $$props.group);
+		if ('disabled' in $$props) $$invalidate(2, disabled = $$props.disabled);
+		if ('selectMax' in $$props) $$invalidate(6, selectMax = $$props.selectMax);
+		if ('selectedVal' in $$props) $$invalidate(5, selectedVal = $$props.selectedVal);
+	};
+
+	$$self.$$.update = () => {
+		if ($$self.$$.dirty & /*tagName*/ 1) {
+			$: setTag(tagName);
+		}
+
+		if ($$self.$$.dirty & /*group*/ 16) {
+			$: updateCheckbox(group);
+		}
+
+		if ($$self.$$.dirty & /*checked*/ 2) {
+			$: updateGroup(checked);
+		}
+	};
+
+	return [
+		tagName,
+		checked,
+		disabled,
+		tag,
+		group,
+		selectedVal,
+		selectMax,
+		input_change_handler
+	];
+}
+
+class TagCheckbox extends internal/* SvelteComponent */.r7T {
+	constructor(options) {
+		super();
+
+		(0,internal/* init */.TsN)(this, options, TagCheckbox_svelte_instance, TagCheckbox_svelte_create_fragment, internal/* safe_not_equal */.jXN, {
+			tagName: 0,
+			checked: 1,
+			group: 4,
+			disabled: 2,
+			selectMax: 6,
+			selectedVal: 5
+		});
+	}
+}
+
+/* harmony default export */ const TagCheckbox_svelte = (TagCheckbox);
+
+;// ./src/lib/input/TagCheckboxBar.svelte
+/* src/lib/input/TagCheckboxBar.svelte generated by Svelte v4.2.19 */
+
+
+
+
+
+function get_each_context(ctx, list, i) {
+	const child_ctx = ctx.slice();
+	child_ctx[9] = list[i];
+	return child_ctx;
+}
+
+// (17:4) {#each tags as tag}
+function create_each_block(ctx) {
+	let tagcheckbox;
+	let updating_selectedVal;
+	let updating_group;
+	let current;
+
+	function tagcheckbox_selectedVal_binding(value) {
+		/*tagcheckbox_selectedVal_binding*/ ctx[7](value);
+	}
+
+	function tagcheckbox_group_binding(value) {
+		/*tagcheckbox_group_binding*/ ctx[8](value);
+	}
+
+	let tagcheckbox_props = {
+		tagName: /*tag*/ ctx[9],
+		selectMax: /*selectMax*/ ctx[6],
+		disabled: /*disabled*/ ctx[5]
+	};
+
+	if (/*value*/ ctx[1] !== void 0) {
+		tagcheckbox_props.selectedVal = /*value*/ ctx[1];
+	}
+
+	if (/*selected*/ ctx[0] !== void 0) {
+		tagcheckbox_props.group = /*selected*/ ctx[0];
+	}
+
+	tagcheckbox = new TagCheckbox_svelte({ props: tagcheckbox_props });
+	internal/* binding_callbacks */.Dnk.push(() => (0,internal/* bind */.oIE)(tagcheckbox, 'selectedVal', tagcheckbox_selectedVal_binding));
+	internal/* binding_callbacks */.Dnk.push(() => (0,internal/* bind */.oIE)(tagcheckbox, 'group', tagcheckbox_group_binding));
+
+	return {
+		c() {
+			(0,internal/* create_component */.N0i)(tagcheckbox.$$.fragment);
+		},
+		m(target, anchor) {
+			(0,internal/* mount_component */.wSR)(tagcheckbox, target, anchor);
+			current = true;
+		},
+		p(ctx, dirty) {
+			const tagcheckbox_changes = {};
+			if (dirty & /*tags*/ 16) tagcheckbox_changes.tagName = /*tag*/ ctx[9];
+			if (dirty & /*selectMax*/ 64) tagcheckbox_changes.selectMax = /*selectMax*/ ctx[6];
+			if (dirty & /*disabled*/ 32) tagcheckbox_changes.disabled = /*disabled*/ ctx[5];
+
+			if (!updating_selectedVal && dirty & /*value*/ 2) {
+				updating_selectedVal = true;
+				tagcheckbox_changes.selectedVal = /*value*/ ctx[1];
+				(0,internal/* add_flush_callback */.Jk$)(() => updating_selectedVal = false);
+			}
+
+			if (!updating_group && dirty & /*selected*/ 1) {
+				updating_group = true;
+				tagcheckbox_changes.group = /*selected*/ ctx[0];
+				(0,internal/* add_flush_callback */.Jk$)(() => updating_group = false);
+			}
+
+			tagcheckbox.$set(tagcheckbox_changes);
+		},
+		i(local) {
+			if (current) return;
+			(0,internal/* transition_in */.c7F)(tagcheckbox.$$.fragment, local);
+			current = true;
+		},
+		o(local) {
+			(0,internal/* transition_out */.Tn8)(tagcheckbox.$$.fragment, local);
+			current = false;
+		},
+		d(detaching) {
+			(0,internal/* destroy_component */.Hbl)(tagcheckbox, detaching);
+		}
+	};
+}
+
+function TagCheckboxBar_svelte_create_fragment(ctx) {
+	let section;
+	let section_class_value;
+	let current;
+	let each_value = (0,internal/* ensure_array_like */.rv_)(/*tags*/ ctx[4]);
+	let each_blocks = [];
+
+	for (let i = 0; i < each_value.length; i += 1) {
+		each_blocks[i] = create_each_block(get_each_context(ctx, each_value, i));
+	}
+
+	const out = i => (0,internal/* transition_out */.Tn8)(each_blocks[i], 1, 1, () => {
+		each_blocks[i] = null;
+	});
+
+	return {
+		c() {
+			section = (0,internal/* element */.ND4)("section");
+
+			for (let i = 0; i < each_blocks.length; i += 1) {
+				each_blocks[i].c();
+			}
+
+			(0,internal/* attr */.CFu)(section, "class", section_class_value = ['tags'].concat(/*classes*/ ctx[3]).join(' '));
+			(0,internal/* attr */.CFu)(section, "name", /*name*/ ctx[2]);
+		},
+		m(target, anchor) {
+			(0,internal/* insert */.Yry)(target, section, anchor);
+
+			for (let i = 0; i < each_blocks.length; i += 1) {
+				if (each_blocks[i]) {
+					each_blocks[i].m(section, null);
+				}
+			}
+
+			current = true;
+		},
+		p(ctx, [dirty]) {
+			if (dirty & /*tags, selectMax, disabled, value, selected*/ 115) {
+				each_value = (0,internal/* ensure_array_like */.rv_)(/*tags*/ ctx[4]);
+				let i;
+
+				for (i = 0; i < each_value.length; i += 1) {
+					const child_ctx = get_each_context(ctx, each_value, i);
+
+					if (each_blocks[i]) {
+						each_blocks[i].p(child_ctx, dirty);
+						(0,internal/* transition_in */.c7F)(each_blocks[i], 1);
+					} else {
+						each_blocks[i] = create_each_block(child_ctx);
+						each_blocks[i].c();
+						(0,internal/* transition_in */.c7F)(each_blocks[i], 1);
+						each_blocks[i].m(section, null);
+					}
+				}
+
+				(0,internal/* group_outros */.V44)();
+
+				for (i = each_value.length; i < each_blocks.length; i += 1) {
+					out(i);
+				}
+
+				(0,internal/* check_outros */.GYV)();
+			}
+
+			if (!current || dirty & /*classes*/ 8 && section_class_value !== (section_class_value = ['tags'].concat(/*classes*/ ctx[3]).join(' '))) {
+				(0,internal/* attr */.CFu)(section, "class", section_class_value);
+			}
+
+			if (!current || dirty & /*name*/ 4) {
+				(0,internal/* attr */.CFu)(section, "name", /*name*/ ctx[2]);
+			}
+		},
+		i(local) {
+			if (current) return;
+
+			for (let i = 0; i < each_value.length; i += 1) {
+				(0,internal/* transition_in */.c7F)(each_blocks[i]);
+			}
+
+			current = true;
+		},
+		o(local) {
+			each_blocks = each_blocks.filter(Boolean);
+
+			for (let i = 0; i < each_blocks.length; i += 1) {
+				(0,internal/* transition_out */.Tn8)(each_blocks[i]);
+			}
+
+			current = false;
+		},
+		d(detaching) {
+			if (detaching) {
+				(0,internal/* detach */.YoD)(section);
+			}
+
+			(0,internal/* destroy_each */.ppq)(each_blocks, detaching);
+		}
+	};
+}
+
+function TagCheckboxBar_svelte_instance($$self, $$props, $$invalidate) {
+	let { name } = $$props;
+	let { classes = [] } = $$props;
+	let { tags } = $$props;
+	let { selected = [] } = $$props;
+	let { value } = $$props;
+	let { disabled = false } = $$props;
+	let { selectMax = 0 } = $$props;
+
+	function tagcheckbox_selectedVal_binding(value$1) {
+		value = value$1;
+		$$invalidate(1, value);
+	}
+
+	function tagcheckbox_group_binding(value) {
+		selected = value;
+		$$invalidate(0, selected);
+	}
+
+	$$self.$$set = $$props => {
+		if ('name' in $$props) $$invalidate(2, name = $$props.name);
+		if ('classes' in $$props) $$invalidate(3, classes = $$props.classes);
+		if ('tags' in $$props) $$invalidate(4, tags = $$props.tags);
+		if ('selected' in $$props) $$invalidate(0, selected = $$props.selected);
+		if ('value' in $$props) $$invalidate(1, value = $$props.value);
+		if ('disabled' in $$props) $$invalidate(5, disabled = $$props.disabled);
+		if ('selectMax' in $$props) $$invalidate(6, selectMax = $$props.selectMax);
+	};
+
+	return [
+		selected,
+		value,
+		name,
+		classes,
+		tags,
+		disabled,
+		selectMax,
+		tagcheckbox_selectedVal_binding,
+		tagcheckbox_group_binding
+	];
+}
+
+class TagCheckboxBar extends internal/* SvelteComponent */.r7T {
+	constructor(options) {
+		super();
+
+		(0,internal/* init */.TsN)(this, options, TagCheckboxBar_svelte_instance, TagCheckboxBar_svelte_create_fragment, internal/* safe_not_equal */.jXN, {
+			name: 2,
+			classes: 3,
+			tags: 4,
+			selected: 0,
+			value: 1,
+			disabled: 5,
+			selectMax: 6
+		});
+	}
+}
+
+/* harmony default export */ const TagCheckboxBar_svelte = (TagCheckboxBar);
 ;// ./src/lib/input/Checkbox.svelte
 /* src/lib/input/Checkbox.svelte generated by Svelte v4.2.19 */
 
@@ -1193,13 +1729,13 @@ class Checkbox extends internal/* SvelteComponent */.r7T {
 
 /* harmony default export */ const Checkbox_svelte = (Checkbox);
 
-;// ./src/lib/input/DayCheckbox.svelte
-/* src/lib/input/DayCheckbox.svelte generated by Svelte v4.2.19 */
+;// ./src/lib/input/TextButtonCheckbox.svelte
+/* src/lib/input/TextButtonCheckbox.svelte generated by Svelte v4.2.19 */
 
 
 
 
-function DayCheckbox_svelte_create_fragment(ctx) {
+function TextButtonCheckbox_svelte_create_fragment(ctx) {
 	let label_1;
 	let input;
 	let t0;
@@ -1216,9 +1752,9 @@ function DayCheckbox_svelte_create_fragment(ctx) {
 			span = (0,internal/* element */.ND4)("span");
 			t1 = (0,internal/* text */.Qq7)(/*label*/ ctx[2]);
 			(0,internal/* attr */.CFu)(input, "type", "checkbox");
-			(0,internal/* attr */.CFu)(input, "class", "svelte-1nqufop");
-			(0,internal/* attr */.CFu)(span, "class", "checkmark svelte-1nqufop");
-			(0,internal/* attr */.CFu)(label_1, "class", "svelte-1nqufop");
+			(0,internal/* attr */.CFu)(input, "class", "svelte-26fsde");
+			(0,internal/* attr */.CFu)(span, "class", "checkmark svelte-26fsde");
+			(0,internal/* attr */.CFu)(label_1, "class", "svelte-26fsde");
 		},
 		m(target, anchor) {
 			(0,internal/* insert */.Yry)(target, label_1, anchor);
@@ -1258,7 +1794,7 @@ function DayCheckbox_svelte_create_fragment(ctx) {
 	};
 }
 
-function DayCheckbox_svelte_instance($$self, $$props, $$invalidate) {
+function TextButtonCheckbox_svelte_instance($$self, $$props, $$invalidate) {
 	let { val } = $$props;
 	let { label } = $$props;
 	let { checked } = $$props;
@@ -1311,14 +1847,14 @@ function DayCheckbox_svelte_instance($$self, $$props, $$invalidate) {
 	return [checked, val, label, group, input_change_handler];
 }
 
-class DayCheckbox extends internal/* SvelteComponent */.r7T {
+class TextButtonCheckbox extends internal/* SvelteComponent */.r7T {
 	constructor(options) {
 		super();
-		(0,internal/* init */.TsN)(this, options, DayCheckbox_svelte_instance, DayCheckbox_svelte_create_fragment, internal/* safe_not_equal */.jXN, { val: 1, label: 2, checked: 0, group: 3 });
+		(0,internal/* init */.TsN)(this, options, TextButtonCheckbox_svelte_instance, TextButtonCheckbox_svelte_create_fragment, internal/* safe_not_equal */.jXN, { val: 1, label: 2, checked: 0, group: 3 });
 	}
 }
 
-/* harmony default export */ const DayCheckbox_svelte = (DayCheckbox);
+/* harmony default export */ const TextButtonCheckbox_svelte = (TextButtonCheckbox);
 
 ;// ./src/lib/input/Recurrence.svelte
 /* src/lib/input/Recurrence.svelte generated by Svelte v4.2.19 */
@@ -1332,40 +1868,78 @@ class DayCheckbox extends internal/* SvelteComponent */.r7T {
 
 
 
-function get_each_context(ctx, list, i) {
+
+
+
+
+
+function Recurrence_svelte_get_each_context(ctx, list, i) {
 	const child_ctx = ctx.slice();
-	child_ctx[6] = list[i];
-	child_ctx[8] = i;
+	child_ctx[14] = list[i];
+	child_ctx[16] = i;
 	return child_ctx;
 }
 
 function get_each_context_1(ctx, list, i) {
 	const child_ctx = ctx.slice();
-	child_ctx[9] = list[i];
-	child_ctx[8] = i;
+	child_ctx[16] = list[i];
 	return child_ctx;
 }
 
-// (29:4) {#if doc.recur == true}
+function get_each_context_2(ctx, list, i) {
+	const child_ctx = ctx.slice();
+	child_ctx[19] = list[i];
+	child_ctx[16] = i;
+	return child_ctx;
+}
+
+function get_each_context_3(ctx, list, i) {
+	const child_ctx = ctx.slice();
+	child_ctx[21] = list[i];
+	child_ctx[16] = i;
+	return child_ctx;
+}
+
+// (59:4) {#if doc.recur == true}
 function Recurrence_svelte_create_if_block(ctx) {
+	let div0;
+	let p;
+	let t0;
+	let t1;
+	let div1;
+	let label0;
+	let t3;
+	let input;
+	let t4;
+	let t5;
+	let div2;
 	let numberinput;
 	let updating_val;
-	let t0;
+	let t6;
+	let div3;
+	let label1;
+	let t8;
 	let select;
-	let t1;
-	let if_block_anchor;
+	let t9;
+	let show_if_2 = RecurrenceDisplayEnums['byweekday'].includes(/*doc*/ ctx[0].recurrence.freq);
+	let t10;
+	let show_if_1 = RecurrenceDisplayEnums['bymonthday'].includes(/*doc*/ ctx[0].recurrence.freq);
+	let t11;
+	let show_if = RecurrenceDisplayEnums['bymonth'].includes(/*doc*/ ctx[0].recurrence.freq);
+	let if_block3_anchor;
 	let current;
 	let mounted;
 	let dispose;
+	let if_block0 = /*doc*/ ctx[0].recurrence.dtend !== null && create_if_block_5(ctx);
 
 	function numberinput_val_binding(value) {
-		/*numberinput_val_binding*/ ctx[2](value);
+		/*numberinput_val_binding*/ ctx[6](value);
 	}
 
 	let numberinput_props = {
 		min: "1",
 		name: "activity-recurrence-interval",
-		label: "Every"
+		label: "Interval"
 	};
 
 	if (/*doc*/ ctx[0].recurrence.interval !== void 0) {
@@ -1374,35 +1948,82 @@ function Recurrence_svelte_create_if_block(ctx) {
 
 	numberinput = new Number_svelte({ props: numberinput_props });
 	internal/* binding_callbacks */.Dnk.push(() => (0,internal/* bind */.oIE)(numberinput, 'val', numberinput_val_binding));
-	let each_value_1 = (0,internal/* ensure_array_like */.rv_)(RecurrenceEnums.freq);
+	let each_value_3 = (0,internal/* ensure_array_like */.rv_)(RecurrenceEnums.freq);
 	let each_blocks = [];
 
-	for (let i = 0; i < each_value_1.length; i += 1) {
-		each_blocks[i] = create_each_block_1(get_each_context_1(ctx, each_value_1, i));
+	for (let i = 0; i < each_value_3.length; i += 1) {
+		each_blocks[i] = create_each_block_3(get_each_context_3(ctx, each_value_3, i));
 	}
 
-	let if_block = /*doc*/ ctx[0].recurrence.freq == RecurrenceEnums.freq[1] && create_if_block_1(ctx);
+	let if_block1 = show_if_2 && create_if_block_4(ctx);
+	let if_block2 = show_if_1 && create_if_block_2(ctx);
+	let if_block3 = show_if && create_if_block_1(ctx);
 
 	return {
 		c() {
+			div0 = (0,internal/* element */.ND4)("div");
+			p = (0,internal/* element */.ND4)("p");
+			t0 = (0,internal/* text */.Qq7)(/*recurrenceText*/ ctx[1]);
+			t1 = (0,internal/* space */.xem)();
+			div1 = (0,internal/* element */.ND4)("div");
+			label0 = (0,internal/* element */.ND4)("label");
+			label0.textContent = "From :";
+			t3 = (0,internal/* space */.xem)();
+			input = (0,internal/* element */.ND4)("input");
+			t4 = (0,internal/* space */.xem)();
+			if (if_block0) if_block0.c();
+			t5 = (0,internal/* space */.xem)();
+			div2 = (0,internal/* element */.ND4)("div");
 			(0,internal/* create_component */.N0i)(numberinput.$$.fragment);
-			t0 = (0,internal/* space */.xem)();
+			t6 = (0,internal/* space */.xem)();
+			div3 = (0,internal/* element */.ND4)("div");
+			label1 = (0,internal/* element */.ND4)("label");
+			label1.textContent = "Frequency :";
+			t8 = (0,internal/* space */.xem)();
 			select = (0,internal/* element */.ND4)("select");
 
 			for (let i = 0; i < each_blocks.length; i += 1) {
 				each_blocks[i].c();
 			}
 
-			t1 = (0,internal/* space */.xem)();
-			if (if_block) if_block.c();
-			if_block_anchor = (0,internal/* empty */.Iex)();
+			t9 = (0,internal/* space */.xem)();
+			if (if_block1) if_block1.c();
+			t10 = (0,internal/* space */.xem)();
+			if (if_block2) if_block2.c();
+			t11 = (0,internal/* space */.xem)();
+			if (if_block3) if_block3.c();
+			if_block3_anchor = (0,internal/* empty */.Iex)();
+			(0,internal/* attr */.CFu)(div0, "class", "recurrenceText svelte-733ewc");
+			(0,internal/* attr */.CFu)(label0, "for", "activity-recurrence-dtstart");
+			(0,internal/* attr */.CFu)(input, "type", "datetime-local");
+			(0,internal/* attr */.CFu)(input, "name", "activity-recurrence-dtstart");
+			(0,internal/* attr */.CFu)(div1, "class", "input-group");
+			(0,internal/* attr */.CFu)(div2, "class", "input-group");
+			(0,internal/* attr */.CFu)(label1, "for", "activity-recurrence-freq");
 			(0,internal/* attr */.CFu)(select, "name", "activity-recurrence-freq");
-			if (/*doc*/ ctx[0].recurrence.freq === void 0) (0,internal/* add_render_callback */.Dti)(() => /*select_change_handler*/ ctx[3].call(select));
+			if (/*doc*/ ctx[0].recurrence.freq === void 0) (0,internal/* add_render_callback */.Dti)(() => /*select_change_handler*/ ctx[7].call(select));
+			(0,internal/* attr */.CFu)(div3, "class", "input-group");
 		},
 		m(target, anchor) {
-			(0,internal/* mount_component */.wSR)(numberinput, target, anchor);
-			(0,internal/* insert */.Yry)(target, t0, anchor);
-			(0,internal/* insert */.Yry)(target, select, anchor);
+			(0,internal/* insert */.Yry)(target, div0, anchor);
+			(0,internal/* append */.BCw)(div0, p);
+			(0,internal/* append */.BCw)(p, t0);
+			(0,internal/* insert */.Yry)(target, t1, anchor);
+			(0,internal/* insert */.Yry)(target, div1, anchor);
+			(0,internal/* append */.BCw)(div1, label0);
+			(0,internal/* append */.BCw)(div1, t3);
+			(0,internal/* append */.BCw)(div1, input);
+			(0,internal/* set_input_value */.Gvd)(input, /*doc*/ ctx[0].recurrence.dtstart);
+			(0,internal/* insert */.Yry)(target, t4, anchor);
+			if (if_block0) if_block0.m(target, anchor);
+			(0,internal/* insert */.Yry)(target, t5, anchor);
+			(0,internal/* insert */.Yry)(target, div2, anchor);
+			(0,internal/* mount_component */.wSR)(numberinput, div2, null);
+			(0,internal/* insert */.Yry)(target, t6, anchor);
+			(0,internal/* insert */.Yry)(target, div3, anchor);
+			(0,internal/* append */.BCw)(div3, label1);
+			(0,internal/* append */.BCw)(div3, t8);
+			(0,internal/* append */.BCw)(div3, select);
 
 			for (let i = 0; i < each_blocks.length; i += 1) {
 				if (each_blocks[i]) {
@@ -1411,17 +2032,45 @@ function Recurrence_svelte_create_if_block(ctx) {
 			}
 
 			(0,internal/* select_option */.fs8)(select, /*doc*/ ctx[0].recurrence.freq, true);
-			(0,internal/* insert */.Yry)(target, t1, anchor);
-			if (if_block) if_block.m(target, anchor);
-			(0,internal/* insert */.Yry)(target, if_block_anchor, anchor);
+			(0,internal/* insert */.Yry)(target, t9, anchor);
+			if (if_block1) if_block1.m(target, anchor);
+			(0,internal/* insert */.Yry)(target, t10, anchor);
+			if (if_block2) if_block2.m(target, anchor);
+			(0,internal/* insert */.Yry)(target, t11, anchor);
+			if (if_block3) if_block3.m(target, anchor);
+			(0,internal/* insert */.Yry)(target, if_block3_anchor, anchor);
 			current = true;
 
 			if (!mounted) {
-				dispose = (0,internal/* listen */.KTR)(select, "change", /*select_change_handler*/ ctx[3]);
+				dispose = [
+					(0,internal/* listen */.KTR)(input, "input", /*input_input_handler*/ ctx[4]),
+					(0,internal/* listen */.KTR)(select, "change", /*select_change_handler*/ ctx[7]),
+					(0,internal/* listen */.KTR)(select, "change", /*updateRecurrenceValues*/ ctx[2])
+				];
+
 				mounted = true;
 			}
 		},
 		p(ctx, dirty) {
+			if (!current || dirty & /*recurrenceText*/ 2) (0,internal/* set_data */.iQh)(t0, /*recurrenceText*/ ctx[1]);
+
+			if (dirty & /*doc*/ 1) {
+				(0,internal/* set_input_value */.Gvd)(input, /*doc*/ ctx[0].recurrence.dtstart);
+			}
+
+			if (/*doc*/ ctx[0].recurrence.dtend !== null) {
+				if (if_block0) {
+					if_block0.p(ctx, dirty);
+				} else {
+					if_block0 = create_if_block_5(ctx);
+					if_block0.c();
+					if_block0.m(t5.parentNode, t5);
+				}
+			} else if (if_block0) {
+				if_block0.d(1);
+				if_block0 = null;
+			}
+
 			const numberinput_changes = {};
 
 			if (!updating_val && dirty & /*doc*/ 1) {
@@ -1436,24 +2085,76 @@ function Recurrence_svelte_create_if_block(ctx) {
 				(0,internal/* select_option */.fs8)(select, /*doc*/ ctx[0].recurrence.freq);
 			}
 
-			if (/*doc*/ ctx[0].recurrence.freq == RecurrenceEnums.freq[1]) {
-				if (if_block) {
-					if_block.p(ctx, dirty);
+			if (dirty & /*doc*/ 1) show_if_2 = RecurrenceDisplayEnums['byweekday'].includes(/*doc*/ ctx[0].recurrence.freq);
+
+			if (show_if_2) {
+				if (if_block1) {
+					if_block1.p(ctx, dirty);
 
 					if (dirty & /*doc*/ 1) {
-						(0,internal/* transition_in */.c7F)(if_block, 1);
+						(0,internal/* transition_in */.c7F)(if_block1, 1);
 					}
 				} else {
-					if_block = create_if_block_1(ctx);
-					if_block.c();
-					(0,internal/* transition_in */.c7F)(if_block, 1);
-					if_block.m(if_block_anchor.parentNode, if_block_anchor);
+					if_block1 = create_if_block_4(ctx);
+					if_block1.c();
+					(0,internal/* transition_in */.c7F)(if_block1, 1);
+					if_block1.m(t10.parentNode, t10);
 				}
-			} else if (if_block) {
+			} else if (if_block1) {
 				(0,internal/* group_outros */.V44)();
 
-				(0,internal/* transition_out */.Tn8)(if_block, 1, 1, () => {
-					if_block = null;
+				(0,internal/* transition_out */.Tn8)(if_block1, 1, 1, () => {
+					if_block1 = null;
+				});
+
+				(0,internal/* check_outros */.GYV)();
+			}
+
+			if (dirty & /*doc*/ 1) show_if_1 = RecurrenceDisplayEnums['bymonthday'].includes(/*doc*/ ctx[0].recurrence.freq);
+
+			if (show_if_1) {
+				if (if_block2) {
+					if_block2.p(ctx, dirty);
+
+					if (dirty & /*doc*/ 1) {
+						(0,internal/* transition_in */.c7F)(if_block2, 1);
+					}
+				} else {
+					if_block2 = create_if_block_2(ctx);
+					if_block2.c();
+					(0,internal/* transition_in */.c7F)(if_block2, 1);
+					if_block2.m(t11.parentNode, t11);
+				}
+			} else if (if_block2) {
+				(0,internal/* group_outros */.V44)();
+
+				(0,internal/* transition_out */.Tn8)(if_block2, 1, 1, () => {
+					if_block2 = null;
+				});
+
+				(0,internal/* check_outros */.GYV)();
+			}
+
+			if (dirty & /*doc*/ 1) show_if = RecurrenceDisplayEnums['bymonth'].includes(/*doc*/ ctx[0].recurrence.freq);
+
+			if (show_if) {
+				if (if_block3) {
+					if_block3.p(ctx, dirty);
+
+					if (dirty & /*doc*/ 1) {
+						(0,internal/* transition_in */.c7F)(if_block3, 1);
+					}
+				} else {
+					if_block3 = create_if_block_1(ctx);
+					if_block3.c();
+					(0,internal/* transition_in */.c7F)(if_block3, 1);
+					if_block3.m(if_block3_anchor.parentNode, if_block3_anchor);
+				}
+			} else if (if_block3) {
+				(0,internal/* group_outros */.V44)();
+
+				(0,internal/* transition_out */.Tn8)(if_block3, 1, 1, () => {
+					if_block3 = null;
 				});
 
 				(0,internal/* check_outros */.GYV)();
@@ -1462,41 +2163,105 @@ function Recurrence_svelte_create_if_block(ctx) {
 		i(local) {
 			if (current) return;
 			(0,internal/* transition_in */.c7F)(numberinput.$$.fragment, local);
-			(0,internal/* transition_in */.c7F)(if_block);
+			(0,internal/* transition_in */.c7F)(if_block1);
+			(0,internal/* transition_in */.c7F)(if_block2);
+			(0,internal/* transition_in */.c7F)(if_block3);
 			current = true;
 		},
 		o(local) {
 			(0,internal/* transition_out */.Tn8)(numberinput.$$.fragment, local);
-			(0,internal/* transition_out */.Tn8)(if_block);
+			(0,internal/* transition_out */.Tn8)(if_block1);
+			(0,internal/* transition_out */.Tn8)(if_block2);
+			(0,internal/* transition_out */.Tn8)(if_block3);
 			current = false;
 		},
 		d(detaching) {
 			if (detaching) {
-				(0,internal/* detach */.YoD)(t0);
-				(0,internal/* detach */.YoD)(select);
+				(0,internal/* detach */.YoD)(div0);
 				(0,internal/* detach */.YoD)(t1);
-				(0,internal/* detach */.YoD)(if_block_anchor);
+				(0,internal/* detach */.YoD)(div1);
+				(0,internal/* detach */.YoD)(t4);
+				(0,internal/* detach */.YoD)(t5);
+				(0,internal/* detach */.YoD)(div2);
+				(0,internal/* detach */.YoD)(t6);
+				(0,internal/* detach */.YoD)(div3);
+				(0,internal/* detach */.YoD)(t9);
+				(0,internal/* detach */.YoD)(t10);
+				(0,internal/* detach */.YoD)(t11);
+				(0,internal/* detach */.YoD)(if_block3_anchor);
 			}
 
-			(0,internal/* destroy_component */.Hbl)(numberinput, detaching);
+			if (if_block0) if_block0.d(detaching);
+			(0,internal/* destroy_component */.Hbl)(numberinput);
 			(0,internal/* destroy_each */.ppq)(each_blocks, detaching);
-			if (if_block) if_block.d(detaching);
+			if (if_block1) if_block1.d(detaching);
+			if (if_block2) if_block2.d(detaching);
+			if (if_block3) if_block3.d(detaching);
+			mounted = false;
+			(0,internal/* run_all */.oOW)(dispose);
+		}
+	};
+}
+
+// (69:8) {#if doc.recurrence.dtend !== null }
+function create_if_block_5(ctx) {
+	let div;
+	let label;
+	let t1;
+	let input;
+	let mounted;
+	let dispose;
+
+	return {
+		c() {
+			div = (0,internal/* element */.ND4)("div");
+			label = (0,internal/* element */.ND4)("label");
+			label.textContent = "To :";
+			t1 = (0,internal/* space */.xem)();
+			input = (0,internal/* element */.ND4)("input");
+			(0,internal/* attr */.CFu)(label, "for", "activity-recurrence-dtend");
+			(0,internal/* attr */.CFu)(input, "type", "datetime-local");
+			(0,internal/* attr */.CFu)(input, "name", "activity-recurrence-dtend");
+			(0,internal/* attr */.CFu)(div, "class", "input-group");
+		},
+		m(target, anchor) {
+			(0,internal/* insert */.Yry)(target, div, anchor);
+			(0,internal/* append */.BCw)(div, label);
+			(0,internal/* append */.BCw)(div, t1);
+			(0,internal/* append */.BCw)(div, input);
+			(0,internal/* set_input_value */.Gvd)(input, /*doc*/ ctx[0].recurrence.dtend);
+
+			if (!mounted) {
+				dispose = (0,internal/* listen */.KTR)(input, "input", /*input_input_handler_1*/ ctx[5]);
+				mounted = true;
+			}
+		},
+		p(ctx, dirty) {
+			if (dirty & /*doc*/ 1) {
+				(0,internal/* set_input_value */.Gvd)(input, /*doc*/ ctx[0].recurrence.dtend);
+			}
+		},
+		d(detaching) {
+			if (detaching) {
+				(0,internal/* detach */.YoD)(div);
+			}
+
 			mounted = false;
 			dispose();
 		}
 	};
 }
 
-// (32:12) {#each RecurrenceEnums.freq as fStr, i}
-function create_each_block_1(ctx) {
+// (84:16) {#each RecurrenceEnums.freq as fStr, i}
+function create_each_block_3(ctx) {
 	let option;
 	let option_value_value;
 
 	return {
 		c() {
 			option = (0,internal/* element */.ND4)("option");
-			option.textContent = `${/*fStr*/ ctx[9]}`;
-			option.__value = option_value_value = /*fStr*/ ctx[9];
+			option.textContent = `${(0,lodash.capitalize)(/*fStr*/ ctx[21])}`;
+			option.__value = option_value_value = /*fStr*/ ctx[21];
 			(0,internal/* set_input_value */.Gvd)(option, option.__value);
 		},
 		m(target, anchor) {
@@ -1511,15 +2276,17 @@ function create_each_block_1(ctx) {
 	};
 }
 
-// (37:8) {#if doc.recurrence.freq == RecurrenceEnums.freq[1]}
-function create_if_block_1(ctx) {
+// (90:8) {#if RecurrenceDisplayEnums['byweekday'].includes(doc.recurrence.freq) }
+function create_if_block_4(ctx) {
+	let label;
+	let t1;
 	let div;
 	let current;
-	let each_value = (0,internal/* ensure_array_like */.rv_)(RecurrenceEnums.byday);
+	let each_value_2 = (0,internal/* ensure_array_like */.rv_)(RecurrenceEnums.byweekday);
 	let each_blocks = [];
 
-	for (let i = 0; i < each_value.length; i += 1) {
-		each_blocks[i] = create_each_block(get_each_context(ctx, each_value, i));
+	for (let i = 0; i < each_value_2.length; i += 1) {
+		each_blocks[i] = create_each_block_2(get_each_context_2(ctx, each_value_2, i));
 	}
 
 	const out = i => (0,internal/* transition_out */.Tn8)(each_blocks[i], 1, 1, () => {
@@ -1528,15 +2295,21 @@ function create_if_block_1(ctx) {
 
 	return {
 		c() {
+			label = (0,internal/* element */.ND4)("label");
+			label.textContent = "Days :";
+			t1 = (0,internal/* space */.xem)();
 			div = (0,internal/* element */.ND4)("div");
 
 			for (let i = 0; i < each_blocks.length; i += 1) {
 				each_blocks[i].c();
 			}
 
-			(0,internal/* attr */.CFu)(div, "class", "weekdays");
+			(0,internal/* attr */.CFu)(label, "for", "activity-recurrence-byweekday");
+			(0,internal/* attr */.CFu)(div, "class", "weekdays text-check-buttons");
 		},
 		m(target, anchor) {
+			(0,internal/* insert */.Yry)(target, label, anchor);
+			(0,internal/* insert */.Yry)(target, t1, anchor);
 			(0,internal/* insert */.Yry)(target, div, anchor);
 
 			for (let i = 0; i < each_blocks.length; i += 1) {
@@ -1549,17 +2322,429 @@ function create_if_block_1(ctx) {
 		},
 		p(ctx, dirty) {
 			if (dirty & /*doc*/ 1) {
-				each_value = (0,internal/* ensure_array_like */.rv_)(RecurrenceEnums.byday);
+				each_value_2 = (0,internal/* ensure_array_like */.rv_)(RecurrenceEnums.byweekday);
 				let i;
 
-				for (i = 0; i < each_value.length; i += 1) {
-					const child_ctx = get_each_context(ctx, each_value, i);
+				for (i = 0; i < each_value_2.length; i += 1) {
+					const child_ctx = get_each_context_2(ctx, each_value_2, i);
 
 					if (each_blocks[i]) {
 						each_blocks[i].p(child_ctx, dirty);
 						(0,internal/* transition_in */.c7F)(each_blocks[i], 1);
 					} else {
-						each_blocks[i] = create_each_block(child_ctx);
+						each_blocks[i] = create_each_block_2(child_ctx);
+						each_blocks[i].c();
+						(0,internal/* transition_in */.c7F)(each_blocks[i], 1);
+						each_blocks[i].m(div, null);
+					}
+				}
+
+				(0,internal/* group_outros */.V44)();
+
+				for (i = each_value_2.length; i < each_blocks.length; i += 1) {
+					out(i);
+				}
+
+				(0,internal/* check_outros */.GYV)();
+			}
+		},
+		i(local) {
+			if (current) return;
+
+			for (let i = 0; i < each_value_2.length; i += 1) {
+				(0,internal/* transition_in */.c7F)(each_blocks[i]);
+			}
+
+			current = true;
+		},
+		o(local) {
+			each_blocks = each_blocks.filter(Boolean);
+
+			for (let i = 0; i < each_blocks.length; i += 1) {
+				(0,internal/* transition_out */.Tn8)(each_blocks[i]);
+			}
+
+			current = false;
+		},
+		d(detaching) {
+			if (detaching) {
+				(0,internal/* detach */.YoD)(label);
+				(0,internal/* detach */.YoD)(t1);
+				(0,internal/* detach */.YoD)(div);
+			}
+
+			(0,internal/* destroy_each */.ppq)(each_blocks, detaching);
+		}
+	};
+}
+
+// (93:16) {#each RecurrenceEnums.byweekday as DayStr2Chr, i }
+function create_each_block_2(ctx) {
+	let textbuttoncheckboxinput;
+	let updating_group;
+	let current;
+
+	function textbuttoncheckboxinput_group_binding(value) {
+		/*textbuttoncheckboxinput_group_binding*/ ctx[8](value);
+	}
+
+	let textbuttoncheckboxinput_props = {
+		val: /*DayStr2Chr*/ ctx[19],
+		name: "activity-recurrence-byweekday",
+		label: /*DayStr2Chr*/ ctx[19].substring(0, 1)
+	};
+
+	if (/*doc*/ ctx[0].recurrence.byweekday !== void 0) {
+		textbuttoncheckboxinput_props.group = /*doc*/ ctx[0].recurrence.byweekday;
+	}
+
+	textbuttoncheckboxinput = new TextButtonCheckbox_svelte({ props: textbuttoncheckboxinput_props });
+	internal/* binding_callbacks */.Dnk.push(() => (0,internal/* bind */.oIE)(textbuttoncheckboxinput, 'group', textbuttoncheckboxinput_group_binding));
+
+	return {
+		c() {
+			(0,internal/* create_component */.N0i)(textbuttoncheckboxinput.$$.fragment);
+		},
+		m(target, anchor) {
+			(0,internal/* mount_component */.wSR)(textbuttoncheckboxinput, target, anchor);
+			current = true;
+		},
+		p(ctx, dirty) {
+			const textbuttoncheckboxinput_changes = {};
+
+			if (!updating_group && dirty & /*doc*/ 1) {
+				updating_group = true;
+				textbuttoncheckboxinput_changes.group = /*doc*/ ctx[0].recurrence.byweekday;
+				(0,internal/* add_flush_callback */.Jk$)(() => updating_group = false);
+			}
+
+			textbuttoncheckboxinput.$set(textbuttoncheckboxinput_changes);
+		},
+		i(local) {
+			if (current) return;
+			(0,internal/* transition_in */.c7F)(textbuttoncheckboxinput.$$.fragment, local);
+			current = true;
+		},
+		o(local) {
+			(0,internal/* transition_out */.Tn8)(textbuttoncheckboxinput.$$.fragment, local);
+			current = false;
+		},
+		d(detaching) {
+			(0,internal/* destroy_component */.Hbl)(textbuttoncheckboxinput, detaching);
+		}
+	};
+}
+
+// (103:8) {#if RecurrenceDisplayEnums['bymonthday'].includes(doc.recurrence.freq)}
+function create_if_block_2(ctx) {
+	let t0;
+	let label;
+	let t2;
+	let div;
+	let current;
+	let if_block = /*doc*/ ctx[0].recurrence.freq === 'MONTHLY' && create_if_block_3(ctx);
+	let each_value_1 = (0,internal/* ensure_array_like */.rv_)(Array(31).keys());
+	let each_blocks = [];
+
+	for (let i = 0; i < each_value_1.length; i += 1) {
+		each_blocks[i] = create_each_block_1(get_each_context_1(ctx, each_value_1, i));
+	}
+
+	const out = i => (0,internal/* transition_out */.Tn8)(each_blocks[i], 1, 1, () => {
+		each_blocks[i] = null;
+	});
+
+	return {
+		c() {
+			if (if_block) if_block.c();
+			t0 = (0,internal/* space */.xem)();
+			label = (0,internal/* element */.ND4)("label");
+			label.textContent = "Month days:";
+			t2 = (0,internal/* space */.xem)();
+			div = (0,internal/* element */.ND4)("div");
+
+			for (let i = 0; i < each_blocks.length; i += 1) {
+				each_blocks[i].c();
+			}
+
+			(0,internal/* attr */.CFu)(label, "for", "activity-recurrence-bymonthday");
+			(0,internal/* attr */.CFu)(div, "class", "monthdays text-check-buttons");
+		},
+		m(target, anchor) {
+			if (if_block) if_block.m(target, anchor);
+			(0,internal/* insert */.Yry)(target, t0, anchor);
+			(0,internal/* insert */.Yry)(target, label, anchor);
+			(0,internal/* insert */.Yry)(target, t2, anchor);
+			(0,internal/* insert */.Yry)(target, div, anchor);
+
+			for (let i = 0; i < each_blocks.length; i += 1) {
+				if (each_blocks[i]) {
+					each_blocks[i].m(div, null);
+				}
+			}
+
+			current = true;
+		},
+		p(ctx, dirty) {
+			if (/*doc*/ ctx[0].recurrence.freq === 'MONTHLY') {
+				if (if_block) {
+					if_block.p(ctx, dirty);
+
+					if (dirty & /*doc*/ 1) {
+						(0,internal/* transition_in */.c7F)(if_block, 1);
+					}
+				} else {
+					if_block = create_if_block_3(ctx);
+					if_block.c();
+					(0,internal/* transition_in */.c7F)(if_block, 1);
+					if_block.m(t0.parentNode, t0);
+				}
+			} else if (if_block) {
+				(0,internal/* group_outros */.V44)();
+
+				(0,internal/* transition_out */.Tn8)(if_block, 1, 1, () => {
+					if_block = null;
+				});
+
+				(0,internal/* check_outros */.GYV)();
+			}
+
+			if (dirty & /*Array, doc*/ 1) {
+				each_value_1 = (0,internal/* ensure_array_like */.rv_)(Array(31).keys());
+				let i;
+
+				for (i = 0; i < each_value_1.length; i += 1) {
+					const child_ctx = get_each_context_1(ctx, each_value_1, i);
+
+					if (each_blocks[i]) {
+						each_blocks[i].p(child_ctx, dirty);
+						(0,internal/* transition_in */.c7F)(each_blocks[i], 1);
+					} else {
+						each_blocks[i] = create_each_block_1(child_ctx);
+						each_blocks[i].c();
+						(0,internal/* transition_in */.c7F)(each_blocks[i], 1);
+						each_blocks[i].m(div, null);
+					}
+				}
+
+				(0,internal/* group_outros */.V44)();
+
+				for (i = each_value_1.length; i < each_blocks.length; i += 1) {
+					out(i);
+				}
+
+				(0,internal/* check_outros */.GYV)();
+			}
+		},
+		i(local) {
+			if (current) return;
+			(0,internal/* transition_in */.c7F)(if_block);
+
+			for (let i = 0; i < each_value_1.length; i += 1) {
+				(0,internal/* transition_in */.c7F)(each_blocks[i]);
+			}
+
+			current = true;
+		},
+		o(local) {
+			(0,internal/* transition_out */.Tn8)(if_block);
+			each_blocks = each_blocks.filter(Boolean);
+
+			for (let i = 0; i < each_blocks.length; i += 1) {
+				(0,internal/* transition_out */.Tn8)(each_blocks[i]);
+			}
+
+			current = false;
+		},
+		d(detaching) {
+			if (detaching) {
+				(0,internal/* detach */.YoD)(t0);
+				(0,internal/* detach */.YoD)(label);
+				(0,internal/* detach */.YoD)(t2);
+				(0,internal/* detach */.YoD)(div);
+			}
+
+			if (if_block) if_block.d(detaching);
+			(0,internal/* destroy_each */.ppq)(each_blocks, detaching);
+		}
+	};
+}
+
+// (104:12) {#if doc.recurrence.freq === 'MONTHLY' }
+function create_if_block_3(ctx) {
+	let div;
+	let tagcheckboxbar;
+	let updating_selected;
+	let current;
+
+	function tagcheckboxbar_selected_binding(value) {
+		/*tagcheckboxbar_selected_binding*/ ctx[9](value);
+	}
+
+	let tagcheckboxbar_props = { tags: Object.keys(RecurrenceNthEnums) };
+
+	if (/*doc*/ ctx[0].recurrence.nth !== void 0) {
+		tagcheckboxbar_props.selected = /*doc*/ ctx[0].recurrence.nth;
+	}
+
+	tagcheckboxbar = new TagCheckboxBar_svelte({ props: tagcheckboxbar_props });
+	internal/* binding_callbacks */.Dnk.push(() => (0,internal/* bind */.oIE)(tagcheckboxbar, 'selected', tagcheckboxbar_selected_binding));
+
+	return {
+		c() {
+			div = (0,internal/* element */.ND4)("div");
+			(0,internal/* create_component */.N0i)(tagcheckboxbar.$$.fragment);
+			(0,internal/* attr */.CFu)(div, "class", "nth");
+		},
+		m(target, anchor) {
+			(0,internal/* insert */.Yry)(target, div, anchor);
+			(0,internal/* mount_component */.wSR)(tagcheckboxbar, div, null);
+			current = true;
+		},
+		p(ctx, dirty) {
+			const tagcheckboxbar_changes = {};
+
+			if (!updating_selected && dirty & /*doc*/ 1) {
+				updating_selected = true;
+				tagcheckboxbar_changes.selected = /*doc*/ ctx[0].recurrence.nth;
+				(0,internal/* add_flush_callback */.Jk$)(() => updating_selected = false);
+			}
+
+			tagcheckboxbar.$set(tagcheckboxbar_changes);
+		},
+		i(local) {
+			if (current) return;
+			(0,internal/* transition_in */.c7F)(tagcheckboxbar.$$.fragment, local);
+			current = true;
+		},
+		o(local) {
+			(0,internal/* transition_out */.Tn8)(tagcheckboxbar.$$.fragment, local);
+			current = false;
+		},
+		d(detaching) {
+			if (detaching) {
+				(0,internal/* detach */.YoD)(div);
+			}
+
+			(0,internal/* destroy_component */.Hbl)(tagcheckboxbar);
+		}
+	};
+}
+
+// (112:16) {#each Array(31).keys() as i}
+function create_each_block_1(ctx) {
+	let textbuttoncheckboxinput;
+	let updating_group;
+	let current;
+
+	function textbuttoncheckboxinput_group_binding_1(value) {
+		/*textbuttoncheckboxinput_group_binding_1*/ ctx[10](value);
+	}
+
+	let textbuttoncheckboxinput_props = {
+		val: /*i*/ ctx[16] + 1,
+		name: "activity-recurrence-bymonthday",
+		label: /*i*/ ctx[16] + 1
+	};
+
+	if (/*doc*/ ctx[0].recurrence.bymonthday !== void 0) {
+		textbuttoncheckboxinput_props.group = /*doc*/ ctx[0].recurrence.bymonthday;
+	}
+
+	textbuttoncheckboxinput = new TextButtonCheckbox_svelte({ props: textbuttoncheckboxinput_props });
+	internal/* binding_callbacks */.Dnk.push(() => (0,internal/* bind */.oIE)(textbuttoncheckboxinput, 'group', textbuttoncheckboxinput_group_binding_1));
+
+	return {
+		c() {
+			(0,internal/* create_component */.N0i)(textbuttoncheckboxinput.$$.fragment);
+		},
+		m(target, anchor) {
+			(0,internal/* mount_component */.wSR)(textbuttoncheckboxinput, target, anchor);
+			current = true;
+		},
+		p(ctx, dirty) {
+			const textbuttoncheckboxinput_changes = {};
+
+			if (!updating_group && dirty & /*doc*/ 1) {
+				updating_group = true;
+				textbuttoncheckboxinput_changes.group = /*doc*/ ctx[0].recurrence.bymonthday;
+				(0,internal/* add_flush_callback */.Jk$)(() => updating_group = false);
+			}
+
+			textbuttoncheckboxinput.$set(textbuttoncheckboxinput_changes);
+		},
+		i(local) {
+			if (current) return;
+			(0,internal/* transition_in */.c7F)(textbuttoncheckboxinput.$$.fragment, local);
+			current = true;
+		},
+		o(local) {
+			(0,internal/* transition_out */.Tn8)(textbuttoncheckboxinput.$$.fragment, local);
+			current = false;
+		},
+		d(detaching) {
+			(0,internal/* destroy_component */.Hbl)(textbuttoncheckboxinput, detaching);
+		}
+	};
+}
+
+// (123:8) {#if RecurrenceDisplayEnums['bymonth'].includes(doc.recurrence.freq)}
+function create_if_block_1(ctx) {
+	let label;
+	let t1;
+	let div;
+	let current;
+	let each_value = (0,internal/* ensure_array_like */.rv_)(RecurrenceEnums.bymonth);
+	let each_blocks = [];
+
+	for (let i = 0; i < each_value.length; i += 1) {
+		each_blocks[i] = Recurrence_svelte_create_each_block(Recurrence_svelte_get_each_context(ctx, each_value, i));
+	}
+
+	const out = i => (0,internal/* transition_out */.Tn8)(each_blocks[i], 1, 1, () => {
+		each_blocks[i] = null;
+	});
+
+	return {
+		c() {
+			label = (0,internal/* element */.ND4)("label");
+			label.textContent = "Months :";
+			t1 = (0,internal/* space */.xem)();
+			div = (0,internal/* element */.ND4)("div");
+
+			for (let i = 0; i < each_blocks.length; i += 1) {
+				each_blocks[i].c();
+			}
+
+			(0,internal/* attr */.CFu)(label, "for", "activity-recurrence-bymonth");
+			(0,internal/* attr */.CFu)(div, "class", "months text-check-buttons");
+		},
+		m(target, anchor) {
+			(0,internal/* insert */.Yry)(target, label, anchor);
+			(0,internal/* insert */.Yry)(target, t1, anchor);
+			(0,internal/* insert */.Yry)(target, div, anchor);
+
+			for (let i = 0; i < each_blocks.length; i += 1) {
+				if (each_blocks[i]) {
+					each_blocks[i].m(div, null);
+				}
+			}
+
+			current = true;
+		},
+		p(ctx, dirty) {
+			if (dirty & /*doc*/ 1) {
+				each_value = (0,internal/* ensure_array_like */.rv_)(RecurrenceEnums.bymonth);
+				let i;
+
+				for (i = 0; i < each_value.length; i += 1) {
+					const child_ctx = Recurrence_svelte_get_each_context(ctx, each_value, i);
+
+					if (each_blocks[i]) {
+						each_blocks[i].p(child_ctx, dirty);
+						(0,internal/* transition_in */.c7F)(each_blocks[i], 1);
+					} else {
+						each_blocks[i] = Recurrence_svelte_create_each_block(child_ctx);
 						each_blocks[i].c();
 						(0,internal/* transition_in */.c7F)(each_blocks[i], 1);
 						each_blocks[i].m(div, null);
@@ -1595,6 +2780,8 @@ function create_if_block_1(ctx) {
 		},
 		d(detaching) {
 			if (detaching) {
+				(0,internal/* detach */.YoD)(label);
+				(0,internal/* detach */.YoD)(t1);
 				(0,internal/* detach */.YoD)(div);
 			}
 
@@ -1603,59 +2790,59 @@ function create_if_block_1(ctx) {
 	};
 }
 
-// (39:16) {#each RecurrenceEnums.byday as DayStr2Chr, i}
-function create_each_block(ctx) {
-	let daycheckboxinput;
+// (126:16) {#each RecurrenceEnums.bymonth as monthNum, i}
+function Recurrence_svelte_create_each_block(ctx) {
+	let textbuttoncheckboxinput;
 	let updating_group;
 	let current;
 
-	function daycheckboxinput_group_binding(value) {
-		/*daycheckboxinput_group_binding*/ ctx[4](value);
+	function textbuttoncheckboxinput_group_binding_2(value) {
+		/*textbuttoncheckboxinput_group_binding_2*/ ctx[11](value);
 	}
 
-	let daycheckboxinput_props = {
-		val: /*DayStr2Chr*/ ctx[6],
-		name: "activity-recurrence-byday",
-		label: /*DayStr2Chr*/ ctx[6].substring(0, 1)
+	let textbuttoncheckboxinput_props = {
+		val: /*i*/ ctx[16] + 1,
+		name: "activity-recurrence-bymonth",
+		label: /*monthNum*/ ctx[14]
 	};
 
-	if (/*doc*/ ctx[0].recurrence.byday !== void 0) {
-		daycheckboxinput_props.group = /*doc*/ ctx[0].recurrence.byday;
+	if (/*doc*/ ctx[0].recurrence.bymonth !== void 0) {
+		textbuttoncheckboxinput_props.group = /*doc*/ ctx[0].recurrence.bymonth;
 	}
 
-	daycheckboxinput = new DayCheckbox_svelte({ props: daycheckboxinput_props });
-	internal/* binding_callbacks */.Dnk.push(() => (0,internal/* bind */.oIE)(daycheckboxinput, 'group', daycheckboxinput_group_binding));
+	textbuttoncheckboxinput = new TextButtonCheckbox_svelte({ props: textbuttoncheckboxinput_props });
+	internal/* binding_callbacks */.Dnk.push(() => (0,internal/* bind */.oIE)(textbuttoncheckboxinput, 'group', textbuttoncheckboxinput_group_binding_2));
 
 	return {
 		c() {
-			(0,internal/* create_component */.N0i)(daycheckboxinput.$$.fragment);
+			(0,internal/* create_component */.N0i)(textbuttoncheckboxinput.$$.fragment);
 		},
 		m(target, anchor) {
-			(0,internal/* mount_component */.wSR)(daycheckboxinput, target, anchor);
+			(0,internal/* mount_component */.wSR)(textbuttoncheckboxinput, target, anchor);
 			current = true;
 		},
 		p(ctx, dirty) {
-			const daycheckboxinput_changes = {};
+			const textbuttoncheckboxinput_changes = {};
 
 			if (!updating_group && dirty & /*doc*/ 1) {
 				updating_group = true;
-				daycheckboxinput_changes.group = /*doc*/ ctx[0].recurrence.byday;
+				textbuttoncheckboxinput_changes.group = /*doc*/ ctx[0].recurrence.bymonth;
 				(0,internal/* add_flush_callback */.Jk$)(() => updating_group = false);
 			}
 
-			daycheckboxinput.$set(daycheckboxinput_changes);
+			textbuttoncheckboxinput.$set(textbuttoncheckboxinput_changes);
 		},
 		i(local) {
 			if (current) return;
-			(0,internal/* transition_in */.c7F)(daycheckboxinput.$$.fragment, local);
+			(0,internal/* transition_in */.c7F)(textbuttoncheckboxinput.$$.fragment, local);
 			current = true;
 		},
 		o(local) {
-			(0,internal/* transition_out */.Tn8)(daycheckboxinput.$$.fragment, local);
+			(0,internal/* transition_out */.Tn8)(textbuttoncheckboxinput.$$.fragment, local);
 			current = false;
 		},
 		d(detaching) {
-			(0,internal/* destroy_component */.Hbl)(daycheckboxinput, detaching);
+			(0,internal/* destroy_component */.Hbl)(textbuttoncheckboxinput, detaching);
 		}
 	};
 }
@@ -1668,7 +2855,7 @@ function Recurrence_svelte_create_fragment(ctx) {
 	let current;
 
 	function checkboxinput_val_binding(value) {
-		/*checkboxinput_val_binding*/ ctx[1](value);
+		/*checkboxinput_val_binding*/ ctx[3](value);
 	}
 
 	let checkboxinput_props = { label: "recur" };
@@ -1754,15 +2941,39 @@ function Recurrence_svelte_create_fragment(ctx) {
 }
 
 function Recurrence_svelte_instance($$self, $$props, $$invalidate) {
+	let recurrenceText;
 	let { doc } = $$props;
 
 	function updateRecurrence(recur) {
 		if (!recur) {
 			// remove recurrence data
 			$$invalidate(0, doc.recurrence = {}, doc);
-		} else if (!Object.hasOwn(doc.recurrence, 'byday')) {
+		} else if (!Object.hasOwn(doc.recurrence, 'byweekday')) {
 			// add new oject when existing pattern doesn't exist
 			$$invalidate(0, doc.recurrence = new lib_RecurrencePattern(), doc);
+		}
+	}
+
+	// when frequency changes reset values which aren't required
+	function updateRecurrenceValues() {
+		//console.log('update recurrence required values');        
+		let props = Object.keys(RecurrenceDisplayEnums);
+
+		props.forEach(p => {
+			if (!RecurrenceDisplayEnums[p].includes(doc.recurrence.freq)) {
+				//console.log('reset ' + p);
+				$$invalidate(0, doc.recurrence[p] = [], doc);
+
+				if (doc.recurrence.freq !== 'MONTHLY') {
+					$$invalidate(0, doc.recurrence.nths = [], doc);
+				}
+			}
+		});
+	}
+
+	function getRecurrenceText(recurrencePattern) {
+		if (Object.hasOwn(recurrencePattern, 'byweekday')) {
+			return rruleText(convertToRRule(recurrencePattern));
 		}
 	}
 
@@ -1771,6 +2982,16 @@ function Recurrence_svelte_instance($$self, $$props, $$invalidate) {
 			doc.recur = value;
 			$$invalidate(0, doc);
 		}
+	}
+
+	function input_input_handler() {
+		doc.recurrence.dtstart = this.value;
+		$$invalidate(0, doc);
+	}
+
+	function input_input_handler_1() {
+		doc.recurrence.dtend = this.value;
+		$$invalidate(0, doc);
 	}
 
 	function numberinput_val_binding(value) {
@@ -1785,9 +3006,30 @@ function Recurrence_svelte_instance($$self, $$props, $$invalidate) {
 		$$invalidate(0, doc);
 	}
 
-	function daycheckboxinput_group_binding(value) {
-		if ($$self.$$.not_equal(doc.recurrence.byday, value)) {
-			doc.recurrence.byday = value;
+	function textbuttoncheckboxinput_group_binding(value) {
+		if ($$self.$$.not_equal(doc.recurrence.byweekday, value)) {
+			doc.recurrence.byweekday = value;
+			$$invalidate(0, doc);
+		}
+	}
+
+	function tagcheckboxbar_selected_binding(value) {
+		if ($$self.$$.not_equal(doc.recurrence.nth, value)) {
+			doc.recurrence.nth = value;
+			$$invalidate(0, doc);
+		}
+	}
+
+	function textbuttoncheckboxinput_group_binding_1(value) {
+		if ($$self.$$.not_equal(doc.recurrence.bymonthday, value)) {
+			doc.recurrence.bymonthday = value;
+			$$invalidate(0, doc);
+		}
+	}
+
+	function textbuttoncheckboxinput_group_binding_2(value) {
+		if ($$self.$$.not_equal(doc.recurrence.bymonth, value)) {
+			doc.recurrence.bymonth = value;
 			$$invalidate(0, doc);
 		}
 	}
@@ -1802,14 +3044,25 @@ function Recurrence_svelte_instance($$self, $$props, $$invalidate) {
 				updateRecurrence(doc.recur);
 			}
 		}
+
+		if ($$self.$$.dirty & /*doc*/ 1) {
+			$: $$invalidate(1, recurrenceText = getRecurrenceText(doc.recurrence));
+		}
 	};
 
 	return [
 		doc,
+		recurrenceText,
+		updateRecurrenceValues,
 		checkboxinput_val_binding,
+		input_input_handler,
+		input_input_handler_1,
 		numberinput_val_binding,
 		select_change_handler,
-		daycheckboxinput_group_binding
+		textbuttoncheckboxinput_group_binding,
+		tagcheckboxbar_selected_binding,
+		textbuttoncheckboxinput_group_binding_1,
+		textbuttoncheckboxinput_group_binding_2
 	];
 }
 
@@ -1821,6 +3074,7 @@ class Recurrence extends internal/* SvelteComponent */.r7T {
 }
 
 /* harmony default export */ const Recurrence_svelte = (Recurrence);
+
 ;// ./src/lib/Modal.js
 
 const Modal_defaults = {
@@ -5068,7 +6322,7 @@ function Activity_svelte_get_each_context(ctx, list, i) {
 }
 
 // (164:20) {#if doc.occurredAt && (doc.complete || doc.recur)}
-function create_if_block_2(ctx) {
+function Activity_svelte_create_if_block_2(ctx) {
 	let t;
 
 	return {
@@ -5424,7 +6678,7 @@ function Activity_svelte_create_fragment(ctx) {
 	internal/* binding_callbacks */.Dnk.push(() => (0,internal/* bind */.oIE)(tagindicator, 'tags', tagindicator_tags_binding));
 	targeticon = new target_svelte({});
 	saveicon0 = new save_svelte({});
-	let if_block0 = /*doc*/ ctx[0].occurredAt && (/*doc*/ ctx[0].complete || /*doc*/ ctx[0].recur) && create_if_block_2(ctx);
+	let if_block0 = /*doc*/ ctx[0].occurredAt && (/*doc*/ ctx[0].complete || /*doc*/ ctx[0].recur) && Activity_svelte_create_if_block_2(ctx);
 
 	modalbtn0 = new ModalBtn_svelte({
 			props: {
@@ -5772,7 +7026,7 @@ function Activity_svelte_create_fragment(ctx) {
 				if (if_block0) {
 					if_block0.p(ctx, dirty);
 				} else {
-					if_block0 = create_if_block_2(ctx);
+					if_block0 = Activity_svelte_create_if_block_2(ctx);
 					if_block0.c();
 					if_block0.m(p0, null);
 				}
@@ -6212,455 +7466,6 @@ class Activity extends internal/* SvelteComponent */.r7T {
 
 /* harmony default export */ const Activity_svelte = (Activity);
 
-;// ./src/lib/input/TagCheckbox.svelte
-/* src/lib/input/TagCheckbox.svelte generated by Svelte v4.2.19 */
-
-
-
-
-
-
-function TagCheckbox_svelte_create_fragment(ctx) {
-	let label;
-	let input;
-	let t0;
-	let span;
-	let t1;
-	let mounted;
-	let dispose;
-
-	return {
-		c() {
-			label = (0,internal/* element */.ND4)("label");
-			input = (0,internal/* element */.ND4)("input");
-			t0 = (0,internal/* space */.xem)();
-			span = (0,internal/* element */.ND4)("span");
-			t1 = (0,internal/* text */.Qq7)(/*tagName*/ ctx[0]);
-			(0,internal/* attr */.CFu)(input, "name", /*tagName*/ ctx[0]);
-			(0,internal/* attr */.CFu)(input, "type", "checkbox");
-			input.disabled = /*disabled*/ ctx[2];
-			(0,internal/* attr */.CFu)(input, "class", "svelte-yr11cf");
-			(0,internal/* attr */.CFu)(label, "class", "tag svelte-yr11cf");
-			(0,internal/* attr */.CFu)(label, "data-checked", /*checked*/ ctx[1]);
-			(0,internal/* set_style */.hgi)(label, "background-color", /*tag*/ ctx[3] ? /*tag*/ ctx[3].hex : 'transparent');
-		},
-		m(target, anchor) {
-			(0,internal/* insert */.Yry)(target, label, anchor);
-			(0,internal/* append */.BCw)(label, input);
-			input.checked = /*checked*/ ctx[1];
-			(0,internal/* set_input_value */.Gvd)(input, /*tagName*/ ctx[0]);
-			(0,internal/* append */.BCw)(label, t0);
-			(0,internal/* append */.BCw)(label, span);
-			(0,internal/* append */.BCw)(span, t1);
-
-			if (!mounted) {
-				dispose = (0,internal/* listen */.KTR)(input, "change", /*input_change_handler*/ ctx[7]);
-				mounted = true;
-			}
-		},
-		p(ctx, [dirty]) {
-			if (dirty & /*tagName*/ 1) {
-				(0,internal/* attr */.CFu)(input, "name", /*tagName*/ ctx[0]);
-			}
-
-			if (dirty & /*disabled*/ 4) {
-				input.disabled = /*disabled*/ ctx[2];
-			}
-
-			if (dirty & /*checked*/ 2) {
-				input.checked = /*checked*/ ctx[1];
-			}
-
-			if (dirty & /*tagName*/ 1) {
-				(0,internal/* set_input_value */.Gvd)(input, /*tagName*/ ctx[0]);
-			}
-
-			if (dirty & /*tagName*/ 1) (0,internal/* set_data */.iQh)(t1, /*tagName*/ ctx[0]);
-
-			if (dirty & /*checked*/ 2) {
-				(0,internal/* attr */.CFu)(label, "data-checked", /*checked*/ ctx[1]);
-			}
-
-			if (dirty & /*tag*/ 8) {
-				(0,internal/* set_style */.hgi)(label, "background-color", /*tag*/ ctx[3] ? /*tag*/ ctx[3].hex : 'transparent');
-			}
-		},
-		i: internal/* noop */.lQ1,
-		o: internal/* noop */.lQ1,
-		d(detaching) {
-			if (detaching) {
-				(0,internal/* detach */.YoD)(label);
-			}
-
-			mounted = false;
-			dispose();
-		}
-	};
-}
-
-function TagCheckbox_svelte_instance($$self, $$props, $$invalidate) {
-	let $settings;
-	(0,internal/* component_subscribe */.j0C)($$self, settings, $$value => $$invalidate(8, $settings = $$value));
-	let tag;
-	let { tagName } = $$props;
-	let { checked } = $$props;
-	let { group } = $$props;
-	let { disabled = false } = $$props;
-	let { selectMax = 0 } = $$props;
-	let { selectedVal } = $$props;
-
-	// get tag object if available
-	function setTag(name) {
-		if (name) {
-			if (Object.hasOwn($settings.tags, name)) {
-				$$invalidate(3, tag = $settings.tags[name]);
-			}
-
-			if (Object.hasOwn($settings.activityTypes, name)) {
-				$$invalidate(3, tag = $settings.activityTypes[name]);
-			}
-		}
-	}
-
-	function updateCheckbox(group) {
-		$$invalidate(1, checked = group.indexOf(tagName) >= 0);
-	}
-
-	function updateGroup(checked) {
-		const intSelectMax = parseInt(selectMax);
-		const index = group.indexOf(tagName);
-
-		if (checked) {
-			if (index < 0) {
-				if (intSelectMax > 0) {
-					if (intSelectMax === 1) {
-						$$invalidate(4, group = [tagName]);
-						$$invalidate(5, selectedVal = tagName);
-					} else if (group.length <= intSelectMax) {
-						group.push(tagName);
-					}
-				} else {
-					group.push(tagName);
-				}
-
-				$$invalidate(4, group);
-			}
-		} else {
-			if (index >= 0) {
-				group.splice(index, 1);
-				$$invalidate(4, group);
-			}
-		}
-	} //        console.log(group);
-
-	function input_change_handler() {
-		checked = this.checked;
-		tagName = this.value;
-		$$invalidate(1, checked);
-		$$invalidate(0, tagName);
-	}
-
-	$$self.$$set = $$props => {
-		if ('tagName' in $$props) $$invalidate(0, tagName = $$props.tagName);
-		if ('checked' in $$props) $$invalidate(1, checked = $$props.checked);
-		if ('group' in $$props) $$invalidate(4, group = $$props.group);
-		if ('disabled' in $$props) $$invalidate(2, disabled = $$props.disabled);
-		if ('selectMax' in $$props) $$invalidate(6, selectMax = $$props.selectMax);
-		if ('selectedVal' in $$props) $$invalidate(5, selectedVal = $$props.selectedVal);
-	};
-
-	$$self.$$.update = () => {
-		if ($$self.$$.dirty & /*tagName*/ 1) {
-			$: setTag(tagName);
-		}
-
-		if ($$self.$$.dirty & /*group*/ 16) {
-			$: updateCheckbox(group);
-		}
-
-		if ($$self.$$.dirty & /*checked*/ 2) {
-			$: updateGroup(checked);
-		}
-	};
-
-	return [
-		tagName,
-		checked,
-		disabled,
-		tag,
-		group,
-		selectedVal,
-		selectMax,
-		input_change_handler
-	];
-}
-
-class TagCheckbox extends internal/* SvelteComponent */.r7T {
-	constructor(options) {
-		super();
-
-		(0,internal/* init */.TsN)(this, options, TagCheckbox_svelte_instance, TagCheckbox_svelte_create_fragment, internal/* safe_not_equal */.jXN, {
-			tagName: 0,
-			checked: 1,
-			group: 4,
-			disabled: 2,
-			selectMax: 6,
-			selectedVal: 5
-		});
-	}
-}
-
-/* harmony default export */ const TagCheckbox_svelte = (TagCheckbox);
-
-;// ./src/lib/input/TagCheckboxBar.svelte
-/* src/lib/input/TagCheckboxBar.svelte generated by Svelte v4.2.19 */
-
-
-
-
-
-function TagCheckboxBar_svelte_get_each_context(ctx, list, i) {
-	const child_ctx = ctx.slice();
-	child_ctx[9] = list[i];
-	return child_ctx;
-}
-
-// (17:4) {#each tags as tag}
-function TagCheckboxBar_svelte_create_each_block(ctx) {
-	let tagcheckbox;
-	let updating_selectedVal;
-	let updating_group;
-	let current;
-
-	function tagcheckbox_selectedVal_binding(value) {
-		/*tagcheckbox_selectedVal_binding*/ ctx[7](value);
-	}
-
-	function tagcheckbox_group_binding(value) {
-		/*tagcheckbox_group_binding*/ ctx[8](value);
-	}
-
-	let tagcheckbox_props = {
-		tagName: /*tag*/ ctx[9],
-		selectMax: /*selectMax*/ ctx[6],
-		disabled: /*disabled*/ ctx[5]
-	};
-
-	if (/*value*/ ctx[1] !== void 0) {
-		tagcheckbox_props.selectedVal = /*value*/ ctx[1];
-	}
-
-	if (/*selected*/ ctx[0] !== void 0) {
-		tagcheckbox_props.group = /*selected*/ ctx[0];
-	}
-
-	tagcheckbox = new TagCheckbox_svelte({ props: tagcheckbox_props });
-	internal/* binding_callbacks */.Dnk.push(() => (0,internal/* bind */.oIE)(tagcheckbox, 'selectedVal', tagcheckbox_selectedVal_binding));
-	internal/* binding_callbacks */.Dnk.push(() => (0,internal/* bind */.oIE)(tagcheckbox, 'group', tagcheckbox_group_binding));
-
-	return {
-		c() {
-			(0,internal/* create_component */.N0i)(tagcheckbox.$$.fragment);
-		},
-		m(target, anchor) {
-			(0,internal/* mount_component */.wSR)(tagcheckbox, target, anchor);
-			current = true;
-		},
-		p(ctx, dirty) {
-			const tagcheckbox_changes = {};
-			if (dirty & /*tags*/ 16) tagcheckbox_changes.tagName = /*tag*/ ctx[9];
-			if (dirty & /*selectMax*/ 64) tagcheckbox_changes.selectMax = /*selectMax*/ ctx[6];
-			if (dirty & /*disabled*/ 32) tagcheckbox_changes.disabled = /*disabled*/ ctx[5];
-
-			if (!updating_selectedVal && dirty & /*value*/ 2) {
-				updating_selectedVal = true;
-				tagcheckbox_changes.selectedVal = /*value*/ ctx[1];
-				(0,internal/* add_flush_callback */.Jk$)(() => updating_selectedVal = false);
-			}
-
-			if (!updating_group && dirty & /*selected*/ 1) {
-				updating_group = true;
-				tagcheckbox_changes.group = /*selected*/ ctx[0];
-				(0,internal/* add_flush_callback */.Jk$)(() => updating_group = false);
-			}
-
-			tagcheckbox.$set(tagcheckbox_changes);
-		},
-		i(local) {
-			if (current) return;
-			(0,internal/* transition_in */.c7F)(tagcheckbox.$$.fragment, local);
-			current = true;
-		},
-		o(local) {
-			(0,internal/* transition_out */.Tn8)(tagcheckbox.$$.fragment, local);
-			current = false;
-		},
-		d(detaching) {
-			(0,internal/* destroy_component */.Hbl)(tagcheckbox, detaching);
-		}
-	};
-}
-
-function TagCheckboxBar_svelte_create_fragment(ctx) {
-	let section;
-	let section_class_value;
-	let current;
-	let each_value = (0,internal/* ensure_array_like */.rv_)(/*tags*/ ctx[4]);
-	let each_blocks = [];
-
-	for (let i = 0; i < each_value.length; i += 1) {
-		each_blocks[i] = TagCheckboxBar_svelte_create_each_block(TagCheckboxBar_svelte_get_each_context(ctx, each_value, i));
-	}
-
-	const out = i => (0,internal/* transition_out */.Tn8)(each_blocks[i], 1, 1, () => {
-		each_blocks[i] = null;
-	});
-
-	return {
-		c() {
-			section = (0,internal/* element */.ND4)("section");
-
-			for (let i = 0; i < each_blocks.length; i += 1) {
-				each_blocks[i].c();
-			}
-
-			(0,internal/* attr */.CFu)(section, "class", section_class_value = ['tags'].concat(/*classes*/ ctx[3]).join(' '));
-			(0,internal/* attr */.CFu)(section, "name", /*name*/ ctx[2]);
-		},
-		m(target, anchor) {
-			(0,internal/* insert */.Yry)(target, section, anchor);
-
-			for (let i = 0; i < each_blocks.length; i += 1) {
-				if (each_blocks[i]) {
-					each_blocks[i].m(section, null);
-				}
-			}
-
-			current = true;
-		},
-		p(ctx, [dirty]) {
-			if (dirty & /*tags, selectMax, disabled, value, selected*/ 115) {
-				each_value = (0,internal/* ensure_array_like */.rv_)(/*tags*/ ctx[4]);
-				let i;
-
-				for (i = 0; i < each_value.length; i += 1) {
-					const child_ctx = TagCheckboxBar_svelte_get_each_context(ctx, each_value, i);
-
-					if (each_blocks[i]) {
-						each_blocks[i].p(child_ctx, dirty);
-						(0,internal/* transition_in */.c7F)(each_blocks[i], 1);
-					} else {
-						each_blocks[i] = TagCheckboxBar_svelte_create_each_block(child_ctx);
-						each_blocks[i].c();
-						(0,internal/* transition_in */.c7F)(each_blocks[i], 1);
-						each_blocks[i].m(section, null);
-					}
-				}
-
-				(0,internal/* group_outros */.V44)();
-
-				for (i = each_value.length; i < each_blocks.length; i += 1) {
-					out(i);
-				}
-
-				(0,internal/* check_outros */.GYV)();
-			}
-
-			if (!current || dirty & /*classes*/ 8 && section_class_value !== (section_class_value = ['tags'].concat(/*classes*/ ctx[3]).join(' '))) {
-				(0,internal/* attr */.CFu)(section, "class", section_class_value);
-			}
-
-			if (!current || dirty & /*name*/ 4) {
-				(0,internal/* attr */.CFu)(section, "name", /*name*/ ctx[2]);
-			}
-		},
-		i(local) {
-			if (current) return;
-
-			for (let i = 0; i < each_value.length; i += 1) {
-				(0,internal/* transition_in */.c7F)(each_blocks[i]);
-			}
-
-			current = true;
-		},
-		o(local) {
-			each_blocks = each_blocks.filter(Boolean);
-
-			for (let i = 0; i < each_blocks.length; i += 1) {
-				(0,internal/* transition_out */.Tn8)(each_blocks[i]);
-			}
-
-			current = false;
-		},
-		d(detaching) {
-			if (detaching) {
-				(0,internal/* detach */.YoD)(section);
-			}
-
-			(0,internal/* destroy_each */.ppq)(each_blocks, detaching);
-		}
-	};
-}
-
-function TagCheckboxBar_svelte_instance($$self, $$props, $$invalidate) {
-	let { name } = $$props;
-	let { classes = [] } = $$props;
-	let { tags } = $$props;
-	let { selected = [] } = $$props;
-	let { value } = $$props;
-	let { disabled = false } = $$props;
-	let { selectMax = 0 } = $$props;
-
-	function tagcheckbox_selectedVal_binding(value$1) {
-		value = value$1;
-		$$invalidate(1, value);
-	}
-
-	function tagcheckbox_group_binding(value) {
-		selected = value;
-		$$invalidate(0, selected);
-	}
-
-	$$self.$$set = $$props => {
-		if ('name' in $$props) $$invalidate(2, name = $$props.name);
-		if ('classes' in $$props) $$invalidate(3, classes = $$props.classes);
-		if ('tags' in $$props) $$invalidate(4, tags = $$props.tags);
-		if ('selected' in $$props) $$invalidate(0, selected = $$props.selected);
-		if ('value' in $$props) $$invalidate(1, value = $$props.value);
-		if ('disabled' in $$props) $$invalidate(5, disabled = $$props.disabled);
-		if ('selectMax' in $$props) $$invalidate(6, selectMax = $$props.selectMax);
-	};
-
-	return [
-		selected,
-		value,
-		name,
-		classes,
-		tags,
-		disabled,
-		selectMax,
-		tagcheckbox_selectedVal_binding,
-		tagcheckbox_group_binding
-	];
-}
-
-class TagCheckboxBar extends internal/* SvelteComponent */.r7T {
-	constructor(options) {
-		super();
-
-		(0,internal/* init */.TsN)(this, options, TagCheckboxBar_svelte_instance, TagCheckboxBar_svelte_create_fragment, internal/* safe_not_equal */.jXN, {
-			name: 2,
-			classes: 3,
-			tags: 4,
-			selected: 0,
-			value: 1,
-			disabled: 5,
-			selectMax: 6
-		});
-	}
-}
-
-/* harmony default export */ const TagCheckboxBar_svelte = (TagCheckboxBar);
 ;// ./src/components/DocBrowser.svelte
 /* src/components/DocBrowser.svelte generated by Svelte v4.2.19 */
 
@@ -7778,7 +8583,7 @@ const get_control_slot_changes = dirty => ({});
 const get_control_slot_context = ctx => ({});
 
 // (24:4) {#if iconSide === 'right'}
-function create_if_block_3(ctx) {
+function MenuItem_svelte_create_if_block_3(ctx) {
 	let current;
 	const control_slot_template = /*#slots*/ ctx[3].control;
 	const control_slot = (0,internal/* create_slot */.Of3)(control_slot_template, ctx, /*$$scope*/ ctx[2], get_control_slot_context);
@@ -7932,7 +8737,7 @@ function MenuItem_svelte_create_fragment(ctx) {
 	let t2;
 	let t3;
 	let current;
-	let if_block0 = /*iconSide*/ ctx[0] === 'right' && create_if_block_3(ctx);
+	let if_block0 = /*iconSide*/ ctx[0] === 'right' && MenuItem_svelte_create_if_block_3(ctx);
 	let if_block1 = /*iconSide*/ ctx[0] === 'right' && MenuItem_svelte_create_if_block_2(ctx);
 	const icon_slot_template = /*#slots*/ ctx[3].icon;
 	const icon_slot = (0,internal/* create_slot */.Of3)(icon_slot_template, ctx, /*$$scope*/ ctx[2], MenuItem_svelte_get_icon_slot_context);
@@ -7979,7 +8784,7 @@ function MenuItem_svelte_create_fragment(ctx) {
 						(0,internal/* transition_in */.c7F)(if_block0, 1);
 					}
 				} else {
-					if_block0 = create_if_block_3(ctx);
+					if_block0 = MenuItem_svelte_create_if_block_3(ctx);
 					if_block0.c();
 					(0,internal/* transition_in */.c7F)(if_block0, 1);
 					if_block0.m(button, t0);
@@ -11263,8 +12068,8 @@ window.app = app;
 /******/ 	// startup
 /******/ 	// Load entry module and return exports
 /******/ 	// This entry module depends on other loaded chunks and execution need to be delayed
-/******/ 	__webpack_require__.O(undefined, [522], () => (__webpack_require__(114)))
-/******/ 	var __webpack_exports__ = __webpack_require__.O(undefined, [522], () => (__webpack_require__(292)))
+/******/ 	__webpack_require__.O(undefined, [704], () => (__webpack_require__(114)))
+/******/ 	var __webpack_exports__ = __webpack_require__.O(undefined, [704], () => (__webpack_require__(928)))
 /******/ 	__webpack_exports__ = __webpack_require__.O(__webpack_exports__);
 /******/ 	
 /******/ })()
