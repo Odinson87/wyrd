@@ -1,5 +1,6 @@
 class ActivityDoc {
     constructor(name = ''){
+        this.schema = 'activity';
         this.name = name;
         this.type = 'Todo';
         this.complete = false;

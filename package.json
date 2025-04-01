@@ -23,6 +23,7 @@
     "lodash": "^4.17.11",
     "pouchdb-browser": "^9.0.0",
     "pouchdb-find": "^9.0.0",
+    "relational-pouch": "^4.1.1",
     "rrule": "^2.8.1",
     "uuid": "^10.0.0"
   }

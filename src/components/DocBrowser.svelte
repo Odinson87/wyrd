@@ -1,14 +1,15 @@
 <script>
-    import { onMount } from 'svelte'
-    import { sortBy } from 'lodash'
-    import PouchDB from 'pouchdb-browser'
+    import { onMount } from 'svelte';
+    import { sortBy } from 'lodash';
+    import PouchDB from 'pouchdb-browser';
+    import { DB } from '../lib/Db.js';
     
-    import { addToast, settings } from '../lib/stores'
-    import Filters from '../lib/filters'
-    import ActivityDoc from '../lib/ActivityDoc'
-    import Activity from './Activity.svelte'
-    import AddIcon from '../lib/icons/plus.svelte'
-    import TagCheckboxBar from '../lib/input/TagCheckboxBar.svelte'
+    import { addToast, settings } from '../lib/stores';
+    import Filters from '../lib/filters';
+    import ActivityDoc from '../lib/ActivityDoc';
+    import Activity from './Activity.svelte';
+    import AddIcon from '../lib/icons/plus.svelte';
+    import TagCheckboxBar from '../lib/input/TagCheckboxBar.svelte';
 
     // Set up local PouchDB and continuous replication to remote CouchDB
     let db = new PouchDB('db', {revs_limit: 1, auto_compaction: true})
@@ -110,10 +111,9 @@
     // in a Redux reducer. It also saves us from having to rebuild the local state todos from the data we sent
     // to the database and the `_id` and `_rev` values that were sent back.
     async function updateItems() {
-        const allDocs = await db.allDocs({
-            include_docs: true
-        })
-        items = allDocs.rows.map(row => row.doc)
+        const response = await DB.db.rel.find('activity');
+        console.log(response);
+        items = response.activities;
         isLoading = false
     }
   
@@ -123,10 +123,12 @@
         doc.complete = false; 
         doc.createdAt = new Date().toISOString()
 
-        const addition = await db.post(doc)
+        const addition = await DB.save(doc);
         if (addition.ok) {
             await updateItems()
         }
+
+
         newDoc = new ActivityDoc;
         addNewItem = false;
     }
@@ -150,7 +152,7 @@
   
     async function updateDoc(event) {
         const { doc: doc } = event.detail
-        const update = await db.put(doc)
+        const update = await DB.save(doc);
         if (update.ok) {
             await updateItems()
         }

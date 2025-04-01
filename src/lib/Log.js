@@ -10,6 +10,7 @@ class Log {
         sentiment = null,
         username = null
     ){
+        this.schema = 'log';
         this.createdAt = (new Date()).toISOString();
         this.occurredAt = getDateTimeStr(occurredAt); 
         this.text = text ? text.replace(/(<([^>]+)>)/gi, "") : null;
